@@ -5,7 +5,8 @@
 			1:15am 28/11/19 Still needs AI... But now kills king if possible
 			3:10am 28/11/19 Added all 16 original animals! Time for the explansion...
 			3:40am 28/11/19 Began adding AI to check all pieces for opponent capture
-			7:12pm 28/11/19 AI at satisfactory beginner level..-->
+			7:12pm 28/11/19 AI at satisfactory beginner level..
+			2:47am 18/12/19 Added custom cards and pushed to github!-->
 <head>
 	<style type="text/css">
 		table {
@@ -92,8 +93,8 @@
 		
 		function bespoke() { customList = true;
 			cardList = [];
-			for (var i = 0; i < 5; i++){
-				cardList.push(prompt("Type in Card No." + (i+1) + ":"));
+			for (var i = 0; i < 5; i++){ // check if allCards.includes(prompt) else i--
+				cardList.push(prompt("Type in Card No." + (i+1) + ":").toLowerCase());
 			}
 			document.getElementById("butt2").style.display = "none";
 			// play();
@@ -131,7 +132,7 @@
 						imgList[pos-1].src = chosenPiece;
 						imgList[chosenPieceNo].src = "images/white.png";
 						swapNext();	deselect(); deselectCards();
-						p2turn = true; checkWin(); flipBoard(); 
+						p2turn = true; checkWin(); setTimeout(flipBoard, 1000); 
 						// if(gameOn) setTimeout(enemyturn, 100); //enemyturn(); 
 					}
 	
@@ -159,7 +160,7 @@
 					highlight(pos-1);
 				}
 				else if(p2turn&&(current.includes('white')||isPlayerPiece(current))&&p2cardselected&&imgList[pos-1].style.background == "red") {//&&enemychosenPiece!=null
-					player2move(pos);enemySwapNext(r); flipBoard(); setTimeout(checkWin, 1000);
+					player2move(pos);enemySwapNext(r); setTimeout(flipBoard, 1000); setTimeout(checkWin, 1000);
 					deselect();	deselectCards();
 					 // ??
 					p2turn = false; p2cardselected=false;
@@ -792,6 +793,7 @@
 			setTimeout(function(){waitalert(int)}, 500);
 			setTimeout(function(){
 				document.getElementById("butt1").style.display = "initial";
+				document.getElementById("butt2").style.display = "initial";
 				imgList[25].style.display = "none";
 				imgList[26].style.display = "none";
 				imgList[27].style.display = "none";
