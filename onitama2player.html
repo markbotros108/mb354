@@ -52,12 +52,17 @@
 			top: 77%;
 			font-size: 102px;
 		}
+		
+		#butt2 {
+			top: 87%;
+		}
 	</style>
 	<title>Onitama 2 Player</title>
 	<!-- <link rel="icon" href="images/boardicon.png"> -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script type="text/javascript">
 		var imgList = document.getElementsByTagName('img');
+		var customList = false;
 		var pos = 0, chosenPiece, chosenPieceNo = 0, gameOn = false, turn=0, p2turn, p2cardselected;
 		var cardList = [], enemySelected, enemychosenPiece=0, enemyPiecesLeft=5, r=0;
 		
@@ -84,9 +89,19 @@
 			}
 			return newOrder;
 		}
+		
+		function bespoke() { customList = true;
+			cardList = [];
+			for (var i = 0; i < 5; i++){
+				cardList.push(prompt("Type in Card No." + (i+1) + ":"));
+			}
+			document.getElementById("butt2").style.display = "none";
+			// play();
+		}
 
 		function play() { gameOn = true; //console.clear(); // Don't need unless logging all moves 
-			cardList = ["crane", "crab", "tiger", "rabbit", "elephant", "dragon", "goose", "rooster", "frog", "monkey", "mantis", "eel", "ox", "cobra", "horse", "boar"];
+			if (!customList) cardList = ["crane", "crab", "tiger", "rabbit", "elephant", "dragon", "goose", "rooster", "frog", "monkey", "mantis", "eel", "ox", "cobra", "horse", "boar"];
+			else customList = false;
 			cardList = shuffle(cardList);
 			document.getElementById("butt1").style.display = "none";
 			document.getElementById("yourcards").style.display = "initial";
@@ -833,7 +848,7 @@
 		<td><img onclick="select(25);"></td>
 	</tr>
 </table>
-<button id="butt1" onclick="play();">New Game</button>
+<button id="butt1" onclick="play();">New Game</button> <button id="butt2" onclick="bespoke();">Choose Cards</button>
 <div id="yourcards" style="display: none;"><img src="" onclick="select(26);"><img src="" onclick="select(27);"></div>
 <div id="notyours" style="display: none;"><img src="" onclick="select(28);"><img src="" onclick="select(29);"></div>
 <div id="next" style="display: none;"><img src=""><hr>Next</div>
