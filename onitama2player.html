@@ -67,6 +67,7 @@
 		var customList = false;
 		var pos = 0, chosenPiece, chosenPieceNo = 0, gameOn = false, turn=0, p2turn, p2cardselected;
 		var cardList = [], enemySelected, enemychosenPiece=0, enemyPiecesLeft=5, r=0;
+		var allCards = ["crane", "crab", "tiger", "rabbit", "elephant", "dragon", "goose", "rooster", "frog", "monkey", "mantis", "eel", "ox", "cobra", "horse", "boar"];
 		
 		$(document).ready( function(){
 			setup();
@@ -102,8 +103,8 @@
 		}
 
 		function play() { gameOn = true; //console.clear(); // Don't need unless logging all moves 
-			if (!customList) cardList = ["crane", "crab", "tiger", "rabbit", "elephant", "dragon", "goose", "rooster", "frog", "monkey", "mantis", "eel", "ox", "cobra", "horse", "boar"];
-			else {customList = false; document.getElementById("butt2").style.display = "none";}
+			if (!customList) { cardList = allCards; document.getElementById("butt2").style.display = "none"; }
+			else customList = false; 
 			cardList = shuffle(cardList);
 			document.getElementById("butt1").style.display = "none";
 			document.getElementById("yourcards").style.display = "initial";
