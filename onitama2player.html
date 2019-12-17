@@ -102,7 +102,7 @@
 
 		function play() { gameOn = true; //console.clear(); // Don't need unless logging all moves 
 			if (!customList) cardList = ["crane", "crab", "tiger", "rabbit", "elephant", "dragon", "goose", "rooster", "frog", "monkey", "mantis", "eel", "ox", "cobra", "horse", "boar"];
-			else customList = false;
+			else {customList = false; document.getElementById("butt2").style.display = "none";}
 			cardList = shuffle(cardList);
 			document.getElementById("butt1").style.display = "none";
 			document.getElementById("yourcards").style.display = "initial";
