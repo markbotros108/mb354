@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html> <!--11:40am 26/11/19 Began 
+			3:40am 27/11/19 Working Player turn without moving enemy turn 
+			4:40pm 27/11/19 Working Enemy turn (currently have to choose enemy piece), just needs AI
+			1:15am 28/11/19 Still needs AI... But now kills king if possible
+			3:10am 28/11/19 Added all 16 original animals! Time for the explansion...
+			3:40am 28/11/19 Began adding AI to check all pieces for opponent capture
+			7:12pm 28/11/19 AI at satisfactory beginner level..-->
+<head>
+	<style type="text/css">
+		table {
+			border: solid;
+			position: absolute;
+			left: 30%;
+			top: 20%;
+		}
+
+		img {
+			height: 100px;
+			padding: 5px;
+		}
+
+		#yourcards, #notyours, #next {
+			position: absolute;
+			top: 65%;
+			left: 5%;
+		}
+
+		#next {
+			top: 50%;
+			left: 62%;
+			border: solid black;
+			padding: 10px;
+			font-size: 32px;
+			/*color: brown;*/
+		}
+
+		#notyours {
+			top: 1%;
+			left: 60%;
+			transform: rotate(180deg);
+		}
+
+		#yourcards img, #notyours img, #next img {
+			height: 300px;
+			padding: 10px;
+		}
+
+		button {
+			position: absolute;
+			left: 41%;
+			top: 83%;
+			font-size: 26px;
+		}
+	</style>
+	<title>Onitama 2 Player</title>
+	<!-- <link rel="icon" href="images/boardicon.png"> -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		var imgList = document.getElementsByTagName('img');
+		var pos = 0, chosenPiece, chosenPieceNo = 0, gameOn = false, turn=0, p2turn, p2cardselected;
+		var cardList = [], enemySelected, enemychosenPiece=0, enemyPiecesLeft=5, r=0;
+		
+		$(document).ready( function(){
+			setup();
+			displaygoals();
+			// speed = parseInt(prompt("Game speed in seconds: "));
+		});
+
+		function setup() { 
+			for (var i = 0; i < imgList.length; i++) { pos++;
+				imgList[i].src = "images/white.png";
+			}
+			p2turn = false;
+		}
+
+		function shuffle(list) {
+			var newOrder = [];
+			var len = list.length;
+			for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+				newOrder.push(list[r]);
+				list.splice(r, 1);
+			}
+			return newOrder;
+		}
+
+		function play() { gameOn = true; //console.clear(); // Don't need unless logging all moves 
+			cardList = ["crane", "crab", "tiger", "rabbit", "elephant", "dragon", "goose", "rooster", "frog", "monkey", "mantis", "eel", "ox", "cobra", "horse", "boar"];
+			cardList = shuffle(cardList);
+			document.getElementById("butt1").style.display = "none";
+			document.getElementById("yourcards").style.display = "initial";
+			document.getElementById("notyours").style.display = "initial";
+			document.getElementById("next").style.display = "initial";
+			setup();
+			displaygoals();
+			for (var i = 0; i < imgList.length; i++) {
+				if(i<5) { if(i==2) imgList[i].src = "images/king2.png";
+					else imgList[i].src = "images/pawn2.png";}
+				else if(i>19&&i<25) { if(i==22) imgList[i].src = "images/king.png";
+					else imgList[i].src = "images/pawn.png";}
+				else if (i>=25) imgList[i].src = "images/"+ cardList.pop() +".png";
+				}
+		}
+
+		function select(pos) { var current = imgList[pos-1].src;
+			if (gameOn) {
+				// Card has been selected
+				if(selectedCard()!=null&&!p2turn) {
+					// Change selected card
+					 if (pos==26||pos==27) {deselectCards(); deselect(); imgList[pos-1].style.background = "red";
+					}
+	
+					 // Or move chosen piece to empty or enemy space
+					else if ((current.includes("white")||current.includes("2."))&&imgList[pos-1].style.background == "red") { if(current.includes("2.")) enemyPiecesLeft--;
+						imgList[pos-1].src = chosenPiece;
+						imgList[chosenPieceNo].src = "images/white.png";
+						swapNext();	deselect(); deselectCards();
+						p2turn = true; checkWin(); flipBoard(); 
+						// if(gameOn) setTimeout(enemyturn, 100); //enemyturn(); 
+					}
+	
+					// Or change chosen piece
+					else { deselect(); 
+						// Only if it's not empty or enemy
+						if(!current.includes("white")&&!current.includes("2.")){ highlight(pos-1); chosenPiece = current; chosenPieceNo = pos-1;
+						}
+					}
+				}
+	
+				// Card has not been selected yet
+				else if ((pos==26||pos==27)&&!p2turn) { deselectCards(); deselect(); enemyDeselect();
+					imgList[pos-1].style.background = "red";
+				}
+				else if ((pos==26||pos==27)&&p2turn) {deselectCards(); deselect(); enemyDeselect();
+					imgList[pos-1].style.background = "red"; p2cardselected = true;	r = pos-28;	
+					enemySelected = imgList[27+r];
+				}
+				else if(p2cardselected&&current.includes('2.')&&p2turn) { deselect();
+					// reversehighlight(parseInt(enemychosenPiece));
+				 // deselectCards(); deselect(); enemyDeselect();
+					imgList[pos-1].style.background = "red";		
+					if(isEnemyPiece(findSelected())) enemychosenPiece = findSelected();
+					highlight(pos-1);
+				}
+				else if(p2turn&&(current.includes('white')||isPlayerPiece(current))&&p2cardselected&&imgList[pos-1].style.background == "red") {//&&enemychosenPiece!=null
+					player2move(pos);enemySwapNext(r); flipBoard(); setTimeout(checkWin, 1000);
+					deselect();	deselectCards();
+					 // ??
+					p2turn = false; p2cardselected=false;
+				}
+			}
+		}
+
+		// function p2select(arg) { //p2cardselected=true;
+			//r = arg; /*enemyDeselect();*/
+			// enemySelected = imgList[27+r];
+			// if(p2turn)
+			// imgList[27+r].style.background = "red";
+			// enemyturn();
+		// }
+
+		function flipBoard() {
+			for (var i = 0; i < 12; i++) {
+				var temp = imgList[24-i].src;
+				imgList[24-i].src = imgList[i].src;
+				imgList[i].src = temp;
+			}
+			var temp2 = imgList[27].src;
+				imgList[27].src = imgList[25].src;
+				imgList[25].src = temp2;
+
+				temp2 = imgList[26].src;
+				imgList[26].src = imgList[28].src;
+				imgList[28].src = temp2;
+		}
+
+		function swapNext() {
+			var temp = selectedCard().src;
+			selectedCard().src = imgList[29].src;
+			imgList[29].src = temp;
+		}
+
+		function enemySwapNext(r) { 
+			var temp = imgList[27+r].src;
+			imgList[27+r].src = imgList[29].src;
+			imgList[29].src = temp;
+		}
+
+		function enemyDeselect() {// Math.floor(Math.random()*enemyPiecesLeft)
+			imgList[27].style.background = "white";
+			imgList[28].style.background = "white";
+		}
+
+		function enemyturn() { turn++; console.log("------Turn " + turn +"------");
+			enemyturn = true;
+			// r = parseInt(prompt("Enter card being used: ")); // Math.floor(Math.random()*2);
+			if(isEnemyPiece(findSelected())) enemychosenPiece = findSelected();
+			// prompt("Enter position of piece to move: "); // findEnemyPiece(); 
+			// imgList[27+r].style.background = "red";
+			enemySelected = imgList[27+r];
+			console.log("Moving the "+ getCardName(imgList[enemychosenPiece].src) +" at position " + enemychosenPiece);
+			player2move();
+			// setTimeout(function(){enemySwapNext(r)}, 1000);
+			setTimeout(checkWin, 1000);
+			setTimeout(deselect, 1100);
+			setTimeout(enemyDeselect, 1200);
+			setTimeout(function(){waitalert(0)}, 1200);
+			p2cardselected=false;
+			enemyturn=false;
+		}
+
+		function findEnemyPiece(randompiecenum) { var currentPiece = 0; // Randomly choose enemy piece to move
+			for (var i = 24; i >= 0; i--) { 
+				var current = imgList[i];
+				if(current.src.includes("2.")) {
+					if (currentPiece==randompiecenum) return i;
+					else currentPiece++;
+				}
+			}
+			return null;
+		}
+
+		function findEnemyPiece() { var positions = findEnemyPositions(); // Find best enemy piece to move w/ AI
+			var choices = possibleEnemyMoves();
+			// Try to move to goal if possible
+			for (var i = 0; i < choices.length; i++) {
+				if(choices[i] == 22)
+					return findEnemyKing();
+			}
+
+			// Try to capture that piece first otherwise protect king.. use pieceThatTargets()
+			if(protectking()){ console.log("Protecting the king"); 
+				if(pieceThatTargets(pieceThatTargets(findEnemyKing())) != null)
+					console.log(pieceThatTargets(pieceThatTargets(findEnemyKing())));
+				return findEnemyKing();
+			} 
+
+			// If this move can capture a player piece
+			for (var i = 0; i < choices.length; i++) {
+				if (imgList[choices[i]].src.includes("king")) // Prioritise capturing king first
+					{	console.log("Aiming for the king");
+						return pieceThatTargets(choices[i]);
+					}
+				if (imgList[choices[i]].src.includes("pawn"))
+					{	console.log("Aiming for a pawn at " + choices[i]);
+						// console.log(possiblePlayerMoves() + " does it have " + (choices[i]) );
+						if(possiblePlayerMoves().includes(choices[i])){
+								console.log("But it was Protected...");
+								break;
+							}
+						else return pieceThatTargets(choices[i]);
+					}
+			}
+
+			// If next player move can capture
+			for (var i = 0; i < positions.length; i++) {
+				if(possiblePlayerMoves().includes(positions[i])){
+						console.log("Protecting a piece");
+						return positions[i];
+					}
+			}
+
+			// Don't move anywhere Player can capture
+			for (var i = 0; i < choices.length; i++) {
+				if(possiblePlayerMoves().includes(choices[i])) { var offendingPiece = pieceThatTargets(choices[i]);
+					console.log("I was smart and didn't move "+ offendingPiece +" to " + choices[i]);
+					console.log("Before: " + positions + "Now removing "+ offendingPiece +" index " + positions.indexOf(pieceThatTargets(choices[i])));
+					if(positions.indexOf(offendingPiece)!=-1)
+						positions.splice(positions.indexOf(offendingPiece), 1); // Find the piece that can move here and don't move it
+					console.log("After " + positions);
+				}
+			}
+			console.log("Found no good moves.. randomly choosing a piece out of " + positions);
+			return positions[Math.floor(Math.random()*positions.length)]; // otherwise choose randomly
+		}
+
+		function pieceThatTargets(pos) { 
+			var positions = findEnemyPositions();
+			for (var i = 0; i < positions.length; i++) {
+					var current = positions[i]; 
+
+					enemySelected = imgList[27]; r=0;
+					enemySelected.style.background = "red";
+					reversehighlight(positions[i]);
+					for (var j = 0; j < 25; j++) {
+						var allHighlights = imgList[j];
+						if(allHighlights.style.background=="red"&&j==pos) 
+							return current;
+					}
+					deselect(); enemyDeselect();
+					enemySelected = imgList[28]; r=1;
+					enemySelected.style.background = "red";
+					reversehighlight(positions[i]);
+					for (var j = 0; j < 25; j++) {
+						var allHighlights = imgList[j];
+						if(allHighlights.style.background=="red"&&j==pos) 
+							return current;	
+					}
+					deselect();
+					enemyDeselect();
+			}
+			console.log("ERROR: Couldn't find piece targetting position " + pos);
+		}
+
+		function findEnemyPositions() { var positions = [];
+			for (var i = 0; i < 25; i++) {
+				var current = imgList[i];
+				if(current.src.includes("2.")) {
+					positions.push(i);	
+				}
+			}
+			return positions;
+		}
+
+		function findEnemyKing() {
+			for (var i = 0; i < 25; i++) {
+				var current = imgList[i];
+				if(current.src.includes("king2.")) {
+					return i;	
+				}
+			}
+		}
+
+		function protectking() { // Returns true if king is in danger so that it can be moved
+			if(possiblePlayerMoves().includes(findEnemyKing())) return true;
+			return false;
+		}
+
+		function possiblePlayerMoves() { // Returns array of all possible player moves next turn
+			var options = [];
+			for (var i = 0; i < 25; i++) {
+				var current = imgList[i];
+				if(isPlayerPiece(current)){
+					select(26);
+					highlight(i);
+					for (var j = 0; j < 25; j++) {
+						var allHighlights = imgList[j];
+						if(allHighlights.style.background=="red") {
+							if(!options.includes(j)) options.push(j); // &&!isPlayerPiece(imgList[j])	
+						}
+					}
+					deselect();
+					select(27);
+					highlight(i);
+					for (var j = 0; j < 25; j++) {
+						var allHighlights = imgList[j];
+						if(allHighlights.style.background=="red") {
+							if(!options.includes(j)) options.push(j); // &&!isPlayerPiece(imgList[j])	
+						}
+					}
+					deselect();
+					deselectCards();
+				}
+			}
+			return options;
+		}
+
+		function possibleEnemyMoves() { // Returns array of all possible enemy moves this turn
+			var options = [];
+			for (var i = 0; i < 25; i++) {
+				var current = imgList[i];
+				if(findEnemyPositions().includes(i)){ enemySelected = imgList[27];
+					enemySelected.style.background = "red";
+					reversehighlight(i);
+					for (var j = 0; j < 25; j++) {
+						var allHighlights = imgList[j];
+						if(allHighlights.style.background=="red") {
+							if(!options.includes(j)&&!isEnemyPiece(imgList[j])) options.push(j);	
+						}
+					}
+					deselect(); enemyDeselect();
+					enemySelected = imgList[28];
+					enemySelected.style.background = "red";
+					reversehighlight(i);
+					for (var j = 0; j < 25; j++) {
+						var allHighlights = imgList[j];
+						if(allHighlights.style.background=="red") {
+							if(!options.includes(j)&&!isEnemyPiece(imgList[j])) options.push(j);	
+						}
+					}
+					deselect();
+					enemyDeselect();
+				}
+			}
+			return options;
+		}
+
+		function isPlayerPiece(argument) {
+			if((argument.includes("pawn")||argument.includes("king"))&&!argument.includes("2.")){
+					return true;
+				}
+			return false;
+		}
+
+		function isEnemyPiece(argument) {
+			if(argument.src.includes("2.")){
+					return true;
+				}
+			return false;
+		}
+
+		function player2move(pos) { var moveTo = imgList[pos-1]; // parseInt(prompt("Where to? "));
+			moveTo.src = enemychosenPiece.src; //imgList[moveTo].src = imgList[enemychosenPiece].src;
+			enemychosenPiece.src = "images/white.png"; //imgList[enemychosenPiece].src = "images/white.png";
+		}
+
+		function moveenemy() { // ADD AI
+			var options = []; var pieceFound = false; var foundAt = 0;
+			do{
+				for (var i = 24; i >= 0; i--) { 
+					var current = imgList[i];
+					if(current.style.background == "red"&&!current.src.includes("2.")) {
+						if(current.src.includes("king")){ // Kill king immediately
+							options = [];
+							options.push(i);
+							console.log("Checkmate!");
+							break;
+						}
+						else if(enemychosenPiece==findEnemyKing()&&possibleEnemyMoves().includes(22)){
+							options = [];
+							options.push(22);
+							console.log("Goal in sight");
+							pieceThatTargets(22); // To use the right card
+							break;
+						}
+						else if(current.src.includes("pawn")&&!possiblePlayerMoves().includes(i)){ // Kill pawn later
+							pieceFound = true;
+							foundAt = i;
+							options.push(foundAt);
+							console.log("Pawn in sight!");
+							break;
+						}
+						else if(current.src.includes("pawn")&&possiblePlayerMoves().includes(i)){ // Don't kill protected pawn
+							console.log("Staying away from protected Pawn!");
+							// break; Maybe push into a stayaway array
+						}
+						else options.push(i);
+					}
+				}
+
+				if(options.length==0) { console.log("Failed to move the "+ getCardName(imgList[enemychosenPiece].src) +" at position " + enemychosenPiece);
+					enemychosenPiece = findEnemyPiece();
+					console.log("Tried moving the "+ getCardName(imgList[enemychosenPiece].src) +" at position " + enemychosenPiece + " instead..");
+					deselect();
+					reversehighlight(parseInt(enemychosenPiece));
+				}
+			} while (options.length==0)
+
+			// cleanup again the options for any that will move the chosen piece into danger
+			var danger = possiblePlayerMoves();
+			for (var i = 0; i < danger.length; i++) {
+				if (options.includes(danger[i])){
+					console.log("Caught the danger at " + options.indexOf(danger[i]) + " in ");
+					console.log(options);
+					options.splice(options.indexOf(danger[i]), 1);
+					console.log(options);
+				}
+				if(options.length==0){ // Try other card
+					enemySelected = imgList[27];
+					enemySelected.style.background = "red";
+					reversehighlight(enemychosenPiece);
+					for (var j = 0; j < 25; j++) {
+						var allHighlights = imgList[j];
+						if(allHighlights.style.background=="red") {
+							if(!options.includes(j)&&!isEnemyPiece(imgList[j])) options.push(j);	
+						}
+					}
+					deselect(); enemyDeselect();
+					enemySelected = imgList[28];
+					enemySelected.style.background = "red";
+					reversehighlight(enemychosenPiece);
+					for (var j = 0; j < 25; j++) {
+						var allHighlights = imgList[j];
+						if(allHighlights.style.background=="red") {
+							if(!options.includes(j)&&!isEnemyPiece(imgList[j])) options.push(j);	
+						}
+					}
+					deselect();
+					enemyDeselect();
+				}
+			}
+
+
+			var numOptions = options.length; console.log("Number of possible moves with the "+ getCardName(enemySelected.src) +" card: " + numOptions);
+			var chosenPos = Math.floor(Math.random()*numOptions);
+			if (pieceFound) {
+				imgList[foundAt].src = imgList[enemychosenPiece].src;
+				imgList[enemychosenPiece].src = "images/white.png";
+			}
+			else {
+				imgList[options[chosenPos]].src = imgList[enemychosenPiece].src;
+				imgList[enemychosenPiece].src = "images/white.png";
+			}
+		}
+
+		function reversehighlight(pos) { var current = imgList[pos]; var selected = enemySelected;
+			current.style.background = "green";
+
+			if(selected.src.includes("tiger")){ // DONE2
+				if(pos <= 14) imgList[pos+10].style.background = "red";
+				if(pos >= 5) imgList[pos-5].style.background = "red";
+			}
+
+			if(selected.src.includes("crab")){ // DONE2
+				if(pos <= 20) imgList[pos+5].style.background = "red";
+				if(pos%5 <= 2) imgList[pos+2].style.background = "red";
+				if(pos%5 >= 2) imgList[pos-2].style.background = "red";
+			}
+
+			if(selected.src.includes("elephant")||selected.src.includes("oos")){ // DONE2
+				if(pos%5 <= 3) imgList[pos+1].style.background = "red";
+				if(pos%5 >= 1) imgList[pos-1].style.background = "red";
+				if(selected.src.includes("elephant")){
+					if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+					if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+				}
+			}
+
+			if(selected.src.includes("dragon")){ // DONE2
+				if(pos <= 19&&pos%5 >= 2) imgList[pos+3].style.background = "red";
+				if(pos <= 17&&pos%5 <= 2) imgList[pos+7].style.background = "red";
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+			}
+
+			if(selected.src.includes("frog")){ // DONE2
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos%5 <= 2) imgList[pos+2].style.background = "red";
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+			}
+
+			if(selected.src.includes("rooster")){ // DONE2
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+			}
+
+			if(selected.src.includes("goose")){ // DONE2
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+			}
+
+			if(selected.src.includes("rabbit")){ // DONE2
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos%5 >= 2) imgList[pos-2].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+			}
+
+			if(selected.src.includes("monkey")){ // DONE2
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+			}
+
+			if(selected.src.includes("crane")){
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos <= 20) imgList[pos+5].style.background = "red";
+			}
+
+			if(selected.src.includes("mantis")){
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+				if(pos >= 5) imgList[pos-5].style.background = "red";
+			}
+
+			if(selected.src.includes("cobra")){
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+				if(pos%5 <= 3) imgList[pos+1].style.background = "red";
+			}
+
+			if(selected.src.includes("eel")){
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos%5 >= 1) imgList[pos-1].style.background = "red";
+			}
+
+			if(selected.src.includes("boar")){
+				if(pos%5 <= 3) imgList[pos+1].style.background = "red";
+				if(pos%5 >= 1) imgList[pos-1].style.background = "red";
+				if(pos < 20) imgList[pos+5].style.background = "red";
+			}
+
+			if(selected.src.includes("ox")&&!selected.src.includes("fox")){
+				if(pos%5 >= 1) imgList[pos-1].style.background = "red";
+				if(pos >= 5) imgList[pos-5].style.background = "red";
+				if(pos < 20) imgList[pos+5].style.background = "red";
+			}
+
+			if(selected.src.includes("horse")){
+				if(pos >= 5) imgList[pos-5].style.background = "red";
+				if(pos < 20) imgList[pos+5].style.background = "red";
+				if(pos%5 <= 3) imgList[pos+1].style.background = "red";
+			}
+		}
+
+		function highlight(pos) { var current = imgList[pos]; var selected = selectedCard();
+			current.style.background = "green";
+
+			if(selected.src.includes("tiger")){
+				if(pos >= 10) imgList[pos-10].style.background = "red";
+				if(pos < 20) imgList[pos+5].style.background = "red";
+			}
+
+			if(selected.src.includes("crab")){
+				if(pos >= 5) imgList[pos-5].style.background = "red";
+				if(pos%5 <= 2) imgList[pos+2].style.background = "red";
+				if(pos%5 >= 2) imgList[pos-2].style.background = "red";
+			}
+
+			if(selected.src.includes("elephant")||selected.src.includes("oos")){
+				if(pos%5 <= 3) imgList[pos+1].style.background = "red";
+				if(pos%5 >= 1) imgList[pos-1].style.background = "red";
+				if(selected.src.includes("elephant")){
+					if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+					if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				}
+			}
+
+			if(selected.src.includes("dragon")){
+				if(pos >= 4&&pos%5 <= 2) imgList[pos-3].style.background = "red";
+				if(pos >= 7&&pos%5 >= 2) imgList[pos-7].style.background = "red";
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+			}
+
+			if(selected.src.includes("rabbit")){
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos%5 <= 2) imgList[pos+2].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+			}
+
+			if(selected.src.includes("goose")){
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+			}
+
+			if(selected.src.includes("rooster")){
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+			}
+
+			if(selected.src.includes("frog")){
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+				if(pos%5 >= 2) imgList[pos-2].style.background = "red";
+			}
+
+			if(selected.src.includes("monkey")){
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+			}
+
+			if(selected.src.includes("mantis")){
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos <= 20) imgList[pos+5].style.background = "red";
+			}
+
+			if(selected.src.includes("crane")){
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+				if(pos >= 5) imgList[pos-5].style.background = "red";
+			}
+
+			if(selected.src.includes("eel")){
+				if(pos >= 6&&pos%5 >= 1) imgList[pos-6].style.background = "red";
+				if(pos <= 19&&pos%5 >= 1) imgList[pos+4].style.background = "red";
+				if(pos%5 <= 3) imgList[pos+1].style.background = "red";
+			}
+
+			if(selected.src.includes("cobra")){
+				if(pos <= 18&&pos%5 <= 3) imgList[pos+6].style.background = "red";
+				if(pos >= 5&&pos%5 <= 3) imgList[pos-4].style.background = "red";
+				if(pos%5 >= 1) imgList[pos-1].style.background = "red";
+			}
+
+			if(selected.src.includes("boar")){
+				if(pos%5 <= 3) imgList[pos+1].style.background = "red";
+				if(pos%5 >= 1) imgList[pos-1].style.background = "red";
+				if(pos >= 5) imgList[pos-5].style.background = "red";
+			}
+
+			if(selected.src.includes("horse")){
+				if(pos%5 >= 1) imgList[pos-1].style.background = "red";
+				if(pos >= 5) imgList[pos-5].style.background = "red";
+				if(pos < 20) imgList[pos+5].style.background = "red";
+			}
+
+			if(selected.src.includes("ox") && !selected.src.includes("fox")){
+				if(pos >= 5) imgList[pos-5].style.background = "red";
+				if(pos < 20) imgList[pos+5].style.background = "red";
+				if(pos%5 <= 3) imgList[pos+1].style.background = "red";
+			}
+
+			/* Normal chess rules
+			if(current.src.includes("pawn")) imgList[pos-5].style.background = "red";
+			else if(current.src.includes("king")&&pos>=6&&pos%5!=0&&pos%5!=4) { imgList[pos-6].style.background = "red";
+				imgList[pos-5].style.background = "red";
+				imgList[pos-4].style.background = "red";
+			}
+			else if(current.src.includes("king")&&pos%5==0&&pos>4) {
+				imgList[pos-5].style.background = "red";
+				imgList[pos-4].style.background = "red";
+			}
+			else if(current.src.includes("king")&&pos%5==4&&pos>4) {
+				imgList[pos-5].style.background = "red";
+				imgList[pos-6].style.background = "red";
+			}*/
+		}
+
+		function getCardName(source) { // Not needed lol
+			var start = source.lastIndexOf("/");
+			var end = source.lastIndexOf(".");
+			var name = source.slice(start+1, end);
+			if(name.includes("2")) return name.slice(0, -1);
+			else return name;
+		}
+
+		function findSelected() {
+			for (var i = 24; i >= 0; i--) { var current = imgList[i].style.background;
+					if(current == "red"||current == "green") return imgList[i];
+				}
+
+			return null;
+		}
+
+		function selectedCard() {
+			for (var i = 25; i <= 26; i++) { var current = imgList[i].style.background;
+					if(current == "red") return imgList[i];
+				}
+
+			return null;
+		}
+
+		function deselect() {
+				while(findSelected() != null)
+				findSelected().style.background = "white";
+			displaygoals();
+		}
+
+		function deselectCards() {
+				while(selectedCard() != null)
+				selectedCard().style.background = "white";
+		}
+
+		function displaygoals() {
+			imgList[2].style.background = "gold";
+			imgList[22].style.background = "gold";
+		}
+
+		function checkWin() { var enemySafe = false; kingSafe = false;
+			for (var i = 0; i < imgList.length; i++) {
+				if (imgList[i].src.includes("king")&&!imgList[i].src.includes("2.")&&i==2) {
+					endgame(1);
+				}
+				else if (imgList[i].src.includes("king2.")&&i==22) {
+					endgame(2);
+				}
+				if (imgList[i].src.includes("king")&&!imgList[i].src.includes("2.")) {
+					kingSafe = true;
+				}
+				if (imgList[i].src.includes("king2.")) {
+					enemySafe = true;
+				}
+			}
+			if (!kingSafe) endgame(2);
+			else if (!enemySafe) endgame(1);
+		}
+
+		function endgame(int) {
+			gameOn = false;
+			setTimeout(function(){waitalert(int)}, 500);
+			setTimeout(function(){document.getElementById("butt1").style.display = "initial";}, 500);
+		}
+
+		function waitalert(arg) { // 0 = player turn, 1 = player wins, 2 = computer wins
+			switch(arg){
+				case 0: if(gameOn) alert("Your turn"); break;
+				case 1: alert("White Player wins!"); break;
+				case 2: alert("Black Player wins!"); break;
+				default: alert("Error waitalert");
+			}
+		}
+	</script>
+</head>
+<body>
+<table id="gameboard" onload="setup();">
+	<tr>
+		<td><img onclick="select(1);"></td>
+		<td><img onclick="select(2);"></td>
+		<td><img onclick="select(3);"></td>
+		<td><img onclick="select(4);"></td>
+		<td><img onclick="select(5);"></td>
+	</tr>
+	<tr>
+		<td><img onclick="select(6);"></td>
+		<td><img onclick="select(7);"></td>
+		<td><img onclick="select(8);"></td>
+		<td><img onclick="select(9);"></td>
+		<td><img onclick="select(10);"></td>
+	</tr>
+	<tr>
+		<td><img onclick="select(11);"></td>
+		<td><img onclick="select(12);"></td>
+		<td><img onclick="select(13);"></td>
+		<td><img onclick="select(14);"></td>
+		<td><img onclick="select(15);"></td>
+	</tr>
+	<tr>
+		<td><img onclick="select(16);"></td>
+		<td><img onclick="select(17);"></td>
+		<td><img onclick="select(18);"></td>
+		<td><img onclick="select(19);"></td>
+		<td><img onclick="select(20);"></td>
+	</tr>
+	<tr>
+		<td><img onclick="select(21);"></td>
+		<td><img onclick="select(22);"></td>
+		<td><img onclick="select(23);"></td>
+		<td><img onclick="select(24);"></td>
+		<td><img onclick="select(25);"></td>
+	</tr>
+</table>
+<button id="butt1" onclick="play();">New Game</button>
+<div id="yourcards" style="display: none;"><img src="" onclick="select(26);"><img src="" onclick="select(27);"></div>
+<div id="notyours" style="display: none;"><img src="" onclick="select(28);"><img src="" onclick="select(29);"></div>
+<div id="next" style="display: none;"><img src=""><hr>Next</div>
+</body>
+</html>
