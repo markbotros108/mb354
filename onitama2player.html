@@ -48,9 +48,9 @@
 
 		button {
 			position: absolute;
-			left: 36%;
+			left: 26%;
 			top: 86%;
-			font-size: 52px;
+			font-size: 152px;
 		}
 	</style>
 	<title>Onitama 2 Player</title>
@@ -774,7 +774,14 @@
 		function endgame(int) {
 			gameOn = false;
 			setTimeout(function(){waitalert(int)}, 500);
-			setTimeout(function(){document.getElementById("butt1").style.display = "initial";}, 500);
+			setTimeout(function(){
+				document.getElementById("butt1").style.display = "initial";
+				imgList[25].style.display = "none";
+				imgList[26].style.display = "none";
+				imgList[27].style.display = "none";
+				imgList[28].style.display = "none";
+				imgList[29].style.display = "none";
+			}, 500);
 		}
 
 		function waitalert(arg) { // 0 = player turn, 1 = player wins, 2 = computer wins
