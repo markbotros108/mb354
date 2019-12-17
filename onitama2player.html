@@ -70,6 +70,7 @@
 		function setup() { 
 			for (var i = 0; i < imgList.length; i++) { pos++;
 				imgList[i].src = "images/white.png";
+				if (i>24) imgList[i].style.display = "initial"
 			}
 			p2turn = false;
 		}
