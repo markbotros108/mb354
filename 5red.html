@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>5 red</title>
+	<script type="text/javascript">
+		var score = 1, enemy = 1, played, gameOn = false, level = 0;
+		var buttonList = document.getElementsByTagName('button');
+		var imgList = document.getElementsByTagName('img');
+		var cardList = [], discard = [];
+
+		function start() { gameOn = true;
+			buttonList[0].style.display = "none";
+			level++;
+			cardList = [];
+			getDeck(level);
+			cardList = shuffle(cardList);
+			update();
+			for (var i = 0; i < 3; i++) { var current = imgList[2+i];
+				current.src = "images/" + cardList.pop() + ".png";
+			}
+		}
+
+		function getDeck(level) {
+			for (var i = 0; i < 8+level; i++) { // Increase deck size here
+				switch (i){
+					case 0:
+					case 1:
+					case 2: cardList.push("reload"); break;
+					case 3: 
+					case 4:
+					case 5: cardList.push("reflect"); break;
+					case 6: 
+					case 7: 
+					case 8: cardList.push("shoot"); break;
+					case 9: cardList.push("block"); break;
+					case 10: cardList.push("attack"); break;
+					default: alert("Problem with " + i);
+				}
+			}
+		}
+
+			function flip(deck) { var flipped = []; var len = deck.length;
+			for (var i = 0; i < len; i++) {
+				flipped.push(deck.pop());
+			}
+			return deck.reverse();
+		}
+
+		function shuffle(list) {
+			var newOrder = [];
+			var len = list.length;
+			for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+				newOrder.push(list[r]);
+				list.splice(r, 1);
+			}
+			return newOrder;
+		}
+
+		function play() {
+			buttonList[1].style.display = "none";
+			buttonList[2].style.display = "initial";
+			draw();
+			deselect();
+			imgList[0].src = "images/"+played+".png";
+			discard.push(played);
+
+				// Deploy enemy attack
+			var r = Math.floor(Math.random()*3);
+			var enemyCard = ""; // Type of attack
+			switch(r){ // 0-2
+				case 0: enemyCard = "shoot"; break;
+				case 1: enemyCard = "reflect"; break;
+				case 2: enemyCard = "reload"; break;
+				default: alert("eror");
+			}
+			document.getElementsByTagName("img")[1].src = "images/"+enemyCard+".png";
+
+		}
+
+
+		function draw() { var len = cardList.length;
+			if (len <= 0) {cardList = flip(discard); discard = [];}
+			if(findSelected() != null) // if something is selected
+			findSelected().src = "images/" + cardList.pop() + ".png";
+		}
+
+		function findSelected() {
+			for (var i = 0; i < 3; i++) { var current = imgList[2+i].style.background;
+				if(current == "red") return imgList[2+i];
+			}
+
+			return null;
+		}
+
+		function deselect() {// 
+				if(findSelected() != null)
+				findSelected().style.background = "white";
+		}
+
+			function select(cardNo) {
+		if (gameOn&&buttonList[2].style.display != "initial") { buttonList[1].style.display = "initial";
+			deselect();
+			var chosen = imgList[2+cardNo];
+			chosen.style.background = "red";
+			var chosenSrc = chosen.src;
+			played = chosenSrc.slice(chosenSrc.lastIndexOf("/")+1, chosenSrc.lastIndexOf("."));
+		}
+	}
+
+		function update() {
+				document.getElementById("score").innerHTML = "Score: " + score;
+				document.getElementById("enemy").innerHTML = "Score: " + enemy;
+		}
+
+		function next() {
+			buttonList[2].style.display = "none";
+			
+			if(imgList[0].src.includes("reload")) {
+				console.log("Player reloaded");
+				score++;
+			}
+			if(imgList[1].src.includes("reload")) {
+				console.log("Enemy reloaded");
+				enemy++;
+			}
+			if(imgList[0].src.includes("shoot")&&imgList[1].src.includes("reflect")) {
+				console.log("Enemy successful block");
+				score = 1;
+				enemy++;
+			}
+			else if(imgList[1].src.includes("shoot")&&imgList[0].src.includes("reflect")) {
+				console.log("Player successful block");
+				enemy = 1;
+				score++;
+			}
+			else if(imgList[0].src.includes("shoot")/*&&imgList[1].src.includes("reload")*/) {
+				console.log("Successful shot");
+				enemy = 1;
+				if(!imgList[1].src.includes("shoot")) score++;
+				else score = 1;
+			}
+			else if(imgList[1].src.includes("shoot")/*&&imgList[0].src.includes("reload")*/) {
+				console.log("Player hit while reloading");
+				score = 1;
+				if(!imgList[0].src.includes("shoot")) enemy++;
+				else {enemy = 1; alert("This should NEVER happen..");}
+			}
+
+			// Update score display
+			update();
+
+			// Reset both play areas
+			imgList[0].src = "images/white.png";
+			imgList[1].src = imgList[0].src;
+
+			// Check for win
+			if(score>=5||enemy>=5){ 
+				buttonList[0].style.display = "initial";
+				if(score>=5) {alert("You win! Next Level: " + (level+1)); }
+				else {alert("You lost! Try again?"); level=0;}
+				score=1; enemy=1; update(); discard = [];
+			}
+		}
+	</script>
+	<style type="text/css">
+		table{
+			position: relative;
+			left: 30%;
+			top: 60px;
+		}
+
+		#score, #enemy { position: absolute;
+			left: 20%;
+			font-size: 36px;
+			width: 75px;
+			text-align: center;
+		}
+
+		#enemy {
+			left: 1100px;
+		}
+
+		button {
+			position: relative;
+			left: 30%;
+			top: 100px;
+			font-size: 36px;
+		}
+
+		img {
+			width: 200px;
+			padding: 10px 10px;
+		}
+
+		#cards {
+			position: relative;
+			left: 20%;
+			top: 190px;
+		}
+	</style>
+</head>
+<body>
+<table style="border: solid;">
+	<tr>
+		<td><img src="images/white.png"></td>
+		<td><img src="images/white.png"></td>
+	</tr>
+</table>
+<div id="score">Your Score</div>
+<div id="enemy">Enemy Score</div>
+<button onclick="start();">Start</button>
+<button onclick="play();" style="display: none; left: 50%;">Play</button>
+<button onclick="next();" style="display: none; left: 60%;">Next</button>
+<div id="cards"><img onclick="select(0);"><img onclick="select(1);"><img onclick="select(2);"></div>
+</body>
+</html>
