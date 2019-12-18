@@ -169,6 +169,10 @@
 			newcard.innerHTML = player[i];
 			newcard.onclick = function(){highlight();}
 			document.getElementById('cardarea').appendChild(newcard);
+			if(i==5){
+				var br = document.createElement("br");
+				document.getElementById('cardarea').appendChild(br);
+			}
 		}
 	}
 
