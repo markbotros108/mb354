@@ -8,10 +8,19 @@
     window.open("onitama2player.html");
   }*/
   function openup(playerNo){
-    if(playerNo==1) {window.open("onitama.html");}
-    else if(playerNo==2) {window.open("onitama2player.html");}
+   switch(playerNo){
+     case 1: window.open("onitama.html"); break;
+     case 2: window.open("onitama2player.html"); break;
+     case 3: window.open("12days.html"); break;
+     case 4: window.open("5red.html"); break;
+     default: alert("ERROR");
+    }
   }
 </script>
 <h3>Click a button below to play Onitama:</h3>
 <button onclick="openup(1);">Single Player</button>
 <button onclick="openup(2);">2 Players</button>
+<hr>
+<h3>Click a button below to play my other games:</h3>
+<button onclick="openup(3);">12 Days</button>
+<button onclick="openup(4);">5 Red</button>
