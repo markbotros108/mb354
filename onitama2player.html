@@ -96,7 +96,7 @@
 		function bespoke() { customList = true;
 			cardList = [];
 			for (var i = 0; i < 5; i++){ // check if allCards.includes(prompt) else i--
-				cardList.push(prompt("Type in Card No." + (i+1) + ":").toLowerCase());
+				cardList.push(prompt("Type in Card No." + (i+1) + ":").toLowerCase().trim());
 			}
 			document.getElementById("butt2").style.display = "none";
 			// play();
