@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Yahtzee attack</title>
+	<script type="text/javascript">
+		
+		var rolled = 0;
+
+		function roll() {var canvas = document.getElementById('canvas');
+		var context = canvas.getContext("2d");
+			// document.getElementById('dice').innerHTML
+			rolled = Math.floor((Math.random()*6)+1);
+			context.font = "bold 100px Times New Roman";
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.fillText(rolled, 25, 85);
+			document.getElementById('rolls').innerHTML += rolled + ", ";
+		}
+	</script>
+</head>
+<body>
+<!-- <div id="dice" style="font-size: 36px">1</div> -->
+<canvas id="canvas" width="100" height="100" style="border: 1px solid black;">
+	Browser does not support canvas.
+</canvas> 
+<div id="rolls" style="position: absolute; left: 30%; top: 5%; width: 100px;"></div>
+<br>
+<button onclick="roll()">Roll</button>
+</body>
+</html>
