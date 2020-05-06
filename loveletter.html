@@ -1,0 +1,118 @@
+<!--Started 1pm 6/5/2020-->
+<html>
+<script type="text/javascript">
+	let cardList = [], yours = [];
+	var gameOn = false;
+
+	function init() { document.getElementById("starter").style.display = "none";
+		document.getElementById('drawer').style.display = "initial";
+		for (var i = 0; i < 16; i++) {
+			if(i<5) cardList[i] = 'Guard'; // 5 guards
+
+			switch(i){//	case 0:	case 1:	case 2:	case 3:			
+				case 5: 
+				case 6: cardList[i] = "Priest"; break;	
+				case 7: 
+				case 8: cardList[i] = "Baron"; break;	
+				case 9: 
+				case 10: cardList[i] = "Handmaid"; break;	
+				case 11: 
+				case 12: cardList[i] = "Prince"; break;
+				case 13: cardList[i] = "King"; break;
+				case 14: cardList[i] = "Countess"; break;
+				case 15: cardList[i] = "Princess"; break;
+			}
+		}
+		cardList = shuffle(cardList);
+		let first = cardList.pop();
+		yours.push(first);
+		document.getElementById('hand').innerHTML += "1:" + first;
+	}
+
+
+	function shuffle(list) {
+		var newOrder = [];
+		var len = list.length;
+		for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+			newOrder.push(list[r]);
+			list.splice(r, 1);
+		}
+		return newOrder;
+	}
+
+	function turn(player) { document.getElementById("drawer").style.display = "none";
+		document.getElementById('player').style.display = "initial";
+		let next = '';
+
+		if(cardList.length>0) next = cardList.pop();
+		else {alert('No more cards left!'); return;}
+
+		switch(player){
+			case 0: 
+				yours.push(next);
+				document.getElementById('hand').innerHTML += "  2:" + next;
+				break;
+			default: alert("Problem with turn");
+		}
+	}
+
+	function play() { document.getElementById("drawer").style.display = "initial";
+		document.getElementById('player').style.display = "none";
+		let chosen = prompt("Which card? 1 or 2");
+		let display = document.getElementById('hand').innerHTML;
+		let updated = '';
+
+		if(chosen == 1){
+			updated = "1" + display.slice(display.indexOf('2')+1);
+			display = yours[0];
+			yours[0] = yours.pop();
+		}
+		else{ updated = "1" + display.slice(display.indexOf('1')+1, display.indexOf('2')).trim();
+			display = yours.pop();
+		} 
+
+		document.getElementById('hand').innerHTML = updated;
+		document.getElementById('played').innerHTML += " " + display;
+	}
+</script>
+<style type="text/css">
+	button{
+		position: absolute;
+		left: 500px;
+		top: 100px;
+		width: 300px;
+		height: 200px;
+		font-size: 72;
+	}
+
+	p{
+		position: absolute;
+		left: 500px;
+		top: 230px;
+		width: 340px;
+		font-size: 72;
+	}
+
+	#played{
+		position: absolute;
+		left: 100px;
+		top: 0px;
+		width: 200px;
+		font-size: 54;
+	}
+</style>
+<button id="starter" onclick="init(); console.log(cardList)">
+Start Game
+</button>
+<button id="drawer" onclick="turn(0);" style="display: none;">
+	Draw
+</button>
+<button id="player" onclick="play();" style="display: none;">
+	Play Card
+</button>
+<div id="played">
+	Played:
+</div>
+<p id="hand"> Your cards:
+</p>
+</html>
