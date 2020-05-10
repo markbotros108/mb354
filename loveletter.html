@@ -1,8 +1,10 @@
 <!--Started 1pm 6/5/2020-->
+<!-- Finished player actions 7pm 10/5/2020, still need to implement AI -->
 <html>
 <script type="text/javascript">
-	let cardList = [], yours = [];
+	let cardList = [], yours = [], p2=[], p3=[] , p4=[];
 	var gameOn = false;
+	var values = ["", "Guard", "Priest", "Baron", "Handmaid", "Prince", "King", "Countess", "Princess"];
 
 	function init() { document.getElementById("starter").style.display = "none";
 		document.getElementById('drawer').style.display = "initial";
@@ -26,7 +28,14 @@
 		cardList = shuffle(cardList);
 		let first = cardList.pop();
 		yours.push(first);
-		document.getElementById('hand').innerHTML += "1:" + first;
+		document.getElementById('hand').innerHTML += "1: " + first;
+
+		
+		p2.push(cardList.pop());
+		
+		p3.push(cardList.pop());
+		
+		p4.push(cardList.pop());
 	}
 
 
@@ -50,7 +59,7 @@
 		switch(player){
 			case 0: 
 				yours.push(next);
-				document.getElementById('hand').innerHTML += "  2:" + next;
+				document.getElementById('hand').innerHTML += " 2: " + next;
 				break;
 			default: alert("Problem with turn");
 		}
@@ -62,17 +71,132 @@
 		let display = document.getElementById('hand').innerHTML;
 		let updated = '';
 
-		if(chosen == 1){
+		if(display.includes("Countess")&& !display.includes("Princess") &&(display.includes("King")||display.includes("Prince"))) {
+			alert("Must discard King/Prince");
+		}
+		else if(chosen == 1){
 			updated = "1" + display.slice(display.indexOf('2')+1);
 			display = yours[0];
 			yours[0] = yours.pop();
 		}
 		else{ updated = "1" + display.slice(display.indexOf('1')+1, display.indexOf('2')).trim();
 			display = yours.pop();
-		} 
+		}
 
+		let altCard = yours[0];
+		switch(display){
+			case "Guard": let target = prompt("Which player would you like to guess?");
+							let guess = prompt("Which card do you think Player " + target + " has?");
+							let success = false;
+
+							switch(target){
+								case "2": if (p2.includes(guess)) success = true;
+										break;
+								case "3": if (p3.includes(guess)) success = true; 
+										break;
+								case "4": if (p4.includes(guess)) success = true;
+										break;
+								default: alert("Not a player. Turn wasted!");
+							}
+
+							if(success) alert("Correct guess! Player " + target + " is out!");
+							else alert("Wrong guess :( ");
+						break;
+			case "Priest": let target2 = prompt("Which player's card would you like to look at?");
+
+							switch(target2){
+								case "2": alert("Player " + target2 + " has " + p2);
+										break;
+								case "3":  alert("Player " + target2 + " has " + p3);
+										break;
+								case "4": alert("Player " + target2 + " has " + p4);
+										break;
+								default: alert("Not a player. Turn wasted!");
+							}
+						break;
+			case "Baron": let target3 = prompt("Which player's card would you like to compare yours with?");
+							let success3 = false;
+							alert("Your card is " + altCard);
+
+							switch(target3){
+								case "2": alert("Player " + target3 + " has " + p2 + " with a value of " + eval(p2[0]) );
+											if(eval(altCard) > eval(p2[0])) success3 = true;
+										break;
+								case "3":  alert("Player " + target3 + " has " + p3 + " with a value of " + eval(p3[0]) );
+											if(eval(altCard) > eval(p3[0])) success3 = true;
+										break;
+								case "4": alert("Player " + target3 + " has " + p4 + " with a value of " + eval(p4[0]) );
+											if(eval(altCard) > eval(p4[0])) success3 = true;
+										break;
+								default: alert("Not a player. Turn wasted!");
+							}
+
+							if(success3) alert("You had higher value! Player " + target3 + " is out!");
+							else alert("You were lower.. You're out :( ");
+						break;
+			case "Handmaid": alert("Protected until next turn!"); break;
+			case "Prince": let target5 = prompt("Which player would you like to discard and draw?");
+
+							switch(target5){
+								case "2": alert("Player " + target5 + " had " + p2);
+									document.getElementById('played').innerHTML += " " + p2.pop();
+									p2.push(cardList.pop());
+										break;
+								case "3":  alert("Player " + target5 + " had " + p3);
+									document.getElementById('played').innerHTML += " " + p3.pop();
+									p3.push(cardList.pop());
+										break;
+								case "4": alert("Player " + target5 + " had " + p4);
+									document.getElementById('played').innerHTML += " " + p4.pop();
+									p4.push(cardList.pop());
+										break;
+								default: alert("Not a player. Turn wasted!");
+							}
+						break;
+			case "King": let target6 = prompt("Which player would you like to swap with?");
+
+							switch(target6){
+								case "2": alert("Player " + target6 + " had " + p2);
+									yours[0] = p2.pop();
+									p2.push(altCard);
+										break;
+								case "3":  alert("Player " + target6 + " had " + p3);
+									yours[0] =  p3.pop();
+									p3.push(altCard);
+										break;
+								case "4": alert("Player " + target6 + " had " + p4);
+									yours[0] = p4.pop();
+									p4.push(altCard);
+										break;
+								default: alert("Not a player. Turn wasted!");
+							} 
+						break;
+			case "Countess": alert("Played Countess"); break;
+			case "Princess": end(0); return;
+			default: alert("Not yet implemented");
+		}
+
+		if(display=="King") updated = "1: " + yours[0];
 		document.getElementById('hand').innerHTML = updated;
 		document.getElementById('played').innerHTML += " " + display;
+	}
+
+	function eval(arg) {
+			for (var i = 0; i < values.length; i++) {
+				if(values[i] === arg) return i;
+			}
+
+		return 0;
+	}
+
+	function end(outcome) {
+		if(outcome) alert("You Win!");
+		else alert("You lose!");
+		document.getElementById('starter').style.display = "initial";
+		 document.getElementById("drawer").style.display = "none";
+		  document.getElementById("player").style.display = "none";
+		document.getElementById("hand").innerHTML = "Your cards:";
+		document.getElementById("played").innerHTML = "Played:";
 	}
 </script>
 <style type="text/css">
@@ -89,7 +213,7 @@
 		position: absolute;
 		left: 500px;
 		top: 230px;
-		width: 340px;
+		width: 380px;
 		font-size: 72;
 	}
 
@@ -99,6 +223,14 @@
 		top: 0px;
 		width: 200px;
 		font-size: 54;
+	}
+
+	#instruct{
+		position: absolute;
+		color: blue;
+		left: 900;
+		top: 100;
+		font-size: 26;
 	}
 </style>
 <button id="starter" onclick="init(); console.log(cardList)">
@@ -115,4 +247,10 @@ Start Game
 </div>
 <p id="hand"> Your cards:
 </p>
+<div id="instruct">
+	1. Guard: Guess a player's card <br /> 2. Priest: Look at a player's card <br />
+	3. Baron: Compare with a player's card (Lowest card loses) <br /> 4. Handmaid: Protection from all cards <br />	
+	5. Prince: Choose a player to discard and draw <br /> 6. King: Trade with another player's card <br />
+	7. Countess: Must discard if you have Prince or King <br /> 8. Princess: Lose the game if discarded <br />
+</div>
 </html>
