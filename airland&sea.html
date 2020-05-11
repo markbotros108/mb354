@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Air, Land & Sea</title>
+	<script type="text/javascript">
+		class alsCard {
+			constructor(value, type, card) {
+				this.strength = value;
+				this.name = card;
+				this.theater = type;
+			}
+			
+			display() {
+				return "<div onclick='confirm(\"Play " + this.name +" face up?\")' id='" + this.theater + "''> Value: " + this.strength + " <br> <b>" + this.name + "</b> <br> Type: " + this.theater + "</div>";
+			}
+
+		}
+
+		deck = [];
+		cardList = ["Support", "Reinforce", "Transport", "Air Drop", "Ambush", "Escalation", "Maneuver", "Maneuver", 
+					"Maneuver", "Aerodrome", "Cover Fire", "Redeploy", "Containment", "Disrupt", "Blockade", "Heavy Bombers", "Heavy Tanks", "Super Battleship"];
+		cardsCreated = 0;
+		var deckMade = false;
+
+		function init() { if(deckMade) return;
+			for (var i = 0; i < 6; i++) {
+				newCard = new alsCard(i+1, "Air", cardList[cardsCreated++]);
+				deck.push(newCard);
+				newCard = new alsCard(i+1, "Land", cardList[cardsCreated++]);
+				deck.push(newCard);
+				newCard = new alsCard(i+1, "Sea", cardList[cardsCreated++]);
+				deck.push(newCard);
+			}
+
+			deck = shuffle(deck); deckMade = true;
+		}
+
+
+		function shuffle(list) {
+			var newOrder = [];
+			var len = list.length;
+			for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+				newOrder.push(list[r]);
+				list.splice(r, 1);
+			}
+			return newOrder;
+		}
+
+		function draw() {
+			for (var i = 0; i < 6; i++) {
+				document.getElementById('hand').innerHTML += deck.pop().display();
+			}
+			document.getElementById('drawer').style.display = "none";
+			document.getElementById('player').style.display = "initial";
+		}
+	</script>
+
+	<style type="text/css">
+		p {
+			position: absolute;
+			left: 100px;
+		}
+
+		button { position: absolute;
+			left: 40%;
+			top: 30%;
+			padding: 20px 33px;
+			font-size: 42px;
+		}
+
+		div {
+			border: solid black;
+			margin: 10px;
+			width: 153px;
+			text-align: center;
+			display: inline-block;
+		}
+
+		#Air {
+			border: solid red;
+		}
+
+		#Land {
+			border: solid green;
+		}
+
+		#Sea {
+			border: solid blue;
+		}
+	</style>
+</head>
+<body>
+<p id="hand">
+	Your hand:
+</p>
+<br />
+<button id="drawer" onclick="init(); draw();">
+	Draw
+</button>
+<button id="player" onclick="" style="display: none;">
+	Play
+</button>
+</body>
+</html>
