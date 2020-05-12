@@ -11,7 +11,37 @@
 			}
 			
 			display() {//onclick='confirm(\"Play " + this.name +" face up?\")' 
-				return "<div draggable=true class='fill " + this.theater + "'> Value: " + this.strength + " <br> <b>" + this.name + "</b> <br> Type: " + this.theater + "</div>";
+				var faceUp = document.createElement('div');
+				faceUp.className = "fill " + this.theater;
+				faceUp.innerHTML = "Value: " + this.strength + " <br> <b>" + this.name + "</b> <br> Type: "+ this.theater;
+				faceUp.onclick = function () {console.log("flipped face down" + this.innerHTML); 
+					this.title = this.innerHTML;
+					this.innerHTML = "Value: 2";
+					this.className = "";
+					this.style.cursor = "pointer";
+					this.style.padding = "36px 0px 0px";
+					this.onclick = function () { console.log("flipped face up again " + this.title); 
+						this.className = "fill " + this.title.substr(this.title.indexOf('Type: ')+6, 4);
+						this.style.padding = "";
+						this.innerHTML = this.title;
+						this.onclick = function () {console.log("flipped face down again" + this.innerHTML); 
+							this.title = this.innerHTML;
+							this.innerHTML = "Value: 2";
+							this.className = "";
+							this.style.cursor = "pointer";
+							this.style.padding = "36px 0px 0px";
+							this.onclick = function () { console.log("flipped face up again " + this.title); 
+								this.className = "fill " + this.title.substr(this.title.indexOf('Type: ')+6, 4);
+								this.style.padding = "";
+								this.onclick = null;
+								this.innerHTML = this.title;};
+						};
+					};
+				};
+				faceUp.draggable = true;
+				faceUp.style.cursor = "pointer";
+
+				return faceUp;
 			}
 
 		}
@@ -23,6 +53,8 @@
 		var deckMade = false;
 		var currentCardType = '';
 		var movedObject;
+		var p2turn = false; // keeps track of player 2 turn
+		var p2drawn = false; // makes sure p2 only draws once
 		var sure=false; // sure of getting rid of card from hand
 		
 		// Drag functions
@@ -62,7 +94,26 @@
 
 			var faceDown = document.createElement('div');
 				faceDown.innerHTML = "Value: 2";
+				faceDown.title = movedObject.innerHTML;
+				faceDown.onclick = function () {console.log("flipped" + this.title); 
+						this.innerHTML = this.title;
+						this.className = movedObject.innerHTML.substr(movedObject.innerHTML.indexOf('Type: ')+6, 4);
+						this.style.padding = "";
+						this.onclick = function () {console.log("flipped face down again" + this.innerHTML); 
+							this.title = this.innerHTML;
+							this.innerHTML = "Value: 2";
+							this.className = "";
+							this.style.cursor = "pointer";
+							this.style.padding = "36px 0px 0px";
+							this.onclick = function () { console.log("flipped face up again " + this.title); 
+								this.className = "fill " + this.title.substr(this.title.indexOf('Type: ')+6, 4);
+								this.style.padding = "";
+								this.onclick = null;
+								this.innerHTML = this.title;};
+					};
+				} ;
 				faceDown.draggable = true;
+				faceDown.style.cursor = "pointer";
 				faceDown.style.padding = "36px 0px 0px";
 
 			if(this.className.includes(currentCardType)) {
@@ -72,6 +123,7 @@
 			else if (confirm("This is not the correct location for this card.\nWould you like to play this face down?")) { sure = true;
 				this.append(faceDown);}
 		}
+
 
 		function init() { if(deckMade) return;
 			for (var i = 0; i < 6; i++) {
@@ -109,13 +161,15 @@
 			return newOrder;
 		}
 
-		function draw() {
-
-			for (var i = 0; i < 6; i++) {
-				document.getElementById('hand').innerHTML += deck.pop().display();
+		function draw(p2) {
+			if(!p2) for (var i = 0; i < 6; i++) {
+				document.getElementById('hand').append(deck.pop().display());
 			}
+			else for (var i = 0; i < 6; i++) {
+					document.getElementById('hand2').append(deck.pop().display());
+				}
 			document.getElementById('drawer').style.display = "none";
-			document.getElementById('player').style.display = "initial";
+			document.getElementById('hider').style.display = "initial";
 
 			const fills = document.querySelectorAll('.fill');
 
@@ -125,6 +179,29 @@
 					fill.addEventListener('dragend', dragEnd);
 				}
 
+		}
+
+		function nextTurn() { // boolean to swap turns
+			p2turn = !p2turn;
+			document.getElementById('player').style.display = "none";
+			document.getElementById('hider').style.display = "initial";
+
+			if(p2turn){
+				document.getElementById('hand').style.display = "none";
+				document.getElementById('hand2').style.display = "initial";
+				if(!p2drawn) draw(p2turn);
+				p2drawn = true;
+			}
+			else {
+				document.getElementById('hand').style.display = "initial";
+				document.getElementById('hand2').style.display = "none";
+			} 
+		}
+
+		function hideCards() { document.getElementById('hand').style.display = "none";
+			document.getElementById('hand2').style.display = "none";
+			document.getElementById('hider').style.display = "none";
+			document.getElementById('player').style.display = "initial";
 		}
 	</script>
 
@@ -197,12 +274,18 @@
 <p id="hand">
 	Your hand:
 </p>
+<p id="hand2" style="display: none;">
+	Your hand:
+</p>
 <br />
-<button id="drawer" onclick="init(); draw();">
+<button id="drawer" onclick="init(); draw(0);">
 	Draw
 </button>
-<button id="player" onclick="" style="display: none;">
-	Play?
+<button id="hider" onclick="hideCards();" style="display: none;">
+	Hide cards
+</button>
+<button id="player" onclick="nextTurn();" style="display: none;">
+	Next turn
 </button>
 <p class="Air empty" id="theater1">
 	<u>Air</u><br>
@@ -213,5 +296,6 @@
 <p class="Sea empty" id="theater3">
 	<u>Sea</u><br>
 </p>
+<embed src="./AirLandSea_Card_Manifest.pdf" type="application/pdf" width="99%" height="280px" style="position: absolute;top: 70%;"></embed>
 </body>
 </html>
