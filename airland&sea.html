@@ -10,8 +10,8 @@
 				this.theater = type;
 			}
 			
-			display() {
-				return "<div onclick='confirm(\"Play " + this.name +" face up?\")' draggable=true class='fill " + this.theater + "''> Value: " + this.strength + " <br> <b>" + this.name + "</b> <br> Type: " + this.theater + "</div>";
+			display() {//onclick='confirm(\"Play " + this.name +" face up?\")' 
+				return "<div draggable=true class='fill " + this.theater + "'> Value: " + this.strength + " <br> <b>" + this.name + "</b> <br> Type: " + this.theater + "</div>";
 			}
 
 		}
@@ -23,6 +23,7 @@
 		var deckMade = false;
 		var currentCardType = '';
 		var movedObject;
+		var sure=false; // sure of getting rid of card from hand
 		
 		// Drag functions
 		function dragStart() { currentCardType = this.className.replace('fill ', '');
@@ -33,6 +34,8 @@
 
 		function dragEnd() { 
 			this.className = 'fill ' + currentCardType;
+			if (sure) setTimeout(() => (this.className = 'invisible'), 0);
+			sure = false;
 			// console.log('end');
 		}
 
@@ -50,14 +53,24 @@
 			this.className = 'Land empty';
 			else this.className = 'Sea empty';
 		}
-		function dragDrop() { //console.log('drop');
+		function dragDrop() { console.log('drop');
 			if(this.id === "theater1")
 			this.className = 'Air empty';
 			else if(this.id === "theater2")
 			this.className = 'Land empty';
 			else this.className = 'Sea empty';
 
-			if(this.className.includes(currentCardType)) this.append(movedObject);
+			var faceDown = document.createElement('div');
+				faceDown.innerHTML = "Value: 2";
+				faceDown.draggable = true;
+				faceDown.style.padding = "36px 0px 0px";
+
+			if(this.className.includes(currentCardType)) {
+				if (confirm("Would you like to play this face up?")) this.append(movedObject);
+				else if (confirm("Would you like to play this face down?")) {sure=true; this.append(faceDown);}
+			}
+			else if (confirm("This is not the correct location for this card.\nWould you like to play this face down?")) { sure = true;
+				this.append(faceDown);}
 		}
 
 		function init() { if(deckMade) return;
