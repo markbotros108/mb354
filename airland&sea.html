@@ -55,6 +55,7 @@
 		var movedObject;
 		var p2turn = false; // keeps track of player 2 turn
 		var p2drawn = false; // makes sure p2 only draws once
+		var divided = false; // make sure theaters only divided once
 		var sure=false; // sure of getting rid of card from hand
 		
 		// Drag functions
@@ -117,11 +118,21 @@
 				faceDown.style.padding = "36px 0px 0px";
 
 			if(this.className.includes(currentCardType)) {
-				if (confirm("Would you like to play this face up?")) this.append(movedObject);
-				else if (confirm("Would you like to play this face down?")) {sure=true; this.append(faceDown);}
+				if (confirm("Would you like to play this face up?")){
+					if(p2turn)	this.append(movedObject);
+					else document.getElementById('p1'+ movedObject.innerHTML.substr(movedObject.innerHTML.indexOf('Type: ')+6, 4)).append(movedObject);
+				 }
+				else if (confirm("Would you like to play this face down?")) {sure=true; 
+					if(p2turn)	this.append(faceDown);
+					else if(this.className.startsWith('L')) document.getElementById('p1Land').append(faceDown);
+					else document.getElementById('p1'+ this.className.substr(0, 3)).append(faceDown);
+				}
 			}
 			else if (confirm("This is not the correct location for this card.\nWould you like to play this face down?")) { sure = true;
-				this.append(faceDown);}
+				if(p2turn)	this.append(faceDown);
+					else if(this.className.startsWith('L')) document.getElementById('p1Land').append(faceDown);
+					else document.getElementById('p1'+ this.className.substr(0, 3)).append(faceDown);
+				}
 		}
 
 
@@ -186,7 +197,13 @@
 			document.getElementById('player').style.display = "none";
 			document.getElementById('hider').style.display = "initial";
 
-			if(p2turn){
+			if(p2turn){ 
+				if(!divided){
+					document.getElementById('theater1').innerHTML += "<hr/>";
+					document.getElementById('theater2').innerHTML += "<hr/>";
+					document.getElementById('theater3').innerHTML += "<hr/>";
+					divided = true;
+				}
 				document.getElementById('hand').style.display = "none";
 				document.getElementById('hand2').style.display = "initial";
 				if(!p2drawn) draw(p2turn);
@@ -288,13 +305,13 @@
 	Next turn
 </button>
 <p class="Air empty" id="theater1">
-	<u>Air</u><br>
+	<u>Air</u><br><span id="p1Air"></span>
 </p>
 <p class="Land empty" id="theater2">
-	<u>Land</u><br>
+	<u>Land</u><br><span id="p1Land"></span>
 </p>
 <p class="Sea empty" id="theater3">
-	<u>Sea</u><br>
+	<u>Sea</u><br><span id="p1Sea"></span>
 </p>
 <embed src="./AirLandSeaCardManifest.pdf" type="application/pdf" width="99%" height="280px" style="position: absolute;top: 70%;"></embed>
 </body>
