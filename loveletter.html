@@ -72,7 +72,7 @@
 		let updated = '';
 
 		if(display.includes("Countess")&& !display.includes("Princess") &&(display.includes("King")||display.includes("Prince"))) {
-			alert("Must discard King/Prince");
+			alert("Must discard Countess because of King/Prince");
 		}
 		else if(chosen == 1){
 			updated = "1" + display.slice(display.indexOf('2')+1);
@@ -173,7 +173,7 @@
 						break;
 			case "Countess": alert("Played Countess"); break;
 			case "Princess": end(0); return;
-			default: alert("Not yet implemented");
+			default: alert(display + " is not yet implemented");
 		}
 
 		if(display=="King") updated = "1: " + yours[0];
