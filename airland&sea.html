@@ -57,7 +57,7 @@
 			this.className = 'Land empty';
 			else this.className = 'Sea empty';
 
-			this.append(movedObject);
+			if(this.className.includes(currentCardType)) this.append(movedObject);
 		}
 
 		function init() { if(deckMade) return;
