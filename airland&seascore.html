@@ -207,7 +207,7 @@
 		}
 
 
-		function flipScore(element) { alert(element.parentNode.id);// flipped up
+		function flipScore(element) { // flipped up
 			if(p2turn){if (element.parentNode.id.includes("p1")) { // p2 flipping p1 cards
 						if(element.parentNode.id.includes("Air")) p1Score1 += (findCardValue(element.title)-2);
 					else if(element.parentNode.id.includes("L")) p1Score2 += (findCardValue(element.title)-2);
