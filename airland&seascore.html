@@ -1,0 +1,479 @@
+<!-- BROKEN DO NOT USE -->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Air, Land & Sea</title>
+	<script type="text/javascript">
+		class alsCard {
+			constructor(value, type, card) {
+				this.strength = value;
+				this.name = card;
+				this.theater = type;
+			}
+			
+			display() {//onclick='confirm(\"Play " + this.name +" face up?\")' 
+				var faceUp = document.createElement('div');
+				faceUp.className = "fill " + this.theater;
+				faceUp.innerHTML = "Value: " + this.strength + " <br> <b>" + this.name + "</b> <br> Type: "+ this.theater;
+				faceUp.onclick = function () {console.log("flipped face down" + this.innerHTML); 
+					this.title = this.innerHTML;
+					this.innerHTML = "Value: 2";
+					this.className = "";
+					this.style.cursor = "pointer";
+					this.style.padding = "36px 0px 0px";
+					flipScore2(this);
+					this.onclick = function () { console.log("flipped face up again " + this.title); 
+						this.className = "fill " + this.title.substr(this.title.indexOf('Type: ')+6, 4);
+						this.style.padding = "";
+						this.innerHTML = this.title;
+						flipScore(this);
+						this.onclick = function () {console.log("flipped face down again" + this.innerHTML); 
+							this.title = this.innerHTML;
+							this.innerHTML = "Value: 2";
+							this.className = "";
+							this.style.cursor = "pointer";
+							this.style.padding = "36px 0px 0px";
+							flipScore2(this);
+							this.onclick = function () { console.log("flipped face up again " + this.title); 
+								this.className = "fill " + this.title.substr(this.title.indexOf('Type: ')+6, 4);
+								this.style.padding = "";
+								this.onclick = null;
+								flipScore(this);
+								this.innerHTML = this.title;};
+						};
+					};
+				};
+				faceUp.draggable = true;
+				faceUp.style.cursor = "pointer";
+
+				return faceUp;
+			}
+
+		}
+
+		deck = [];
+		cardList = ["Support", "Reinforce", "Transport", "Air Drop", "Ambush", "Escalation", "Maneuver", "Maneuver", 
+					"Maneuver", "Aerodrome", "Cover Fire", "Redeploy", "Containment", "Disrupt", "Blockade", "Heavy Bombers", "Heavy Tanks", "Super Battleship"];
+		cardsCreated = 0;
+		var deckMade = false;
+		var currentCardType = '';
+		var movedObject, fills, empties;
+		var p2turn = false; // keeps track of player 2 turn
+		var p2drawn = false; // makes sure p2 only draws once
+		var divided = false; // make sure theaters only divided once
+		var sure=false; // sure of getting rid of card from hand because it was placed face down
+		var p1Name, p2Name, p1Score1 = 0, p1Score2 = 0, p1Score3 = 0, p2Score1 = 0, p2Score2 = 0, p2Score3 = 0;
+		
+		// Drag functions
+		function dragStart() { currentCardType = this.className.replace('fill ', '');
+			movedObject = this;
+			setTimeout(() => (this.className = 'invisible'), 0);
+			// if(!p2turn){
+				if(this.parentNode.id.includes("Sea")) {
+					if (p2turn) p2Score3 -= findCardValue(movedObject.innerHTML);
+					else p1Score3 -= findCardValue(movedObject.innerHTML);
+				}
+				else if(this.parentNode.id.includes("Air")) {
+					if (p2turn) p2Score1 -= findCardValue(movedObject.innerHTML);
+					else p1Score1 -= findCardValue(movedObject.innerHTML);
+				}
+				else if(this.parentNode.id.includes("Land")) {
+					if (p2turn) p2Score2 -= findCardValue(movedObject.innerHTML);
+					else p1Score2 -= findCardValue(movedObject.innerHTML);
+				}
+			// }
+		}
+
+		function dragEnd() { 
+			this.className = 'fill ' + currentCardType;
+			if (sure) setTimeout(() => (this.className = 'invisible'), 0);
+			sure = false;
+		}
+
+		function dragOver(e) { //			console.log('over');
+			e.preventDefault();
+		}
+		function dragEnter(e) { //console.log('enter');
+			e.preventDefault();
+			this.className += ' hovered';
+		}
+		function dragLeave() { //console.log('leave');
+			if(this.id === "theater1")
+			this.className = 'Air empty';
+			else if(this.id === "theater2")
+			this.className = 'Land empty';
+			else this.className = 'Sea empty';
+		}
+		function dragDrop() { console.log('drop');
+			if(this.id === "theater1")
+			this.className = 'Air empty';
+			else if(this.id === "theater2")
+			this.className = 'Land empty';
+			else this.className = 'Sea empty';
+
+			var faceDown = document.createElement('div');
+				faceDown.innerHTML = "Value: 2";
+				faceDown.className="fill "
+				faceDown.title = movedObject.innerHTML;
+				faceDown.onclick = function () {console.log("flipped" + this.title); 
+						this.innerHTML = this.title;
+						this.className = movedObject.innerHTML.substr(movedObject.innerHTML.indexOf('Type: ')+6, 4);
+						this.style.padding = "";
+						flipScore(this);
+						this.onclick = function () {console.log("flipped face down again" + this.innerHTML); 
+							this.title = this.innerHTML;
+							this.innerHTML = "Value: 2";
+							this.className = "";
+							this.style.cursor = "pointer";
+							this.style.padding = "36px 0px 0px";
+							flipScore2(this);
+							this.onclick = function () { console.log("flipped face up again " + this.title); 
+								this.className = "fill " + this.title.substr(this.title.indexOf('Type: ')+6, 4);
+								this.style.padding = "";
+								this.onclick = null;
+								flipScore(this);
+								this.innerHTML = this.title;};
+					};
+				} ;
+				faceDown.draggable = true;
+				faceDown.style.padding = "36px 0px 0px";
+
+			if(this.className.includes(currentCardType)) { // Card is in appropriate theater
+				if (confirm("Would you like to play this face up?")){ // Player wants it face up
+						var addScore = findCardValue(movedObject.innerText);
+
+					if(p2turn){	this.append(movedObject);  // Player 2
+						switch(this.className){
+							case "Air empty": p2Score1 += addScore; break;
+							case "Land empty": p2Score2 += addScore; break;
+							case "Sea empty": p2Score3 += addScore; break;
+							default: alert("problem with scoring p2");
+						}
+					}
+					else {
+						document.getElementById('p1'+ movedObject.innerHTML.substr(movedObject.innerHTML.indexOf('Type: ')+6, 4)).append(movedObject);
+						switch(this.className){
+							case "Air empty": p1Score1 += addScore; break;
+							case "Land empty": p1Score2 += addScore; break;
+							case "Sea empty": p1Score3 += addScore; break;
+							default: alert("problem with scoring p1");
+						}
+					}
+				 }
+
+				else if (confirm("Would you like to play this face down?")) {sure=true; // Correct but face down
+					if(p2turn)	{ this.append(faceDown);
+						switch(this.className){
+							case "Air empty": p2Score1 += 2; break;
+							case "Land empty": p2Score2 += 2; break;
+							case "Sea empty": p2Score3 += 2; break;
+							default: alert("problem with scoring p2");
+						}
+					}
+					else if(this.className.startsWith('L')) { p1Score2 += 2;
+						document.getElementById('p1Land').append(faceDown);
+					}
+					else { document.getElementById('p1'+ this.className.substr(0, 3)).append(faceDown);
+						if(this.className.includes("Air")) p1Score1 += 2;
+						else p1Score3 += 2;
+					}
+				}
+			}
+
+			else if (confirm("This is not the correct location for this card.\nWould you like to play this face down?")) { sure = true;
+				if(p2turn){	this.append(faceDown);
+					switch(this.className){
+							case "Air empty": p2Score1 += 2; break;
+							case "Land empty": p2Score2 += 2; break;
+							case "Sea empty": p2Score3 += 2; break;
+							default: alert("problem with scoring p2");
+						}
+				}
+					else if(this.className.startsWith('L')) { p1Score2 += 2;
+						document.getElementById('p1Land').append(faceDown);
+					}
+					else { document.getElementById('p1'+ this.className.substr(0, 3)).append(faceDown);
+						if(this.className.includes("Air")) p1Score1 += 2;
+						else p1Score3 += 2;
+					}
+				}
+			reFills();
+			reEmpties();
+			updateScores();
+		}
+
+		function findCardValue(cardHTML) {
+			return parseInt(cardHTML.charAt(cardHTML.indexOf("Value: ")+7));
+		}
+
+
+		function flipScore(element) { alert(element.parentNode.id);// flipped up
+			if(p2turn){if (element.parentNode.id.includes("p1")) { // p2 flipping p1 cards
+						if(element.parentNode.id.includes("Air")) p1Score1 += (findCardValue(element.title)-2);
+					else if(element.parentNode.id.includes("L")) p1Score2 += (findCardValue(element.title)-2);
+					else p1Score3 += (findCardValue(element.title)-2);
+			}
+						else if(element.parentNode.className.includes("Air")) p2Score1 += (findCardValue(element.title)-2);
+						else if(element.parentNode.className.includes("L")) p2Score2 += (findCardValue(element.title)-2);
+						else p2Score3 += (findCardValue(element.title)-2);
+			}
+			else if(element.parentNode.id.includes('theater')) {
+							if(element.parentNode.className.includes("Air")) p2Score1 += (findCardValue(element.title)-2);
+							else if(element.parentNode.className.includes("L")) p2Score2 += (findCardValue(element.title)-2);
+							else p2Score3 += (findCardValue(element.title)-2);
+						}
+			else if(element.parentNode.id.includes("Air")) p1Score1 += (findCardValue(element.title)-2);
+						else if(element.parentNode.id.includes("L")) p1Score2 += (findCardValue(element.title)-2);
+						else p1Score3 += (findCardValue(element.title)-2);
+			updateScores();
+		}
+
+		function flipScore2(element) {  // flipped down
+			if(p2turn){ if (element.parentNode.id.includes("p1")) { // p2 flipping p1 cards
+						if(element.parentNode.id.includes("Air")) p1Score1 -= (findCardValue(element.title)-2);
+					else if(element.parentNode.id.includes("L")) p1Score2 -= (findCardValue(element.title)-2);
+					else p1Score3 -= (findCardValue(element.title)-2);
+			}
+						else if(element.parentNode.className.includes("Air")) p2Score1 -= (findCardValue(element.title)-2);
+						else if(element.parentNode.className.includes("L")) p2Score2 -= (findCardValue(element.title)-2);
+						else p2Score3 -= (findCardValue(element.title)-2);
+			}
+			else if(element.parentNode.id.includes('theater')) {
+							if(element.parentNode.className.includes("Air")) p2Score1 -= (findCardValue(element.title)-2);
+							else if(element.parentNode.className.includes("L")) p2Score2 -= (findCardValue(element.title)-2);
+							else p2Score3 -= (findCardValue(element.title)-2);
+						}
+			else if(element.parentNode.id.includes("Air")) p1Score1 -= (findCardValue(element.title)-2);
+			else if(element.parentNode.id.includes("L")) p1Score2 -= (findCardValue(element.title)-2);
+			else p1Score3 -= (findCardValue(element.title)-2);
+			updateScores();
+		}
+
+		function init() { if(deckMade) return;
+			for (var i = 0; i < 6; i++) {
+				newCard = new alsCard(i+1, "Air", cardList[cardsCreated++]);
+				deck.push(newCard);
+				newCard = new alsCard(i+1, "Land", cardList[cardsCreated++]);
+				deck.push(newCard);
+				newCard = new alsCard(i+1, "Sea", cardList[cardsCreated++]);
+				deck.push(newCard);
+			}
+
+			deck = shuffle(deck); deckMade = true;
+			p1Name = prompt("Player 1 (Top) Name:");
+			p2Name = prompt("Player 2 (Bottom) Name:");
+			document.getElementById('hand2').innerHTML = document.getElementById('hand2').innerHTML.replace("Bottom player", p2Name);
+			document.getElementById('hand').innerHTML = document.getElementById('hand').innerHTML.replace("Top player", p1Name);
+			reEmpties();
+		}
+
+
+		function shuffle(list) {
+			var newOrder = [];
+			var len = list.length;
+			for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+				newOrder.push(list[r]);
+				list.splice(r, 1);
+			}
+			return newOrder;
+		}
+
+		function draw(p2) {
+			if(!p2) for (var i = 0; i < 6; i++) {
+				document.getElementById('hand').append(deck.pop().display());
+			}
+			else for (var i = 0; i < 6; i++) {
+					document.getElementById('hand2').append(deck.pop().display());
+				}
+			document.getElementById('drawer').style.display = "none";
+			document.getElementById('hider').style.display = "initial";
+
+			reFills();
+		}
+
+		function reFills() {
+
+			fills = document.querySelectorAll('.fill');
+
+				// Fill listeners
+				for(const fill of fills){
+					fill.addEventListener('dragstart', dragStart);
+					fill.addEventListener('dragend', dragEnd);
+				}
+
+		}
+
+		function reEmpties() {
+
+			empties = document.querySelectorAll('.empty');
+
+			// Loop thru empties
+			for(const empty of empties){
+				empty.addEventListener('dragover', dragOver);
+				empty.addEventListener('dragenter', dragEnter);
+				empty.addEventListener('dragleave', dragLeave);
+				empty.addEventListener('drop', dragDrop);
+			}
+
+		}
+
+		function nextTurn() { // boolean to swap turns
+			p2turn = !p2turn;
+			document.getElementById('player').style.display = "none";
+			document.getElementById('hider').style.display = "initial";
+
+			if(p2turn){ 
+				if(!divided){
+					document.getElementById('theater1').innerHTML += "<hr/>";
+					document.getElementById('theater2').innerHTML += "<hr/>";
+					document.getElementById('theater3').innerHTML += "<hr/>";
+					divided = true;
+				}
+				document.getElementById('hand').style.display = "none";
+				document.getElementById('hand2').style.display = "initial";
+				if(!p2drawn) draw(p2turn);
+				p2drawn = true;
+			}
+			else { 
+				document.getElementById('hand').style.display = "initial";
+				document.getElementById('hand2').style.display = "none";
+			} 
+			reFills();
+			reEmpties();
+		}
+
+		function hideCards() { document.getElementById('hand').style.display = "none";
+			document.getElementById('hand2').style.display = "none";
+			document.getElementById('hider').style.display = "none";
+			document.getElementById('player').style.display = "initial";
+		}
+
+		function updateScores() {
+			document.getElementById('p1score1').innerHTML = p1Score1;
+			document.getElementById('p1score2').innerHTML = p1Score2;
+			document.getElementById('p1score3').innerHTML = p1Score3;
+			document.getElementById('p2score1').innerHTML = p2Score1;
+			document.getElementById('p2score2').innerHTML = p2Score2;
+			document.getElementById('p2score3').innerHTML = p2Score3;
+		}
+	</script>
+
+	<style type="text/css">
+		p {
+			position: absolute;
+			left: 100px;
+			background-color: white;
+		}
+
+		button { position: absolute;
+			left: 47%;
+			top: 60%;
+			padding: 20px 33px;
+			font-size: 42px;
+		}
+
+		div {
+			border: solid black;
+			margin: 10px;
+			width: 153px;
+			text-align: center;
+			display: inline-block;
+		}
+
+		.fill {
+			cursor: pointer;
+		}
+
+		.hovered {
+			background-color: lightgrey;
+		}
+
+		.invisible {
+			display: none;
+		}
+
+		.Air {
+			border: solid red;
+		}
+
+		.Land {
+			border: solid forestgreen;
+		}
+
+		.Sea {
+			border: solid blue;
+		}
+
+		#theater1, #theater2, #theater3 {
+			position: absolute;
+			top: 10%;
+			width: 30%;
+			height: 42%;
+			font-size: 72px;
+			text-align: center;
+		}
+		#theater2 {
+			left: 36%;
+		}
+		#theater3 {
+			left: 67%;
+		}
+		#theater1 div, #theater2 div, #theater3 div {
+			font-size: 16px;
+		}
+		#p1score1, #p1score2, #p1score3{
+			position: relative;
+			left: 30%;
+			padding: 0px 20px;
+		}
+		#p1score1, #p1score3{
+			left: 35%;
+		}
+
+		#p2score1, #p2score2, #p2score3{
+			position: absolute;
+			top: 51%;
+			left: 31.2%;
+			padding: 0px 20px;
+			font-size: 72px;
+		}
+		#p2score2, #p2score3{
+			left: 62%;
+		}
+		#p2score3{
+			left: 93%;
+		}
+	</style>
+</head>
+<body>
+<p id="hand">
+	Top player's hand:
+</p>
+<p id="hand2" style="display: none;">
+	Bottom player's hand:
+</p>
+<br />
+<button id="drawer" onclick="init(); draw(0);">
+	Draw
+</button>
+<button id="hider" onclick="hideCards();" style="display: none;">
+	Hide cards
+</button>
+<button id="player" onclick="nextTurn();" style="display: none;">
+	Next turn
+</button>
+<p class="Air empty" id="theater1">
+	<u>Air</u><span class="Air" id="p1score1">0</span><br><span id="p1Air"></span>
+</p>
+<p class="Land empty" id="theater2">
+	<u>Land</u><span class="Land" id="p1score2">0</span><br><span id="p1Land"></span>
+</p>
+<p class="Sea empty" id="theater3">
+	<u>Sea</u><span class="Sea" id="p1score3">0</span><br><span id="p1Sea"></span>
+</p>
+<span class="Air" id="p2score1">0</span>
+<span class="Land" id="p2score2">0</span>
+<span class="Sea" id="p2score3">0</span>
+<embed src="./AirLandSeaCardManifest.pdf" type="application/pdf" width="99%" height="280px" style="position: absolute;top: 70%;"></embed>
+</body>
+</html>
