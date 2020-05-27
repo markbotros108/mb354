@@ -1,0 +1,124 @@
+<html>
+<title>Startups</title>
+<script>
+var deck=[], hand=[];
+var coins = 10;
+var card = 5;
+var indexer = 0;
+var cardsPlayed = 0;
+var noMarkets = 0;
+
+	function init(){
+			for (var i = 0; i < 45; i++) {
+				if(indexer < card) deck[i] = card;
+				else {card++; deck[i] = card; indexer=0; }
+				indexer++;
+			}
+
+			 deck = shuffle(deck);
+			 console.log(deck);
+	}
+
+	function startup(){ init();
+		var name = "Mark";//prompt("Starting up Startups! What's your name?");
+		document.getElementById('hand').innerHTML = name + "'s hand: ";
+		document.getElementById('invested').innerHTML = name + "'s investments: ";
+		document.getElementById('coins').innerHTML = "Coins: " + coins;
+		document.getElementById('drawer').style.display = 'initial';
+		document.getElementById('starter').style.display = 'none';
+		next(0); next(0); next(0);
+	}
+
+	function next(ingame){ var value = deck.pop();
+		if(ingame) document.getElementById('drawer').style.visibility = 'hidden';
+		var newcard = document.createElement("div");
+		newcard.style.display = "inline";
+		newcard.style.marginLeft = "10px";
+		newcard.innerHTML = value;
+		newcard.style.border = "solid black";
+		newcard.style.fontSize = 64;
+		newcard.style.width = "fit-content";
+		newcard.style.textAlign = "center";
+		newcard.style.padding = "5px";
+		hand.push(value);
+		newcard.onclick = function(){play(value);}
+		document.getElementById('hand').appendChild(newcard);
+		console.log(hand);
+	}
+
+		function shuffle(list) {
+			var newOrder = [];
+			var len = list.length;
+			for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+				newOrder.push(list[r]);
+				list.splice(r, 1);
+			}
+			return newOrder;
+		}
+
+	function play(card) { var currentPay = 0;
+			var list = document.getElementById('hand');
+			var playedCard = childIndex(card);
+			var newInvestment = list.removeChild(list.childNodes[playedCard]);
+		if(confirm("Would you like to invest in " + card + "?")){
+			hand.splice(playedCard-1, 1);
+			document.getElementById('invested').appendChild(newInvestment);
+			cardsPlayed++; // ???
+		}
+		else { var discard = document.createElement('td');
+			noMarkets++;
+			newInvestment.id = noMarkets;
+			newInvestment.onclick = function() {market(this.id);}
+			discard.appendChild(newInvestment);
+			document.getElementById('valueRow').appendChild(discard);
+
+			var paymentList = document.getElementById('coinRow').childNodes;
+			for (var i = 0; i < paymentList.length; i++) {
+				if(paymentList[i].innerHTML == 0) {paymentList[i].innerHTML += 0; currentPay++;}
+			}
+			coins -= currentPay;
+
+			var currentCoin = document.createElement('td');
+			currentCoin.innerHTML = 0;
+			document.getElementById('coinRow').appendChild(currentCoin);
+		}
+		console.log(hand);
+		document.getElementById('coins').innerHTML = "Coins: " + coins;
+		document.getElementById('drawer').style.visibility = 'initial';
+	}
+
+	function childIndex(clicked){
+		var index = 0;
+		var list = document.getElementById('hand');
+		for (var i = 0; i < list.childNodes.length; i++) {
+			if (clicked.toString() === list.childNodes[i].innerHTML) break;
+			else index++;
+		}
+		return index;
+	}
+
+	function market(index){ var numIndex = parseInt(index);
+		var noCoins = document.getElementById('coinRow').childNodes[numIndex+2].innerHTML.length;
+
+		// Remove from market
+		// Put back into hand
+
+		coins += noCoins;
+		document.getElementById('coins').innerHTML = "Coins: " + coins;		
+	}
+</script>
+<button id='starter' style='position: relative; margin: 100px; left: 200px; font-size: 64' onclick='startup();'>Begin</button>
+<button id='drawer' style='display:none; position: relative; margin: 100px; left: 200px; font-size: 64' onclick='next(1);'>Draw</button>
+<table border="3" style="position: relative; left: 200px;">
+	<caption>TABLE</caption>
+	<tr id="valueRow">
+		<td>Value:</td>
+	</tr>
+	<tr id="coinRow">
+		<td>Coins:</td>
+	</tr>
+</table>
+<P id='invested' style='position: relative; left: 200px; border: solid black 5px; width: 80%; font-size: 64' >Your investments: </p>
+<P id='hand' style='position: relative; left: 200px; font-size: 64' >Your hand: </p>
+<P id='coins' style='position: relative; left: 200px; font-size: 64' >Coins: 0</p>
+</html>
