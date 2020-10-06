@@ -42,8 +42,8 @@
 			
 			document.getElementById("less").style.display="initial";
 			document.getElementById("more").style.display="initial";
-			if(playerCount == 5) document.getElementbyId("less").style.display="none";
-			else if(playerCount == 10) document.getElementbyId("more").style.display="none";
+			if(playerCount == 5) document.getElementById("less").style.display="none";
+			else if(playerCount == 10) document.getElementById("more").style.display="none";
 			
 			document.getElementById('playerimage').src = "images/" + playerCount + ".png";
 
