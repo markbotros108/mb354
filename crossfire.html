@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!-- Started 2:22am Finished 4:32am 7/10/20 -->
+<html>
+<head>
+	<title>Crossfire Cards</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		var playerCount = 5;
+		var currDecoy, updateDecoy;
+		var Agent = document.createElement('li');
+			Agent.innerHTML = "Agent";
+		var Agent2 = document.createElement('li');
+			Agent2.innerHTML = "Agent";
+		var Assassin = document.createElement('li');
+			Assassin.innerHTML = "Assassin";
+		var Assassin2 = document.createElement('li');
+			Assassin2.innerHTML = "Assassin";
+		var Decoy = document.createElement('li');
+			Decoy.innerHTML = "Decoy";
+		var VIP = document.createElement('li');
+			VIP.innerHTML = "VIP";
+		var Bystander = document.createElement('li');
+			Bystander.innerHTML = "Bystander";
+		var Agent3 = document.createElement('li');
+			Agent3.innerHTML = "Agent";
+		var Assassin3 = document.createElement('li');
+			Assassin3.innerHTML = "Assassin";
+		var Decoy2 = document.createElement('li');
+			Decoy2.innerHTML = "Decoy";
+
+		$(document).ready( function(){
+		document.getElementById('cardList').append(Agent);
+		document.getElementById('cardList').append(Assassin);
+			Decoy.innerHTML += " (Red) ";
+		document.getElementById('cardList').append(Decoy);
+		});
+
+		function change(arg) {
+			if (arg && playerCount>=5 && playerCount<10) playerCount++;
+			else if(!arg && playerCount>5 && playerCount<=10) playerCount--;
+			document.getElementById('noPlayers').innerHTML = playerCount;
+
+			
+			document.getElementById('playerimage').src = "images/" + playerCount + ".png";
+
+			document.getElementById('cardList').innerHTML = '';
+			document.getElementById('cardList').append(VIP);
+			document.getElementById('cardList').append(Bystander);
+			document.getElementById('cardList').append(Agent);
+			document.getElementById('cardList').append(Assassin);
+
+			switch(playerCount){
+				case 5: currDecoy = Decoy.innerHTML;
+						if(currDecoy.includes('(')){
+							updateDecoy = currDecoy.replace("Blue", "Red");
+								Decoy.innerHTML = updateDecoy;
+						}
+						else Decoy.innerHTML += "(Red)";
+
+						document.getElementById('cardList').append(Decoy);
+						break;
+				case 6: currDecoy = Decoy.innerHTML;
+						if(currDecoy.includes('(')){
+							updateDecoy = currDecoy.replace("Red", "Blue");
+								Decoy.innerHTML = updateDecoy;
+						}
+						else Decoy.innerHTML += "(Blue)";
+
+						document.getElementById('cardList').append(Decoy);
+						document.getElementById('cardList').append(Assassin2);
+						break;
+				case 7: document.getElementById('cardList').append(Agent2);
+						document.getElementById('cardList').append(Assassin2);
+						currDecoy = Decoy.innerHTML;
+						updateDecoy = currDecoy.replace("(Red)", "");
+						updateDecoy = currDecoy.replace("(Blue)", "");
+							Decoy.innerHTML = updateDecoy;
+						document.getElementById('cardList').append(Decoy);
+						break;
+				case 8: document.getElementById('cardList').append(Agent2);
+						document.getElementById('cardList').append(Assassin2);
+							currDecoy = Decoy.innerHTML;
+							if(currDecoy.includes('(')){
+								updateDecoy = currDecoy.replace("Blue", "Red");
+									Decoy.innerHTML = updateDecoy;
+							}
+							else Decoy.innerHTML += "(Red)";
+						document.getElementById('cardList').append(Decoy);
+							currDecoy = Decoy2.innerHTML;
+							updateDecoy = currDecoy.replace("(Red)", "");
+							updateDecoy = currDecoy.replace("(Blue)", "");
+								Decoy2.innerHTML = updateDecoy;
+						document.getElementById('cardList').append(Decoy2);
+						break;
+				case 9: document.getElementById('cardList').append(Agent2);
+						document.getElementById('cardList').append(Assassin2);
+						document.getElementById('cardList').append(Agent3);
+						document.getElementById('cardList').append(Assassin3);
+							currDecoy = Decoy2.innerHTML;
+							updateDecoy = currDecoy.replace("(Red)", "");
+							updateDecoy = currDecoy.replace("(Blue)", "");
+								Decoy2.innerHTML = updateDecoy;
+						document.getElementById('cardList').append(Decoy2);
+						break;
+				case 10: document.getElementById('cardList').append(Agent2);
+						document.getElementById('cardList').append(Assassin2);
+						document.getElementById('cardList').append(Agent3);
+						document.getElementById('cardList').append(Assassin3);
+						document.getElementById('cardList').append(Decoy);
+							currDecoy = Decoy2.innerHTML;
+							if(currDecoy.includes('(')){
+								updateDecoy = currDecoy.replace("Red", "Blue");
+									Decoy2.innerHTML = updateDecoy;
+							}
+							else Decoy2.innerHTML += " (Blue)";
+						document.getElementById('cardList').append(Decoy2);
+						break;
+				// default: alert("Not implemented yet"); 
+			}
+		}
+	</script>
+	<style type="text/css">
+		button {
+			font-size: 90px;
+			left: 30%;
+		}
+	</style>
+</head>
+<body>
+Number of Players<br>
+<button onclick="change(0)"><</button>
+<span id="noPlayers" style="font-size: 110px;">5</span>
+<button onclick="change(1)">></button>
+<ol id="cardList" title="Card List">
+	<li>VIP</li>
+	<li>Bystander</li>
+</ol>
+<img id="playerimage" src="images/5.png">
+</body>
+</html>
