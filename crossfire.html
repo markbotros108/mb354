@@ -40,8 +40,8 @@
 			else if(!arg && playerCount>5 && playerCount<=10) playerCount--;
 			document.getElementById('noPlayers').innerHTML = playerCount;
 			
-			document.getElementbyId("less").style.display="initial";
-			document.getElementbyId("more").style.display="initial";
+			document.getElementById("less").style.display="initial";
+			document.getElementById("more").style.display="initial";
 			if(playerCount == 5) document.getElementbyId("less").style.display="none";
 			else if(playerCount == 10) document.getElementbyId("more").style.display="none";
 			
