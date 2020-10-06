@@ -39,7 +39,11 @@
 			if (arg && playerCount>=5 && playerCount<10) playerCount++;
 			else if(!arg && playerCount>5 && playerCount<=10) playerCount--;
 			document.getElementById('noPlayers').innerHTML = playerCount;
-
+			
+			document.getElementbyId("less").style.display="initial";
+			document.getElementbyId("more").style.display="initial";
+			if(playerCount == 5) document.getElementbyId("less").style.display="none";
+			else if(playerCount == 10) document.getElementbyId("more").style.display="none";
 			
 			document.getElementById('playerimage').src = "images/" + playerCount + ".png";
 
@@ -123,15 +127,15 @@
 		button {
 			font-size: 90px;
 			left: 30%;
-			padding: 0px 200px;
+			padding: 0px 150px;
 		}
 	</style>
 </head>
 <body>
 Number of Players<br>
-<button onclick="change(0)"><</button>
+<button id="less" onclick="change(0)"><</button>
 <span id="noPlayers" style="font-size: 110px;">5</span>
-<button onclick="change(1)">></button>
+<button id="more" onclick="change(1)">></button>
 <ol id="cardList" title="Card List">
 	<li>VIP</li>
 	<li>Bystander</li>
