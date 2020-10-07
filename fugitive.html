@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<!-- Began 3:45am 6/10/2020 (15-30mins) -->
+<!-- TODO:  0. Create new instances of Card class and append to players hands DONE
+			1. Add buttons for drawing from each deck DO
+			2. Create hand arrays and display function
+			3. Fix size of containers DO
+			4. Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php
+			WHICH INCLUDE:
+				A) Playing a card into play area and adding it to played array invisible to marshall
+				B) Drawing / Sorting?
+				C) Turns including Marshall guesses -->
+<head>
+	<title>Fugitive Game</title>
+<style type="text/css">
+	button {
+		padding: 15px 30px;
+		font-size: 30px;
+	}
+
+	p{
+		font-size: 30px;
+		border: solid;
+		width: 80%;
+		height: 150px;
+		padding: 5px;
+		/*display: inline-block;*/
+	}
+
+	/*.hands {
+		width: 90%;
+	}*/
+
+	.card {
+		border: solid;
+		position: relative;
+		margin-top: 10px;
+		margin-left: 10px;
+		padding: 20px;
+		font-size: 60px;
+	}
+
+</style>
+</head>
+
+<script type="text/javascript">
+	var deck1 = [], deck2=[], deck3=[];
+
+	function init() { 
+		// create the 3 decks
+		var i =3;
+		while(i<41){ i++;
+			if(i<15) deck1.push(i);
+			else if (i<29) deck2.push(i);
+			else deck3.push(i);
+		}
+
+		// shuffle decks
+		deck1 = shuffle(deck1);
+		deck2 = shuffle(deck2);
+		deck3 = shuffle(deck3);
+
+		// reveal deck buttons and hand/play areas
+		document.getElementById('starter').style.display = 'none';
+		document.getElementById('buttonholder').style.display = 'initial';
+		document.getElementById('detcards').style.display = 'inline-block';//.innerHTML = deck1;
+		document.getElementById('played').style.display = 'inline-block';//.innerHTML = deck2;
+		document.getElementById('fugcards').style.display = 'inline-block';//.innerHTML = deck3;
+
+		// Add 2, 3 and 42 to fugitive hand
+		for (var i = 2; i <= 4; i++) {
+			var newcard = document.createElement('span');
+			if(i==4) newcard.innerHTML = 42;
+			else newcard.innerHTML = i;
+			newcard.className = 'card';
+			document.getElementById('fugcards').append(newcard);
+		}
+
+		// Also add 3 random small and 2 medium cards
+		for (var i = 0; i < 3; i++) {
+			var newcard = document.createElement('span');
+			newcard.className = 'card';
+			newcard.innerHTML = deck1.pop();
+			document.getElementById('fugcards').append(newcard);
+
+			var newcard2;
+			if(i<2){
+				newcard2 = document.createElement('span');
+				newcard2.className = 'card';
+				newcard2.innerHTML = deck2.pop();
+				document.getElementById('fugcards').append(newcard2);
+			}
+		}
+		
+	}
+
+	function shuffle(list) {
+		var newOrder = [];
+		var len = list.length;
+		for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+			newOrder.push(list[r]);
+			list.splice(r, 1);
+		}
+		return newOrder;
+	}
+
+	function draw(deck) {
+		switch(deck) {
+			case 1: break;
+			case 2: break;
+			case 3: 
+		}
+	}
+</script>
+
+<body>
+	<button id="starter" onclick="init()">BEGIN GAME</button>
+<p class="hands" id="detcards" style="display: none;">Marshall cards</p>
+<p id="played" style="display: none;">Play Area</p>
+<p class="hands" id="fugcards" style="display: none;">Fugitive's cards: <span class="card">1</span></p>
+<hr>
+<span id="buttonholder" style="display: none;">
+<button id="low" onclick="draw(1)">Deck 1(4-14)</button>
+<button id="mid" onclick="draw(2)">Deck 2 (15-28)</button>
+<button id="hi" onclick="draw(3)">Deck 3 (29-41)</button></span>
+</body>
+</html>
