@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html>
-<!-- Began 3:45am 6/10/2020 (15-30mins) -->
-<!-- TODO:  0. Create new instances of Card class and append to players hands DONE
-			1. Add buttons for drawing from each deck DO
-			2. Create hand arrays and display function
-			3. Fix size of containers DO
-			4. Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php
+<!-- Began 3:45am 6/10/2020 -->
+<!-- ALmost done 4:30pm 8/10/2020 -->
+<!-- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php
 			WHICH INCLUDE:
-				A) Playing a card into play area and adding it to played array invisible to marshall
-				B) Drawing / Sorting?
+				A) adding played cards to played array invisible to marshall
+				B) Drawing
 				C) Turns including Marshall guesses -->
 <head>
 	<title>Fugitive Game</title>
@@ -40,13 +37,20 @@
 		font-size: 60px;
 	}
 
+	.card:hover {
+		cursor: pointer;
+		background-color: yellow;
+	}
+
 </style>
 </head>
 
 <script type="text/javascript">
-	var deck1 = [], deck2=[], deck3=[];
+	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[];
+	var fugturn = true, turn1done=false;
+	var drawncard; // Value of most recently drawn card
 
-	function init() { 
+	function init() { //alert("Fugitive's turn");
 		// create the 3 decks
 		var i =3;
 		while(i<41){ i++;
@@ -62,36 +66,21 @@
 
 		// reveal deck buttons and hand/play areas
 		document.getElementById('starter').style.display = 'none';
-		document.getElementById('buttonholder').style.display = 'initial';
 		document.getElementById('detcards').style.display = 'inline-block';//.innerHTML = deck1;
 		document.getElementById('played').style.display = 'inline-block';//.innerHTML = deck2;
 		document.getElementById('fugcards').style.display = 'inline-block';//.innerHTML = deck3;
 
-		// Add 2, 3 and 42 to fugitive hand
-		for (var i = 2; i <= 4; i++) {
-			var newcard = document.createElement('span');
-			if(i==4) newcard.innerHTML = 42;
-			else newcard.innerHTML = i;
-			newcard.className = 'card';
-			document.getElementById('fugcards').append(newcard);
-		}
-
-		// Also add 3 random small and 2 medium cards
+		// Add 3 random small and 2 medium cards
 		for (var i = 0; i < 3; i++) {
-			var newcard = document.createElement('span');
-			newcard.className = 'card';
-			newcard.innerHTML = deck1.pop();
-			document.getElementById('fugcards').append(newcard);
+			drawncard = deck1.pop();
+			fughand.push(drawncard);
 
-			var newcard2;
 			if(i<2){
-				newcard2 = document.createElement('span');
-				newcard2.className = 'card';
-				newcard2.innerHTML = deck2.pop();
-				document.getElementById('fugcards').append(newcard2);
+				drawncard = deck2.pop();
+				fughand.push(drawncard);
 			}
 		}
-		
+		display();
 	}
 
 	function shuffle(list) {
@@ -104,12 +93,102 @@
 		return newOrder;
 	}
 
-	function draw(deck) {
+	function draw(deck, fugturn) { //alert(fugturn);
 		switch(deck) {
-			case 1: break;
-			case 2: break;
-			case 3: 
+			case 'low': if(confirm('Are you sure you wish to draw from the 4-14 deck?'))
+					{ drawncard = deck1.pop();
+						alert("You drew a "+drawncard);
+						if(fugturn)	fughand.push(drawncard);
+						else marshand.push(drawncard); 
+						document.getElementById('low').innerHTML = "4-14 Deck (" +deck1.length+ ")";
+					}
+					break;
+			case 'mid': if(confirm('Are you sure you wish to draw from the 15-29 deck?')); 
+					{ drawncard = deck2.pop();
+						alert("You drew a "+drawncard);
+						if(fugturn)	fughand.push(drawncard);
+						else marshand.push(drawncard); 
+						document.getElementById('mid').innerHTML = "15-29 Deck (" +deck2.length+ ")";
+					}
+					break;
+			case 'hi': if(confirm('Are you sure you wish to draw from the 30-41 deck?'));
+					{ drawncard = deck3.pop();
+						alert("You drew a "+drawncard);
+						if(fugturn)	fughand.push(drawncard);
+						else marshand.push(drawncard); 
+						document.getElementById('hi').innerHTML = "30-41 Deck (" +deck3.length+ ")";
+					}
+					break;
 		}
+
+		if(turn1done){document.getElementById('buttonholder').style.display = 'none';}
+		if(!fugturn) document.getElementById('guesser').style.display = 'initial';
+		document.getElementById('ender').style.display = 'initial';
+		display();
+	}
+
+	function play(no) {
+		if(fugturn){
+				var newcard = document.createElement('span');
+				newcard.className = 'card';
+				newcard.innerHTML = no;
+				document.getElementById('played').append(newcard);
+		
+				// Remove within the fugitive's hand and add to hideouts array
+				var noAsInt = parseInt(no);//		console.log(fughand.indexOf(noAsInt));
+				var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
+				hideouts.push(playedcard[0]);
+		
+				// Display the new changes
+				display();
+		
+				// Allow player to end turn
+				document.getElementById('ender').style.display = 'initial';}
+	}
+
+	function guess() {
+		// Allow Marshall to guess cards in play area i.e. in the hideout array
+		// USE PARSEINT
+	}
+
+	function next() { // Switch player turn
+		turn1done = true;
+		if (fugturn) {fugturn = false; alert("Marshall's turn");}
+		else {fugturn = true; alert("Fugitive's turn"); }
+
+		// Change Display function
+		display();
+		document.getElementById('ender').style.display = 'none';
+		document.getElementById('guesser').style.display = 'none';
+		deckcheck();
+		if(turn1done) document.getElementById('buttonholder').style.display = 'initial';
+	}
+
+	function deckcheck() {
+		if (!deck1.length) document.getElementById('low').style.display = 'none';
+		if (!deck2.length) document.getElementById('mid').style.display = 'none';
+		if (!deck3.length) document.getElementById('hi').style.display = 'none';
+	}
+
+	function display() { // Ensure this changes per player turn using argument
+		document.getElementById('fugcards').innerHTML = "Fugitive's cards: ";
+		document.getElementById('detcards').innerHTML = "Marshall's cards: ";
+		fughand.sort(function(a, b){return a-b});
+		// marshand.sort(function(a, b){return a-b});
+		for (var i = 0; i < fughand.length; i++) {
+					var newcard = document.createElement('span');
+					newcard.className = 'card';
+					newcard.innerHTML = fughand[i];
+					newcard.onclick = function() {play(this.innerHTML);}
+					document.getElementById('fugcards').append(newcard);
+				}
+
+		for (var i = 0; i < marshand.length; i++) {
+					var newcard = document.createElement('span');
+					newcard.className = 'card';
+					newcard.innerHTML = marshand[i];
+					document.getElementById('detcards').append(newcard);
+				}
 	}
 </script>
 
@@ -117,11 +196,14 @@
 	<button id="starter" onclick="init()">BEGIN GAME</button>
 <p class="hands" id="detcards" style="display: none;">Marshall cards</p>
 <p id="played" style="display: none;">Play Area</p>
-<p class="hands" id="fugcards" style="display: none;">Fugitive's cards: <span class="card">1</span></p>
+<p class="hands" id="fugcards" style="display: none;">Fugitive's cards: </p>
 <hr>
 <span id="buttonholder" style="display: none;">
-<button id="low" onclick="draw(1)">Deck 1(4-14)</button>
-<button id="mid" onclick="draw(2)">Deck 2 (15-28)</button>
-<button id="hi" onclick="draw(3)">Deck 3 (29-41)</button></span>
+<button id="low" onclick="draw(id, fugturn)">4-14 Deck (8)</button>
+<button id="mid" onclick="draw(id, fugturn)">15-28 Deck (12)</button>
+<button id="hi" onclick="draw(id, fugturn)">29-41 Deck (13)</button>
+</span>
+<button id="guesser" onclick="guess()" style="display: none;">Guess a Hideout</button>
+<button id="ender" onclick="next()" style="display: none;">End Turn</button>
 </body>
 </html>
