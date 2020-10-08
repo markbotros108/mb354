@@ -2,11 +2,8 @@
 <html>
 <!-- Began 3:45am 6/10/2020 -->
 <!-- ALmost done 4:30pm 8/10/2020 -->
-<!-- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php
-			WHICH INCLUDE:
-				A) adding played cards to played array invisible to marshall
-				B) Drawing
-				C) Turns including Marshall guesses -->
+<!-- Comleted working prototype 4am 9/10/2020 -->
+<!-- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php -->
 <head>
 	<title>Fugitive Game</title>
 <style type="text/css">
@@ -23,10 +20,6 @@
 		padding: 5px;
 		/*display: inline-block;*/
 	}
-
-	/*.hands {
-		width: 90%;
-	}*/
 
 	.card {
 		border: solid;
@@ -46,7 +39,7 @@
 </head>
 
 <script type="text/javascript">
-	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[];
+	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[], revealed=[];
 	var fugturn = true, turn1done=false;
 	var drawncard; // Value of most recently drawn card
 
@@ -121,7 +114,7 @@
 					break;
 		}
 
-		if(turn1done){document.getElementById('buttonholder').style.display = 'none';}
+		if(turn1done){document.getElementById('buttonholder').style.display = 'none';} // Only when card was drawn
 		if(!fugturn) document.getElementById('guesser').style.display = 'initial';
 		document.getElementById('ender').style.display = 'initial';
 		display();
@@ -129,11 +122,6 @@
 
 	function play(no) {
 		if(fugturn){
-				var newcard = document.createElement('span');
-				newcard.className = 'card';
-				newcard.innerHTML = no;
-				document.getElementById('played').append(newcard);
-		
 				// Remove within the fugitive's hand and add to hideouts array
 				var noAsInt = parseInt(no);//		console.log(fughand.indexOf(noAsInt));
 				var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
@@ -147,8 +135,40 @@
 	}
 
 	function guess() {
-		// Allow Marshall to guess cards in play area i.e. in the hideout array
-		// USE PARSEINT
+		// Allow Marshall to guess cards ONCE in play area i.e. in the hideout array
+		document.getElementById('guesser').style.display = 'none';
+		if(confirm("Would you like to guess one card? Click Cancel for multiple guesses."))
+		{
+			var guess = parseInt(prompt("What is your guess?"));
+			var correctguess = 0;
+			for (var i = 0; i < hideouts.length; i++) {
+				if(guess == hideouts[i]){ alert("Correct! One hideout has been revealed.");
+						 revealed.push(guess); correctguess++; break;}
+			}
+			if(!correctguess) alert("Incorrect.");
+		}
+		else {
+			var sizeOfGuess = parseInt(prompt("How many guesses?"));
+			var multiguess = [];
+			var correctguesses = 0;
+
+			for (var i = 0; i < sizeOfGuess; i++) {
+				multiguess.push(parseInt( prompt((sizeOfGuess-i) + " guesses remaining. What is your guess?") ));
+			}
+
+			for (var i = 0; i < multiguess.length; i++) {
+					for (var j = 0; j < hideouts.length; j++) {
+						if(hideouts[j] == multiguess[i]) correctguesses++;
+					}
+			}
+
+			if(correctguesses == sizeOfGuess) {alert("ALL GUESSES CORRECT!"); 
+								revealed = revealed.concat(multiguess);  }
+			else alert("One or more guesses were incorrect...");
+		}
+
+		// Show revealed cards
+		display();
 	}
 
 	function next() { // Switch player turn
@@ -173,22 +193,34 @@
 	function display() { // Ensure this changes per player turn using argument
 		document.getElementById('fugcards').innerHTML = "Fugitive's cards: \n";
 		document.getElementById('detcards').innerHTML = "Marshall's cards: \n";
+		document.getElementById('played').innerHTML = "Play Area\n";
 		fughand.sort(function(a, b){return a-b});
-		// marshand.sort(function(a, b){return a-b});
+		marshand.sort(function(a, b){return a-b});
 		for (var i = 0; i < fughand.length; i++) {
 					var newcard = document.createElement('span');
 					newcard.className = 'card';
-					newcard.innerHTML = fughand[i];
-					newcard.onclick = function() {play(this.innerHTML);}
+					if(fugturn){ newcard.innerHTML = fughand[i];
+						 newcard.onclick = function() {play(this.innerHTML);}
+					}
+					else newcard.innerHTML = "~";
 					document.getElementById('fugcards').append(newcard);
 				}
 
 		for (var i = 0; i < marshand.length; i++) {
 					var newcard = document.createElement('span');
 					newcard.className = 'card';
-					newcard.innerHTML = marshand[i];
+					if(fugturn) newcard.innerHTML = "~";
+					else newcard.innerHTML = marshand[i];
 					document.getElementById('detcards').append(newcard);
 				}
+		for (var i = 0; i < hideouts.length; i++) {
+				var newcard = document.createElement('span');
+				newcard.className = 'card';
+				if(fugturn) newcard.innerHTML = hideouts[i];
+				else if(revealed.includes(hideouts[i])) newcard.innerHTML = hideouts[i];
+					else newcard.innerHTML = "~";
+				document.getElementById('played').append(newcard);
+		}
 	}
 </script>
 
