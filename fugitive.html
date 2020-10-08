@@ -171,8 +171,8 @@
 	}
 
 	function display() { // Ensure this changes per player turn using argument
-		document.getElementById('fugcards').innerHTML = "Fugitive's cards: ";
-		document.getElementById('detcards').innerHTML = "Marshall's cards: ";
+		document.getElementById('fugcards').innerHTML = "Fugitive's cards: \n";
+		document.getElementById('detcards').innerHTML = "Marshall's cards: \n";
 		fughand.sort(function(a, b){return a-b});
 		// marshand.sort(function(a, b){return a-b});
 		for (var i = 0; i < fughand.length; i++) {
