@@ -103,7 +103,7 @@
 						document.getElementById('low').innerHTML = "4-14 Deck (" +deck1.length+ ")";
 					}
 					break;
-			case 'mid': if(confirm('Are you sure you wish to draw from the 15-29 deck?')); 
+			case 'mid': if(confirm('Are you sure you wish to draw from the 15-29 deck?'))
 					{ drawncard = deck2.pop();
 						alert("You drew a "+drawncard);
 						if(fugturn)	fughand.push(drawncard);
@@ -111,7 +111,7 @@
 						document.getElementById('mid').innerHTML = "15-29 Deck (" +deck2.length+ ")";
 					}
 					break;
-			case 'hi': if(confirm('Are you sure you wish to draw from the 30-41 deck?'));
+			case 'hi': if(confirm('Are you sure you wish to draw from the 30-41 deck?'))
 					{ drawncard = deck3.pop();
 						alert("You drew a "+drawncard);
 						if(fugturn)	fughand.push(drawncard);
