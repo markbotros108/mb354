@@ -3,7 +3,11 @@
 <!-- Began 3:45am 6/10/2020 -->
 <!-- ALmost done 4:30pm 8/10/2020 -->
 <!-- Comleted working prototype 4am 9/10/2020 -->
-<!-- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php -->
+<!-- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php 
+			INCLUDING  1. Making sure Fugitive can only play 1 card per turn 
+							but 2 on first turn DONE
+						2. Marshall can't make same guess twice (can't be in revealed)
+						3. End game checks -->
 <head>
 	<title>Fugitive Game</title>
 <style type="text/css">
@@ -40,10 +44,10 @@
 
 <script type="text/javascript">
 	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[], revealed=[];
-	var fugturn = true, turn1done=false;
-	var drawncard; // Value of most recently drawn card
+	var fugturn = true, turn1done=false, endTheGame=false;
+	var drawncard, lastplayed=0, playedThisTurn=0; // Value of most recently drawn card
 
-	function init() { alert("Fugitive's turn");
+	function init() { //alert("Fugitive's turn");
 		// create the 3 decks
 		var i =3;
 		while(i<41){ i++;
@@ -121,17 +125,24 @@
 	}
 
 	function play(no) {
-		if(fugturn){
+		if(fugturn && (!playedThisTurn || (!turn1done && playedThisTurn < 2) ) ){
 				// Remove within the fugitive's hand and add to hideouts array
 				var noAsInt = parseInt(no);//		console.log(fughand.indexOf(noAsInt));
+				var diff = noAsInt - lastplayed;
+				if( diff <= 3 && diff > 0 ){ lastplayed = noAsInt; // Update last played
 				var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
 				hideouts.push(playedcard[0]);
+				playedThisTurn++;
 		
 				// Display the new changes
 				display();
 		
 				// Allow player to end turn
 				document.getElementById('ender').style.display = 'initial';}
+
+				// Card must be within 3 away from last card
+				else alert("Card must be within 3 steps from last played hideout.");
+			}
 	}
 
 	function guess() {
@@ -172,16 +183,36 @@
 	}
 
 	function next() { // Switch player turn
-		turn1done = true;
-		if (fugturn) {fugturn = false; alert("Marshall's turn");}
-		else {fugturn = true; alert("Fugitive's turn"); }
+		winCheck();
+		turn1done = true; playedThisTurn=0;
+		if (fugturn && !endTheGame ) {fugturn = false; alert("Marshall's turn");}
+		else if (!endTheGame) {fugturn = true; alert("Fugitive's turn"); }
 
 		// Change Display function
 		display();
 		document.getElementById('ender').style.display = 'none';
 		document.getElementById('guesser').style.display = 'none';
 		deckcheck();
-		if(turn1done) document.getElementById('buttonholder').style.display = 'initial';
+		if(!endTheGame) document.getElementById('buttonholder').style.display = 'initial';
+	}
+
+	function winCheck() {
+		revealed.sort(function(a, b){return a-b});
+		hideouts.sort(function(a, b){return a-b});
+		if (revealed === hideouts) { alert("Fugitive caught! Marshall wins!");
+				endTheGame = true;
+			}
+		else if (hideouts.includes(42) ) { alert("Fugitive escapes! Marshall loses!");
+				endTheGame = true;
+			}
+
+		if(endTheGame){ endTheGame = false; // sort out draw decks
+			hideouts = []; fughand = [1, 2, 3, 42]; marshand = []; revealed = [];
+			document.getElementById('starter').style.display = 'initial';
+			document.getElementById('detcards').style.display = 'none';
+			document.getElementById('played').style.display = 'none';
+			document.getElementById('fugcards').style.display = 'none';
+		}
 	}
 
 	function deckcheck() {
