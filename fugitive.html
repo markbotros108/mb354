@@ -3,11 +3,9 @@
 <!-- Began 3:45am 6/10/2020 -->
 <!-- ALmost done 4:30pm 8/10/2020 -->
 <!-- Comleted working prototype 4am 9/10/2020 -->
+<!-- Finished 4pm 10/10/2020	 -->
 <!-- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php 
-			INCLUDING  1. Making sure Fugitive can only play 1 card per turn 
-							but 2 on first turn DONE
-						2. Marshall can't make same guess twice (can't be in revealed)
-						3. End game checks -->
+			INCLUDING  Marshall can't make same guess twice (can't be in revealed) -->
 <head>
 	<title>Fugitive Game</title>
 <style type="text/css">
@@ -44,10 +42,10 @@
 
 <script type="text/javascript">
 	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[], revealed=[];
-	var fugturn = true, turn1done=false, endTheGame=false;
+	var fugturn = true, turn1done=false, endTheGame;
 	var drawncard, lastplayed=0, playedThisTurn=0; // Value of most recently drawn card
 
-	function init() { //alert("Fugitive's turn");
+	function init() { endTheGame = false;
 		// create the 3 decks
 		var i =3;
 		while(i<41){ i++;
@@ -199,14 +197,15 @@
 	function winCheck() {
 		revealed.sort(function(a, b){return a-b});
 		hideouts.sort(function(a, b){return a-b});
-		if (revealed === hideouts) { alert("Fugitive caught! Marshall wins!");
+		if (revealed.toString() === hideouts.toString()) { alert("Fugitive caught! Marshall wins!");
 				endTheGame = true;
 			}
 		else if (hideouts.includes(42) ) { alert("Fugitive escapes! Marshall loses!");
 				endTheGame = true;
 			}
 
-		if(endTheGame){ endTheGame = false; // sort out draw decks
+		if(endTheGame){ 
+			fugturn=true; turn1done=false; deck1 = []; deck2=[]; deck3=[];
 			hideouts = []; fughand = [1, 2, 3, 42]; marshand = []; revealed = [];
 			document.getElementById('starter').style.display = 'initial';
 			document.getElementById('detcards').style.display = 'none';
