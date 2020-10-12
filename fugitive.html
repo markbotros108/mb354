@@ -3,7 +3,8 @@
 <!-- Began 3:45am 6/10/2020 -->
 <!-- ALmost done 4:30pm 8/10/2020 -->
 <!-- Comleted working prototype 4am 9/10/2020 -->
-<!-- Finished 4pm 10/10/2020	 -->
+<!-- Finished 4pm 10/10/2020 -->
+<!-- Sprinting completed 3:15am 13/10/2020 -->
 <!-- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php 
 			INCLUDING  Marshall can't make same guess twice (can't be in revealed) -->
 <head>
@@ -32,6 +33,15 @@
 		font-size: 60px;
 	}
 
+	.minicard {
+		border: solid;
+		position: relative;
+		margin-top: 10px;
+		margin-left: 10px;
+		padding: 20px;
+		font-size: 20px;
+	}
+
 	.card:hover {
 		cursor: pointer;
 		background-color: yellow;
@@ -41,7 +51,7 @@
 </head>
 
 <script type="text/javascript">
-	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[], revealed=[];
+	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[], revealed=[], sprints=[];
 	var fugturn = true, turn1done=false, endTheGame;
 	var drawncard, lastplayed=0, playedThisTurn=0; // Value of most recently drawn card
 
@@ -88,58 +98,81 @@
 		return newOrder;
 	}
 
-	function draw(deck, fugturn) { //alert(fugturn);
+	function draw(deck, fugturn) { var cardDrawn = false;
 		switch(deck) {
 			case 'low': if(confirm('Are you sure you wish to draw from the 4-14 deck?'))
-					{ drawncard = deck1.pop();
+					{ cardDrawn = true;
+						drawncard = deck1.pop();
 						alert("You drew a "+drawncard);
 						if(fugturn)	fughand.push(drawncard);
 						else marshand.push(drawncard); 
-						document.getElementById('low').innerHTML = "4-14 Deck (" +deck1.length+ ")";
+						document.getElementById('low').innerHTML = "4-14 Deck (" +deck1.length+ " left)";
 					}
 					break;
 			case 'mid': if(confirm('Are you sure you wish to draw from the 15-29 deck?'))
-					{ drawncard = deck2.pop();
+					{ cardDrawn = true;
+						drawncard = deck2.pop();
 						alert("You drew a "+drawncard);
 						if(fugturn)	fughand.push(drawncard);
 						else marshand.push(drawncard); 
-						document.getElementById('mid').innerHTML = "15-29 Deck (" +deck2.length+ ")";
+						document.getElementById('mid').innerHTML = "15-29 Deck (" +deck2.length+ " left)";
 					}
 					break;
 			case 'hi': if(confirm('Are you sure you wish to draw from the 30-41 deck?'))
-					{ drawncard = deck3.pop();
+					{ cardDrawn=true;
+						drawncard = deck3.pop();
 						alert("You drew a "+drawncard);
 						if(fugturn)	fughand.push(drawncard);
 						else marshand.push(drawncard); 
-						document.getElementById('hi').innerHTML = "30-41 Deck (" +deck3.length+ ")";
+						document.getElementById('hi').innerHTML = "30-41 Deck (" +deck3.length+ " left)";
 					}
 					break;
 		}
-
-		if(turn1done){document.getElementById('buttonholder').style.display = 'none';} // Only when card was drawn
-		if(!fugturn) document.getElementById('guesser').style.display = 'initial';
-		document.getElementById('ender').style.display = 'initial';
-		display();
+		if (cardDrawn){
+			if(turn1done){document.getElementById('buttonholder').style.display = 'none';} // Only when card was drawn
+			if(!fugturn ) document.getElementById('guesser').style.display = 'initial';
+			document.getElementById('ender').style.display = 'initial';
+			display();
+		}
 	}
 
 	function play(no) {
 		if(fugturn && (!playedThisTurn || (!turn1done && playedThisTurn < 2) ) ){
 				// Remove within the fugitive's hand and add to hideouts array
-				var noAsInt = parseInt(no);//		console.log(fughand.indexOf(noAsInt));
+				var noAsInt = parseInt(no);
 				var diff = noAsInt - lastplayed;
+
 				if( diff <= 3 && diff > 0 ){ lastplayed = noAsInt; // Update last played
 				var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
 				hideouts.push(playedcard[0]);
+				sprints.push(playedcard[0]);
 				playedThisTurn++;
 		
 				// Display the new changes
 				display();
 		
 				// Allow player to end turn
-				document.getElementById('ender').style.display = 'initial';}
+				document.getElementById('ender').style.display = 'initial';
+				}
+
+				else if(diff>=4 && diff < (fughand.length-2) ) { lastplayed = noAsInt;
+					var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
+					hideouts.push(playedcard[0]);
+
+					var sprintedwith=[]; sprintedwith.push(playedcard[0]);
+					for (var i = 0; i < diff-3; i++) {
+						var sprintercard = parseInt(prompt("Which card would you like to sprint using?"));
+						sprintedwith.push(fughand.splice(fughand.indexOf(sprintercard), 1)[0]);
+					}
+					sprints.push(sprintedwith);
+
+					playedThisTurn++;
+					display();
+					document.getElementById('ender').style.display = 'initial';
+				}
 
 				// Card must be within 3 away from last card
-				else alert("Card must be within 3 steps from last played hideout.");
+				else alert("Card must be within 3 steps from last played hideout. More steps are also allowed but require sacrificing cards.");
 			}
 	}
 
@@ -204,7 +237,7 @@
 				endTheGame = true;
 			}
 
-		if(endTheGame){ 
+		if(endTheGame){ lastplayed=0; playedThisTurn=0; sprints=[];
 			fugturn=true; turn1done=false; deck1 = []; deck2=[]; deck3=[];
 			hideouts = []; fughand = [1, 2, 3, 42]; marshand = []; revealed = [];
 			document.getElementById('starter').style.display = 'initial';
@@ -250,6 +283,19 @@
 				else if(revealed.includes(hideouts[i])) newcard.innerHTML = hideouts[i];
 					else newcard.innerHTML = "~";
 				document.getElementById('played').append(newcard);
+
+				if(sprints[i].length != null && !revealed.includes(sprints[i][0])) {
+					var newmini = document.createElement('span');
+					newmini.className = 'minicard';
+					newmini.innerHTML = sprints[i].length-1;
+					document.getElementById('played').append(newmini);
+				}
+				else if(sprints[i].length != null) {
+					var newmini = document.createElement('span');
+					newmini.className = 'minicard';
+					newmini.innerHTML = sprints[i];
+					document.getElementById('played').append(newmini);
+				}
 		}
 	}
 </script>
