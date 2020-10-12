@@ -7,8 +7,8 @@
     console.log("Hello " + x);
     window.open("onitama2player.html");
   }*/
-  function openup(playerNo){
-   switch(playerNo){
+  function openup(playerNo){ window.open(playerNo);
+  /* switch(playerNo){
      case 1: window.open("onitama.html"); break;
      case 2: window.open("onitama2player.html"); break;
      case 3: window.open("12days.html"); break;
@@ -18,8 +18,9 @@
     case 7: window.open("startup.html"); break;
     case 8: window.open("yahtzee.html"); break;
     case 9: window.open("crossfire.html"); break;
-     default: alert("ERROR");
-    }
+    case 10: window.open("fugitive.html"); break;
+     //default: alert("ERROR");
+    }*/
   }
 </script>
 <h3>Click a button below to play Onitama:</h3>
@@ -34,3 +35,4 @@
 <button onclick="openup(7);">Start Ups</button>
 <button onclick="openup(8);">Dice roll</button>
 <button onclick="openup(9);">Crossfire</button>
+<button onclick="openup("fugitive.html");">Fugitive</button>
