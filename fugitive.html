@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
-<!-- Began 3:45am 6/10/2020 -->
-<!-- ALmost done 4:30pm 8/10/2020 -->
-<!-- Completed working prototype 4am 9/10/2020 -->
-<!-- Finished 4pm 10/10/2020 -->
-<!-- Sprinting completed 3:15am 13/10/2020 -->
-<!-- Working Sprint with chance of double sprint! (30%) 4am 14/10/2020 -->
-<!-- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php 
-			INCLUDING  Marshall can't make same guess twice (can't be in revealed) -->
+<!-- Began 3:45am 6/10/2020 
+ ALmost done 4:30pm 8/10/2020 
+ Completed working prototype 4am 9/10/2020 
+ Finished 4pm 10/10/2020 
+ Sprinting completed 3:15am 13/10/2020 
+ Working Sprint with chance of double sprint! (30%) 4am 14/10/2020 
+ TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php 
+			INCLUDING Marshall can't make same guess twice (can't be in revealed)
+			AND Fugitive can fake sprints I.E. sprint when not necessary -->
 <head>
 	<title>Fugitive Game</title>
 <style type="text/css">
@@ -53,7 +54,7 @@
 
 <script type="text/javascript">
 	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[], revealed=[], sprints=[];
-	var fugturn = true, turn1done=false, endTheGame;
+	var fugturn = true, turn1done=false, endTheGame, drawnThisTurn=0;
 	var drawncard, lastplayed=0, playedThisTurn=0; // Value of most recently drawn card
 
 	function init() { endTheGame = false;
@@ -102,7 +103,7 @@
 	function draw(deck, fugturn) { var cardDrawn = false;
 		switch(deck) {
 			case 'low': if(confirm('Are you sure you wish to draw from the 4-14 deck?'))
-					{ cardDrawn = true;
+					{ cardDrawn = true; drawnThisTurn++;
 						drawncard = deck1.pop();
 						alert("You drew a "+drawncard);
 						if(fugturn)	fughand.push(drawncard);
@@ -111,7 +112,7 @@
 					}
 					break;
 			case 'mid': if(confirm('Are you sure you wish to draw from the 15-29 deck?'))
-					{ cardDrawn = true;
+					{ cardDrawn = true; drawnThisTurn++;
 						drawncard = deck2.pop();
 						alert("You drew a "+drawncard);
 						if(fugturn)	fughand.push(drawncard);
@@ -120,7 +121,7 @@
 					}
 					break;
 			case 'hi': if(confirm('Are you sure you wish to draw from the 30-41 deck?'))
-					{ cardDrawn=true;
+					{ cardDrawn=true; drawnThisTurn++;
 						drawncard = deck3.pop();
 						alert("You drew a "+drawncard);
 						if(fugturn)	fughand.push(drawncard);
@@ -130,7 +131,7 @@
 					break;
 		}
 		if (cardDrawn){
-			if(turn1done){document.getElementById('buttonholder').style.display = 'none';} // Only when card was drawn
+			if(turn1done || drawnThisTurn>1){document.getElementById('buttonholder').style.display = 'none';} // Only when card was drawn
 			if(!fugturn ) document.getElementById('guesser').style.display = 'initial';
 			document.getElementById('ender').style.display = 'initial';
 			display();
@@ -223,9 +224,9 @@
 
 	function next() { // Switch player turn
 		winCheck();
-		turn1done = true; playedThisTurn=0;
+		playedThisTurn=0; drawnThisTurn=0;
 		if (fugturn && !endTheGame ) {fugturn = false; alert("Marshall's turn");}
-		else if (!endTheGame) {fugturn = true; alert("Fugitive's turn"); }
+		else if (!endTheGame) {fugturn = true; turn1done = true; alert("Fugitive's turn"); }
 
 		// Change Display function
 		display();
