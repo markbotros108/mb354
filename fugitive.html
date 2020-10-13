@@ -2,9 +2,10 @@
 <html>
 <!-- Began 3:45am 6/10/2020 -->
 <!-- ALmost done 4:30pm 8/10/2020 -->
-<!-- Comleted working prototype 4am 9/10/2020 -->
+<!-- Completed working prototype 4am 9/10/2020 -->
 <!-- Finished 4pm 10/10/2020 -->
 <!-- Sprinting completed 3:15am 13/10/2020 -->
+<!-- Working Sprint with chance of double sprint! (70%) 4am 14/10/2020 -->
 <!-- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php 
 			INCLUDING  Marshall can't make same guess twice (can't be in revealed) -->
 <head>
@@ -155,14 +156,21 @@
 				document.getElementById('ender').style.display = 'initial';
 				}
 
-				else if(diff>=4 && diff < (fughand.length-2) ) { lastplayed = noAsInt;
+				else if(diff>=4 && diff <= (fughand.length+1) ) { lastplayed = noAsInt;
 					var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
 					hideouts.push(playedcard[0]);
 
 					var sprintedwith=[]; sprintedwith.push(playedcard[0]);
-					for (var i = 0; i < diff-3; i++) {
-						var sprintercard = parseInt(prompt("Which card would you like to sprint using?"));
-						sprintedwith.push(fughand.splice(fughand.indexOf(sprintercard), 1)[0]);
+					for (var i = diff-3; i > 0; i--) { var successSprint = false;
+						while(!successSprint){
+							if (sprintedwith.length>=2 && Math.random() > 0.7 ) {successSprint=true; console.log("Success"); }
+							else {
+								var sprintercard = parseInt(prompt(i+" cards needed. Which card would you like to sprint using?"));
+								if(fughand.includes(sprintercard)) { successSprint=true;
+															sprintedwith.push(fughand.splice(fughand.indexOf(sprintercard), 1)[0]);}
+								else alert("This card is not in your hand!");
+							}
+						}
 					}
 					sprints.push(sprintedwith);
 
