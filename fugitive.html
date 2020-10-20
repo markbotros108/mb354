@@ -157,7 +157,7 @@
 				document.getElementById('ender').style.display = 'initial';
 				}
 
-				else if(diff>=4 && diff <= (fughand.length+1) ) { lastplayed = noAsInt;
+				else if( (diff>=4 && diff <= (fughand.length+1)) || (no==42 && diff <= (fughand.length+2)) ) { lastplayed = noAsInt;
 					var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
 					hideouts.push(playedcard[0]);
 
