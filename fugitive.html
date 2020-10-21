@@ -163,7 +163,7 @@
 
 					var sprintedwith=[]; sprintedwith.push(playedcard[0]);
 					for (var i = diff-3; i > 0; i--) { var successSprint = false;
-						while(!successSprint){
+						while(!successSprint||bluff){ bluff=confirm('Do you want to bluff more cards?');
 							if (sprintedwith.length>=2 && Math.random() > 0.7 ) {successSprint=true; console.log("Success"); }
 							else {
 								var sprintercard = parseInt(prompt(i+" cards needed. Which card would you like to sprint using?"));
