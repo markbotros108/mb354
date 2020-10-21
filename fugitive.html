@@ -139,12 +139,12 @@
 	}
 
 	function play(no) {
-		if(fugturn && (!playedThisTurn || (!turn1done && playedThisTurn < 2) ) ){
+		if(fugturn && (!playedThisTurn || (!turn1done && playedThisTurn < 2) ) ){ var bluff = confirm('Do you want to bluff a sprint?);
 				// Remove within the fugitive's hand and add to hideouts array
 				var noAsInt = parseInt(no);
 				var diff = noAsInt - lastplayed;
 
-				if( diff <= 3 && diff > 0 ){ lastplayed = noAsInt; // Update last played
+				if( diff <= 3 && diff > 0 && !bluff ){ lastplayed = noAsInt; // Update last played
 				var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
 				hideouts.push(playedcard[0]);
 				sprints.push(playedcard[0]);
@@ -157,7 +157,7 @@
 				document.getElementById('ender').style.display = 'initial';
 				}
 
-				else if( (diff>=4 && diff <= (fughand.length+1)) || (no==42 && diff <= (fughand.length+2)) ) { lastplayed = noAsInt;
+				else if( (diff>=4 && diff <= (fughand.length+1)) || (no==42 && diff <= (fughand.length+2)) || bluff) { lastplayed = noAsInt;
 					var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
 					hideouts.push(playedcard[0]);
 
