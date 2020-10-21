@@ -6,9 +6,8 @@
  Finished 4pm 10/10/2020 
  Sprinting completed 3:15am 13/10/2020 
  Working Sprint with chance of double sprint! (30%) 4am 14/10/2020
- Bluff sprints added, 41 bug fixed, cards are hidden for marshall during turn swaps 3am 22/10/2020
- TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php 
-			INCLUDING Marshall can't make same guess twice (can't be in revealed) -->
+ Bluff sprints added, 41 bug fixed, cards are hidden for marshall during turn swaps, past guesses displayed 3:30am 22/10/2020
+ TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php  -->
 <head>
 	<title>Fugitive Game</title>
 <style type="text/css">
@@ -24,6 +23,13 @@
 		height: 150px;
 		padding: 5px;
 		/*display: inline-block;*/
+	}
+
+	#pastguesses{
+		border: none;
+		font-size: 15px;
+		height: inherit;
+		padding: 0px;
 	}
 
 	.card {
@@ -53,11 +59,11 @@
 </head>
 
 <script type="text/javascript">
-	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[], revealed=[], sprints=[];
+	var deck1 = [], deck2=[], deck3=[], hideouts=[], fughand=[1, 2, 3, 42], marshand=[], revealed=[], sprints=[], pastguesses=[];
 	var fugturn = true, turn1done=false, endTheGame, drawnThisTurn=0;
 	var drawncard, lastplayed=0, playedThisTurn=0; // Value of most recently drawn card
 
-	function init() { endTheGame = false;
+	function init() { endTheGame = false; fugturn=true;
 		// create the 3 decks
 		var i =3;
 		while(i<41){ i++;
@@ -73,6 +79,7 @@
 
 		// reveal deck buttons and hand/play areas
 		document.getElementById('starter').style.display = 'none';
+		document.getElementById('pastguesses').style.display = 'inline-block';
 		document.getElementById('detcards').style.display = 'inline-block';//.innerHTML = deck1;
 		document.getElementById('played').style.display = 'inline-block';//.innerHTML = deck2;
 		document.getElementById('fugcards').style.display = 'inline-block';//.innerHTML = deck3;
@@ -208,6 +215,7 @@
 		if(confirm("Would you like to guess one card? Click Cancel for multiple guesses."))
 		{
 			var guess = parseInt(prompt("What is your guess?"));
+			pastguesses.push(guess);
 			var correctguess = 0;
 			for (var i = 0; i < hideouts.length; i++) {
 				if(guess == hideouts[i]){ alert("Correct! One hideout has been revealed.");
@@ -233,6 +241,7 @@
 			if(correctguesses == sizeOfGuess) {alert("ALL GUESSES CORRECT!"); 
 								revealed = revealed.concat(multiguess);  }
 			else alert("One or more guesses were incorrect...");
+			pastguesses.push(multiguess);
 		}
 
 		// Show revealed cards
@@ -271,13 +280,14 @@
 				endTheGame = true;
 			}
 
-		if(endTheGame){ lastplayed=0; playedThisTurn=0; sprints=[];
+		if(endTheGame){ lastplayed=0; playedThisTurn=0; sprints=[]; pastguesses=[];
 			fugturn=true; turn1done=false; deck1 = []; deck2=[]; deck3=[];
 			hideouts = []; fughand = [1, 2, 3, 42]; marshand = []; revealed = [];
 			document.getElementById('starter').style.display = 'initial';
 			document.getElementById('detcards').style.display = 'none';
 			document.getElementById('played').style.display = 'none';
 			document.getElementById('fugcards').style.display = 'none';
+			document.getElementById('pastguesses').style.display = 'none';
 		}
 	}
 
@@ -287,10 +297,27 @@
 		if (!deck3.length) document.getElementById('hi').style.display = 'none';
 	}
 
+	function displayguesses() { var stringOfGuesses = '';
+		for (var i = 0; i < pastguesses.length; i++) {
+			if (pastguesses[i].length > 1) {
+				stringOfGuesses +=  "[" + pastguesses[i] + "]";
+			}
+			else stringOfGuesses += pastguesses[i];
+			if(i+1 < pastguesses.length) stringOfGuesses += ', ';
+		}
+		return stringOfGuesses;
+	}
+
+	function revealedsprint(arr) { var stringtodisplay = arr;
+		stringtodisplay.splice(0, 1);
+		return stringtodisplay;
+	}
+
 	function display() { // Ensure this changes per player turn using argument
 		document.getElementById('fugcards').innerHTML = "Fugitive's cards: \n";
 		document.getElementById('detcards').innerHTML = "Marshall's cards: \n";
 		document.getElementById('played').innerHTML = "Play Area\n";
+		document.getElementById('pastguesses').innerHTML = "Past guesses: " + displayguesses();
 		fughand.sort(function(a, b){return a-b});
 		marshand.sort(function(a, b){return a-b});
 		for (var i = 0; i < fughand.length; i++) {
@@ -327,7 +354,7 @@
 				else if(sprints[i].length != null) {
 					var newmini = document.createElement('span');
 					newmini.className = 'minicard';
-					newmini.innerHTML = sprints[i];
+					newmini.innerHTML = revealedsprint(sprints[i]);
 					document.getElementById('played').append(newmini);
 				}
 		}
@@ -336,6 +363,7 @@
 
 <body>
 	<button id="starter" onclick="init()">BEGIN GAME</button>
+<p id="pastguesses" style="display: none;">Past guesses: </p>
 <p class="hands" id="detcards" style="display: none;">Marshall cards</p>
 <p id="played" style="display: none;">Play Area</p>
 <p class="hands" id="fugcards" style="display: none;">Fugitive's cards: </p>
