@@ -5,10 +5,10 @@
  Completed working prototype 4am 9/10/2020 
  Finished 4pm 10/10/2020 
  Sprinting completed 3:15am 13/10/2020 
- Working Sprint with chance of double sprint! (30%) 4am 14/10/2020 
+ Working Sprint with chance of double sprint! (30%) 4am 14/10/2020
+ Bluff sprints added, 41 bug fixed, cards are hidden for marshall during turn swaps 3am 22/10/2020
  TODO:  Workings of the gameplay https://www.ultraboardgames.com/fugitive/game-rules.php 
-			INCLUDING Marshall can't make same guess twice (can't be in revealed)
-			AND Fugitive can fake sprints I.E. sprint when not necessary -->
+			INCLUDING Marshall can't make same guess twice (can't be in revealed) -->
 <head>
 	<title>Fugitive Game</title>
 <style type="text/css">
@@ -139,31 +139,48 @@
 	}
 
 	function play(no) {
-		if(fugturn && (!playedThisTurn || (!turn1done && playedThisTurn < 2) ) ){ var bluff = confirm('Do you want to bluff a sprint?');
+		if(fugturn && (!playedThisTurn || (!turn1done && playedThisTurn < 2) ) ){
 				// Remove within the fugitive's hand and add to hideouts array
 				var noAsInt = parseInt(no);
 				var diff = noAsInt - lastplayed;
 
-				if( diff <= 3 && diff > 0 && !bluff ){ lastplayed = noAsInt; // Update last played
-				var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
-				hideouts.push(playedcard[0]);
-				sprints.push(playedcard[0]);
-				playedThisTurn++;
-		
-				// Display the new changes
-				display();
-		
-				// Allow player to end turn
-				document.getElementById('ender').style.display = 'initial';
-				}
-
-				else if( (diff>=4 && diff <= (fughand.length+1)) || (no==42 && diff <= (fughand.length+2)) || bluff) { lastplayed = noAsInt;
+				if( diff <= 3 && diff > 0 ){ lastplayed = noAsInt; // Update last played
 					var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
 					hideouts.push(playedcard[0]);
-					if(bluff) diff=4;
+					var bluff = confirm('Would you like to bluff a sprint?');
+
+					if(bluff){ var sprintedwith = [playedcard[0]];
+						while(bluff){
+							var sprintercard = parseInt(prompt("Which card would you like to bluff using?"));
+								if(fughand.includes(sprintercard))
+									sprintedwith.push(fughand.splice(fughand.indexOf(sprintercard), 1)[0]);
+								else alert("This card is not in your hand!");
+							bluff = confirm('Would you like to continue bluffing?');
+						}
+						sprints.push(sprintedwith);
+					}
+
+				else {		
+						sprints.push(playedcard[0]);
+					}
+
+					// Update played cards count
+					playedThisTurn++;						
+
+					// Display the new changes
+					display();
+			
+					// Allow player to end turn
+					document.getElementById('ender').style.display = 'initial';
+				}
+
+				else if( (diff>=4 && diff <= (fughand.length+1)) || (noAsInt==42 && diff <= (fughand.length+2)) ) { lastplayed = noAsInt;
+					var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
+					hideouts.push(playedcard[0]);
+
 					var sprintedwith=[]; sprintedwith.push(playedcard[0]);
 					for (var i = diff-3; i > 0; i--) { var successSprint = false;
-						while(!successSprint||bluff){ bluff=confirm('Do you want to bluff more cards?'); if(!bluff) break;
+						while(!successSprint){
 							if (sprintedwith.length>=2 && Math.random() > 0.7 ) {successSprint=true; console.log("Success"); }
 							else {
 								var sprintercard = parseInt(prompt(i+" cards needed. Which card would you like to sprint using?"));
@@ -224,16 +241,24 @@
 
 	function next() { // Switch player turn
 		winCheck();
-		playedThisTurn=0; drawnThisTurn=0;
-		if (fugturn && !endTheGame ) {fugturn = false; alert("Marshall's turn");}
-		else if (!endTheGame) {fugturn = true; turn1done = true; alert("Fugitive's turn"); }
+		playedThisTurn=0; drawnThisTurn=0; fugturn = !fugturn;
+		if(fugturn) setTimeout(display, 1000);
+		else display();
 
-		// Change Display function
-		display();
+		if(fugturn) turn1done = true;
+		setTimeout(turnchangelag, 100);
+		
 		document.getElementById('ender').style.display = 'none';
 		document.getElementById('guesser').style.display = 'none';
 		deckcheck();
-		if(!endTheGame) document.getElementById('buttonholder').style.display = 'initial';
+		if (!endTheGame) document.getElementById('buttonholder').style.display = 'initial';
+	}
+
+	function turnchangelag(){
+		if (!endTheGame){
+			if (!fugturn) alert("Marshall's turn");
+			else alert("Fugitive's turn"); 
+		}
 	}
 
 	function winCheck() {
