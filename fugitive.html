@@ -160,7 +160,7 @@
 				else if( (diff>=4 && diff <= (fughand.length+1)) || (no==42 && diff <= (fughand.length+2)) || bluff) { lastplayed = noAsInt;
 					var playedcard = fughand.splice(fughand.indexOf(noAsInt), 1);
 					hideouts.push(playedcard[0]);
-
+					if(bluff) diff=42;
 					var sprintedwith=[]; sprintedwith.push(playedcard[0]);
 					for (var i = diff-3; i > 0; i--) { var successSprint = false;
 						while(!successSprint||bluff){ bluff=confirm('Do you want to bluff more cards?');
