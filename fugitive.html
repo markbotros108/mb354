@@ -27,7 +27,6 @@
 
 	#pastguesses{
 		border: none;
-		font-size: 15px;
 		height: inherit;
 		padding: 0px;
 	}
@@ -308,8 +307,11 @@
 		return stringOfGuesses;
 	}
 
-	function revealedsprint(arr) { var stringtodisplay = arr;
-		stringtodisplay.splice(0, 1);
+	function revealedsprint(arr) { var stringtodisplay = '';
+		for(int i = 0; i < arr.length; i++){
+			if(i != 0) stringtodisplay += arr[i];
+			if (i+1 < arr.length) stringtodisplay += ',';
+		}
 		return stringtodisplay;
 	}
 
