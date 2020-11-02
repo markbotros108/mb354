@@ -1,12 +1,29 @@
+<!-- 28/10/20 
+1. switch to arrays and displays
+2. End turn after drawing and playing a card -->
 <html>
 <title>Startups</title>
+<style type="text/css">
+	.card {
+		display: inline;
+		margin-left: 10px;
+		border: solid;
+		font-size: 64;
+		width: auto;/*fit-content*/
+		text-align: center;
+		padding: 0px 15px;
+		cursor: pointer;
+	}
+</style>
 <script>
-var deck=[], hand=[];
-var coins = 10;
+var deck=[], hand=[], hand2=[], hand3=[], table=[], coinsArr=[100, 10, 10];
+var names = ['Harry', 'Lily'];
+var currentPlayer=0;
 var card = 5;
 var indexer = 0;
 var cardsPlayed = 0;
 var noMarkets = 0;
+var bought = 0; // number of cards bought from market
 
 	function init(){
 			for (var i = 0; i < 45; i++) {
@@ -15,35 +32,47 @@ var noMarkets = 0;
 				indexer++;
 			}
 
-			 deck = shuffle(deck);
-			 console.log(deck);
+			 deck = shuffle(deck);// console.log(deck);
 	}
 
-	function startup(){ init();
-		var name = "Mark";//prompt("Starting up Startups! What's your name?");
-		document.getElementById('hand').innerHTML = name + "'s hand: ";
-		document.getElementById('invested').innerHTML = name + "'s investments: ";
-		document.getElementById('coins').innerHTML = "Coins: " + coins;
+	function startup(){ init();//prompt("Starting up Startups! How many players?");
+		names.splice(0, 0, "Mark");//prompt("What's your name?");
+		document.getElementById('hand').innerHTML = names[0] + "'s hand: ";
+		document.getElementById('hand').style.display = 'block';
+		document.getElementById('invested').innerHTML = names[0] + "'s investments: ";
+		document.getElementById('invested').style.display = 'block';
+		document.getElementById('coins').innerHTML = "Coins: " + coinsArr[0];
+		document.getElementById('coins').style.display = 'initial';
 		document.getElementById('drawer').style.display = 'initial';
 		document.getElementById('starter').style.display = 'none';
-		next(0); next(0); next(0);
+		draw(0); draw(0); draw(0);
+		draw(1); draw(1); draw(1);
+		draw(2); draw(2); draw(2);
 	}
 
-	function next(ingame){ var value = deck.pop();
-		if(ingame) document.getElementById('drawer').style.visibility = 'hidden';
+	function draw(ingame){ var value = deck.pop(); payMarket();
+		if(ingame) document.getElementById('drawer').style.visibility = 'hidden'; // to make sure draw on first turn xD 
+
+		//should all be in display function
 		var newcard = document.createElement("div");
-		newcard.style.display = "inline";
-		newcard.style.marginLeft = "10px";
+		newcard.className = 'card';
 		newcard.innerHTML = value;
-		newcard.style.border = "solid black";
-		newcard.style.fontSize = 64;
-		newcard.style.width = "fit-content";
-		newcard.style.textAlign = "center";
-		newcard.style.padding = "5px";
-		hand.push(value);
 		newcard.onclick = function(){play(value);}
 		document.getElementById('hand').appendChild(newcard);
-		console.log(hand);
+
+		switch(ingame){
+			case 0:	hand.push(value); break;
+			case 1:	hand2.push(value); break;
+			case 2:	hand3.push(value); break;
+		}
+	}
+
+	// next should continue game to next player's turn
+	function next(){ currentPlayer++; if(currentPlayer==3)currentPlayer=0; 
+		alert(names[currentPlayer] +"'s turn");
+		document.getElementById('hand').innerHTML = names[currentPlayer] + "'s hand: ";
+		document.getElementById('invested').innerHTML = names[currentPlayer] + "'s investments: ";
+		document.getElementById('coins').innerHTML = "Coins: " + coinsArr[currentPlayer];
 	}
 
 		function shuffle(list) {
@@ -56,12 +85,13 @@ var noMarkets = 0;
 			return newOrder;
 		}
 
-	function play(card) { var currentPay = 0;
+	function play(card) {
 			var list = document.getElementById('hand');
 			var playedCard = childIndex(card);
 			var newInvestment = list.removeChild(list.childNodes[playedCard]);
 		if(confirm("Would you like to invest in " + card + "?")){
-			hand.splice(playedCard-1, 1);
+			newInvestment.onclick = null;
+			newInvestment.style.cursor = 'no-drop';
 			document.getElementById('invested').appendChild(newInvestment);
 			cardsPlayed++; // ???
 		}
@@ -70,21 +100,17 @@ var noMarkets = 0;
 			newInvestment.id = noMarkets;
 			newInvestment.onclick = function() {market(this.id);}
 			discard.appendChild(newInvestment);
+			discard.id = "card" + noMarkets;
 			document.getElementById('valueRow').appendChild(discard);
 
-			var paymentList = document.getElementById('coinRow').childNodes;
-			for (var i = 0; i < paymentList.length; i++) {
-				if(paymentList[i].innerHTML == 0) {paymentList[i].innerHTML += 0; currentPay++;}
-			}
-			coins -= currentPay;
-
 			var currentCoin = document.createElement('td');
-			currentCoin.innerHTML = 0;
+			// currentCoin.innerHTML = 0;
+			currentCoin.id = noMarkets + "c";
 			document.getElementById('coinRow').appendChild(currentCoin);
 		}
-		console.log(hand);
-		document.getElementById('coins').innerHTML = "Coins: " + coins;
+		hand.splice(playedCard-1, 1);//console.log(hand);
 		document.getElementById('drawer').style.visibility = 'initial';
+		next();
 	}
 
 	function childIndex(clicked){
@@ -97,18 +123,39 @@ var noMarkets = 0;
 		return index;
 	}
 
-	function market(index){ var numIndex = parseInt(index);
-		var noCoins = document.getElementById('coinRow').childNodes[numIndex+2].innerHTML.length;
+	function market(index){ var numIndex = parseInt(index); // index is id = number in market
+		var list = document.getElementById('valueRow');	
+		var coinlist = document.getElementById('coinRow');		
+		console.log(list.childNodes[numIndex+2].innerHTML + ": ");
+		console.log(coinlist.childNodes[numIndex+2].innerHTML);
+		var noCoins = coinlist.childNodes[numIndex+2].innerHTML.length;
 
 		// Remove from market
-		// Put back into hand
+		console.log("Index: " + numIndex + " has " + noCoins + " coins.");
+		var newInvestment = list.removeChild(list.childNodes[numIndex+2]);
+		document.getElementById('coinRow').removeChild(document.getElementById('coinRow').childNodes[numIndex+2]);
+
+		// Put into investments
+		document.getElementById('invested').appendChild(newInvestment.childNodes[0]);
 
 		coins += noCoins;
-		document.getElementById('coins').innerHTML = "Coins: " + coins;		
+		document.getElementById('coins').innerHTML = "Coins: " + coins;
+		noMarkets--; bought++;	
+	}
+
+	function payMarket(){ var currentPay = 0;
+			var paymentList = document.getElementById('coinRow').childNodes;
+			for (var i = 0; i < paymentList.length; i++) {
+				if(paymentList[i].innerHTML == 0) {
+					paymentList[i].innerHTML += '0'; currentPay++;
+				}
+			}
+			coins -= currentPay;
+		document.getElementById('coins').innerHTML = "Coins: " + coins;
 	}
 </script>
 <button id='starter' style='position: relative; margin: 100px; left: 200px; font-size: 64' onclick='startup();'>Begin</button>
-<button id='drawer' style='display:none; position: relative; margin: 100px; left: 200px; font-size: 64' onclick='next(1);'>Draw</button>
+<button id='drawer' style='display:none; position: relative; margin: 100px; left: 200px; font-size: 64' onclick='draw(currentPlayer);'>Draw</button>
 <table border="3" style="position: relative; left: 200px;">
 	<caption>TABLE</caption>
 	<tr id="valueRow">
@@ -118,7 +165,7 @@ var noMarkets = 0;
 		<td>Coins:</td>
 	</tr>
 </table>
-<P id='invested' style='position: relative; left: 200px; border: solid black 5px; width: 80%; font-size: 64' >Your investments: </p>
-<P id='hand' style='position: relative; left: 200px; font-size: 64' >Your hand: </p>
-<P id='coins' style='position: relative; left: 200px; font-size: 64' >Coins: 0</p>
+<P id='invested' style='position: relative; left: 200px; border: solid black 5px; width: 80%; font-size: 64; display: none;' >Your investments: </p>
+<P id='hand' style='position: relative; left: 200px; font-size: 64; display: none;' >Your hand: </p>
+<P id='coins' style='position: relative; left: 200px; font-size: 64; display: none;' >Coins: 0</p>
 </html>
