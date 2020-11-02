@@ -50,6 +50,8 @@
 
 	if(right==questions) alert("You got ALL "+right+" out of "+questions+" questions right! Well done!");
 	else alert("You got only "+right+" out of "+questions+" questions right. Try again! The wrong questions were " + wrong);
+	
+	if(morseOrNot) document.getElementById('morseTable').style.display = 'none';
 </script>
 <table id="morseTable" style="text-align: center;"></table>
 </body>
