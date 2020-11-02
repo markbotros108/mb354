@@ -1,0 +1,56 @@
+<!-- 2:35am-3am 3/11/20 -->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Morse code tester</title>
+</head>
+<body> 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript">
+	var binArray = ['apart', 'boot to the head', 'coca cola', 'dockworker', 'e', 'get a haircut', 'good gravy', 'hippity hop', 'i i', 'lets jump jump jump', 'kangaroo', 'to l with it', 'mm mm', 'navy', 'one of us', 'a poopy smell', 'god save the queen', 'rotation', 'si si si', 'tall', 'underwhere', 'va va va voom', 'a white whale', 'x marks the spot', 'yellow yoyo', 'zinc zookeeper'];
+	var letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+	var code = ['.-', '-...', '-.-.', '-..', '.', '..-.', '--.', '....', '..', '.---', '-.-', '.-..', '--', '-.', '---', '.--.', '--.-', '.-.', '...', '-', '..-', '...-', '.--', '-..-', '-.--', '--..'];
+	var morseOrNot= confirm("Would you like to be tested in morse code?");
+	var questions= prompt("How many letters would you like to guess?");
+	var right = 0;
+	var wrong = [];
+
+	$(document).ready( function(){
+				var letterline = document.createElement('tr');
+				for (var i = 0; i < letters.length; i++) {
+					var newcell = document.createElement('th');
+					newcell.innerHTML = letters[i];
+					letterline.append(newcell);
+				}
+				document.getElementById('morseTable').append(letterline);
+				letterline = document.createElement('tr');
+				for (var i = 0; i < letters.length; i++) {
+					var newcell = document.createElement('td');
+					newcell.innerHTML = binArray[i];
+					newcell.style.border = 'solid blue';
+					letterline.append(newcell);
+				}
+				document.getElementById('morseTable').append(letterline);
+		});
+
+	function test() {
+		for (var i = 0; i < parseInt(questions); i++) { var newletter = Math.floor(Math.random()*letters.length); console.log(letters[newletter]);
+		var input = prompt("What is " + letters[newletter] + " in morse code?");
+		if(input === code[newletter]) {right++; code.splice(newletter, 1); letters.splice(newletter, 1);}
+		else wrong.push(i);
+	}
+	}
+
+	if(morseOrNot) test();
+	else for (var i = 0; i < parseInt(questions); i++) { var newletter = Math.floor(Math.random()*letters.length); console.log(letters[newletter]);
+		var input = prompt("What is " + letters[newletter] + " in morse code?");
+		if(input === binArray[newletter]) {right++; binArray.splice(newletter, 1); letters.splice(newletter, 1);}
+		else wrong.push(i);
+	}
+
+	if(right==questions) alert("You got ALL "+right+" out of "+questions+" questions right! Well done!");
+	else alert("You got only "+right+" out of "+questions+" questions right. Try again! The wrong questions were " + wrong);
+</script>
+<table id="morseTable" style="text-align: center;"></table>
+</body>
+</html>
