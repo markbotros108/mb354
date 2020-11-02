@@ -16,6 +16,7 @@
 	var wrong = [];
 
 	$(document).ready( function(){
+	if(morseOrNot) {document.getElementById('morseTable').style.display = 'none'; console.log('here');}
 				var letterline = document.createElement('tr');
 				for (var i = 0; i < letters.length; i++) {
 					var newcell = document.createElement('th');
@@ -51,7 +52,6 @@
 	if(right==questions) alert("You got ALL "+right+" out of "+questions+" questions right! Well done!");
 	else alert("You got only "+right+" out of "+questions+" questions right. Try again! The wrong questions were " + wrong);
 	
-	if(morseOrNot) {document.getElementById('morseTable').style.display = 'none'; console.log('here');}
 </script>
 <table id="morseTable" style="text-align: center;"></table>
 </body>
