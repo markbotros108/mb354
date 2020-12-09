@@ -98,8 +98,8 @@
 		return newOrder;
 	}
 
-	function highlight() {
-		// this.style.borderColor = "red";
+	function highlight(card) {
+		 card.style.borderColor = "red";
 		console.log("Need to fix this highlighter..");
 	}
 
@@ -167,7 +167,7 @@
 		for (var i = 0; i < player.length; i++) {
 			var newcard = document.createElement('span');
 			newcard.innerHTML = player[i];
-			newcard.onclick = function(){highlight();}
+			newcard.onclick = function(){highlight(this);}
 			document.getElementById('cardarea').appendChild(newcard);
 			if(i==5){
 				var br = document.createElement("br");
