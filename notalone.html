@@ -12,6 +12,7 @@
 
 		img {
 			padding: 8px;
+			cursor: pointer;
 		}
 
 		#stats{
@@ -31,11 +32,15 @@
 			var newcard = document.createElement('img');
 			newcard.src = 'images/' + cards[i] + '.png';
 			newcard.style.width = '18%';
+			newcard.onclick = function() {play(this.src);}
 			document.getElementById('hand').append(newcard);
 			}
 		}
 
-		
+		function play(name){ //let currHtml = this.innerHTML;
+			let fixedName = name.slice( name.indexOf('es/')+3, name.indexOf('.') );
+			alert('You played '+ fixedName);
+		}
 	</script>
 </head>
 <body>
