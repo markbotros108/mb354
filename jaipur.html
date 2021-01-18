@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<title>Jaipur</title>
+<style type="text/css">
+	#starter {
+		padding: 15px 35px;
+		font-size: 137px;
+	}
+
+	#hand, #starter, #market {
+		position: absolute;
+		left: 25%;
+		top: 60%;
+	}
+
+	#hand {
+		font-size: 36px;
+
+	}
+
+	.card {
+		cursor: pointer;
+		color: blue;
+		width: 170px;
+		text-align: center;
+		margin-left: 15px;
+		padding: 5px;
+		border: solid black;
+		display: inline-block;
+	}
+
+	#market {
+		top: 10%;
+		border: double;
+		padding: 50px;
+	}
+
+	#market .card {
+		width: auto;
+	}
+</style>
+<script type="text/javascript">
+	let goods = ["silver", "gold", "diamond", "silk", "spice"];
+	let deck = [], hand2 = [];
+	$(document).ready( function(){ init(); }); 
+
+	function init() { let iter = 0;
+		for (var i = 0; i < 11; i++) {
+			if (i<6) {
+				deck.push(goods[0]);
+				deck.push(goods[1]);
+				deck.push(goods[2]);
+			}
+			if (i<8) {deck.push(goods[3]);
+					deck.push(goods[4]);
+					deck.push('camel');
+				}
+			if(i < 10) deck.push('leather');
+		}
+		deck = shuffle(deck);
+	}
+
+	function shuffle(list) {
+		var newOrder = [];
+		var len = list.length;
+		for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+			newOrder.push(list[r]);
+			list.splice(r, 1);
+		}
+		return newOrder;
+	}
+
+	function start() {
+		document.getElementById('starter').style.display = 'none';
+		document.getElementById('market').style.display = 'initial';
+		for (var i = 0; i < 5; i++) {
+			var newcard = document.createElement('div');
+			newcard.className = 'card';
+			newcard.onclick = play;
+			let cardName = deck.pop();
+			newcard.innerHTML = cardName.toUpperCase() +'<hr>';
+			var cardImg = document.createElement('img');
+			cardImg.src = 'images/'+cardName+'.png';// cardImg.style.width = "153px";
+			newcard.appendChild(cardImg);
+			document.getElementById('hand').append(newcard);
+
+			// Deal opponent hand
+			hand2.push(deck.pop());
+
+			if(i<3) {
+				var newcamel = document.createElement('div');
+				newcamel.className = 'card';
+				newcamel.innerHTML = 'CAMEL<hr>';
+				var cardImg = document.createElement('img');
+				cardImg.src = 'images/camel.png';// cardImg.style.width = "153px";
+				newcamel.appendChild(cardImg);
+				document.getElementById('market').append(newcamel);
+			}
+			else {
+				var newMarket = document.createElement('div');
+				newMarket.className = 'card';
+				let cardName = deck.pop();
+				newMarket.innerHTML = cardName.toUpperCase()+ '<hr>';
+				var cardImg = document.createElement('img');
+				cardImg.src = 'images/'+cardName+'.png';
+				newMarket.appendChild(cardImg);
+				document.getElementById('market').append(newMarket);
+			}
+		}
+	}
+
+	function take(){
+
+	}
+
+	function sell(){
+		
+	}
+
+	function play(){ let currHtml = this.innerHTML;
+		currHtml = currHtml.slice( 0, currHtml.indexOf('<') );
+		alert('You played '+ currHtml);
+	}
+</script>
+</head>
+<body>
+<button id="starter" onclick="start()">Start</button>
+<div id="market" style="display: none;"></div>
+<div id="hand"></div>
+</body>
+</html>

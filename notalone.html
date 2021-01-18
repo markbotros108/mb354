@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html> 
+<head> 
+	<title>Not Alone</title>
+	<style type="text/css">
+		#hand, #stats {
+			color: blue;
+			position: absolute;
+			left: 6%;
+			top: 50%;
+		}
+
+		img {
+			padding: 8px;
+		}
+
+		#stats{
+			top: 5%;
+			font-size: 66px;
+		}
+	</style>	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		// Began 3:30pm 18/1/21
+		let cards = ['lair', 'jungle', 'river', 'beach', 'rover'];
+		
+		$(document).ready( function(){ init(); }); 
+
+		function init(){
+			for (var i = 0; i < cards.length; i++) {
+			var newcard = document.createElement('img');
+			newcard.src = 'images/' + cards[i] + '.png';
+			newcard.style.width = '18%';
+			document.getElementById('hand').append(newcard);
+			}
+		}
+
+		
+	</script>
+</head>
+<body>
+<div id="hand"></div>
+<span id="stats">Will: 3 <br> Assimilation: 0 <br> Rescue: 0</span>
+</body>
+</html>

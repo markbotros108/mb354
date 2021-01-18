@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Combo Fighter</title>
+</head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<body>
+<style type="text/css">
+	button{
+		font-size: 72px;
+		position: absolute;
+		left:40%;
+		top: 60%;
+	}
+	.container { display: none;
+		background-color: #333;
+		padding: 1rem;
+		margin-top: 1rem;
+	}
+	#playarea{
+		position: absolute;
+		width: 600px;
+		height: 150px;
+		left: 34%;
+		top: 34%;
+	}
+	#hand{
+		position: absolute;
+		width: 600px;
+		height: 100px;
+		left: 30%;
+		top: 70%;
+	}
+	#playButton{
+		display: none;
+	}
+	.scoreboard{
+		position: absolute;
+		top: 50%;
+		left: 15%;
+		font-size: 48px;
+	}
+	#score2{
+		top: 20%;
+	}
+	.fullcard{
+		border: double black;
+		width: fit-content;
+		padding: 240px 150px;
+	}
+	/*.empty {
+		display: inline-block;
+		margin: 10px;
+		padding: 5px 5px;
+	}*/
+	.card { display: inline-block;
+		margin: 10px;
+		background-color: white;
+		position: relative;
+		border: double black;
+		width: fit-content;
+		padding: 24px 15px;
+	}
+	.card:hover{
+		cursor: pointer;
+		background-color: yellow;
+	}
+</style>
+<script type="text/javascript">
+	const options = ["DEFEND", "MOVE", "ATTACK"];
+	const shapes = [1,2,3];
+	var deck = [], deck2 = [];
+	// if(confirm("Would you like the default deck?")){
+		for (var i = 0; i < 10; i++) deck.push(options[i%3]);
+		for (var i = 0; i < 50; i++) {
+			if (i<18) deck2.push(options[0]);
+			else if(i<30) deck2.push(options[1]);
+			else deck2.push(options[2]);
+
+			if (i%10==0) deck2.pop();
+		}
+	// }
+	// else while(deck.length<10){
+	// 	for(var i=0; i<3; i++) {
+	// 		let input = parseInt(prompt("How many " +options[i] + " would you like?"));
+	// 			for (var j = 0; j < input; j++) {
+	// 				deck.push(options[i]);
+	// 			}
+	// 		}
+	// }
+	deck = shuffle(deck); deck2 = shuffle(deck2);
+
+	$(document).ready( function(){ 
+		var playedCard = document.getElementById('playarea').children[0];
+		const cards = document.querySelectorAll('.card');
+		const containers = document.querySelectorAll('.container');
+
+		cards.forEach(card => {
+			card.addEventListener('dragstart', dragStart );
+			card.addEventListener('dragend', dragEnd);
+			// card.addEventListener('touchmove', e => { console.log('this');
+			// 	var touchLocation = e.targetTouches[0];
+			// 	card.style.left = 0-touchLocation.pageX/2 + 'px';
+			// 	card.style.top = 0-touchLocation.pageY/4 + 'px';
+			// });
+			// card.addEventListener('touchend', dragEnd);
+		});
+
+		containers.forEach(container => {
+			container.addEventListener('dragover', e =>{
+				e.preventDefault();
+				const afterElement = getDragAfterElement(container, e.clientX);
+				const card = document.querySelector('.held');
+				if (afterElement == null) {
+					container.appendChild(card);
+				}
+				else {
+					container.insertBefore(card, afterElement);
+				}
+			})
+		});
+	});
+
+	function getDragAfterElement(container, x){
+		const dragElements = [...container.querySelectorAll('.card:not(.held)')];
+		return dragElements.reduce((closest, child) => {
+			const box = child.getBoundingClientRect();
+			const offset = x - box.left - box.width / 2;
+			// console.log(offset);
+			if(offset < 0 && offset > closest.offset) {
+				return {offset: offset, element:child }
+			}
+			else return closest;
+		}, { offset: Number.NEGATIVE_INFINITY } ).element;
+	}
+	
+	// function touchMove() {
+	// 	var touchLocation = e.	}
+
+	function dragStart() { //console.log('dragged');
+		this.classList.add('held');
+	}
+
+	function dragEnd() { //console.log('released');
+		this.classList.remove('held');
+		playButtonCheck();
+	}
+
+	function playButtonCheck(){ 
+		if(document.getElementById('playarea').children.length)
+			document.getElementById('playButton').style.display = 'initial';
+		else document.getElementById('playButton').style.display = 'none';
+	}
+	
+
+	function shuffle(list) {
+		var newOrder = [];
+		var len = list.length;
+		for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+			newOrder.push(list[r]);
+			list.splice(r, 1);
+		}
+		return newOrder;
+	}
+
+	function begin() { updateScores();
+		document.getElementById('starter').style.display = 'none';
+		const allCon = document.querySelectorAll('.container');
+		allCon.forEach(con => {
+			con.style.display = 'initial';
+		})
+
+		for (var i = 0; i < 5; i++) {
+			// var randNum = Math.floor(Math.random()*3);
+			randomcard(options.indexOf(deck.pop()), i);
+			document.getElementById(i).onclick = function() {//play(this.innerHTML, this.id);
+				move(this.id);
+			}
+		}
+	}
+
+	function move(id){
+		var element = document.getElementById(id);
+		if(element.parentNode.id === "hand") document.getElementById('playarea').appendChild(element);
+		else document.getElementById('hand').appendChild(element);
+		playButtonCheck();
+	}
+
+	function play() { 
+		var currentPlayed = document.getElementById('playarea').children[0];
+		if(currentPlayed != null ){
+		var arg = currentPlayed.innerHTML;
+				
+				//Play opponent's card
+				let currentOpp = randomOpp();
+				var oppcard = document.createElement('p');
+				oppcard.className = 'card';
+				oppcard.innerHTML = currentOpp;
+				switch(currentOpp)
+					{
+						case 'DEFEND': oppcard.style.color = 'blue';break;
+						case 'MOVE':  oppcard.style.color = 'darkorange';break;
+						case 'ATTACK': oppcard.style.color = 'red';break;
+						default: alert('Opp ran out of cards...');
+					}
+				document.getElementById('playarea').appendChild(oppcard);
+
+				// Determine battle results
+				setTimeout(function(){battleAlert(arg, options.indexOf(arg), currentOpp);}, 400);
+
+				// deal with combos
+
+				//draw new card
+				setTimeout(function(){draw(currentPlayed);}, 1200);
+			}
+		updateScores();
+	}
+
+	function draw(played){
+		if(deck.length)	randomcard(options.indexOf(deck.pop()), played.id);
+		else alert("No more cards in deck");
+				// var element = document.getElementById(id);
+				// element.parentNode.removeChild(element);
+		//discard opponent's card
+		document.getElementById('playarea').innerHTML = '';
+		playButtonCheck();
+	}
+
+	function updateScores(){
+		document.getElementById('score').innerHTML = "Player score: " + deck.length;
+		document.getElementById('score2').innerHTML = "Opponent score: "+ deck2.length;
+	}
+
+	function randomOpp(){
+		var randNum = deck2.pop(); //Math.floor(Math.random()*3);
+		/*switch(randNum)
+		{
+			case 0: return 'DEFEND';
+			case 1: return 'MOVE';
+			case 2: return 'ATTACK';
+		}*/
+		return randNum;
+	}
+
+	function randomcard(randNum, cardId) { 
+		var rcard = document.getElementById(cardId); var details = {colour:'blank'}; 
+			rcard.title = Math.floor(Math.random()*3);
+			switch(randNum)
+		{
+			case 0: rcard.innerHTML = 'DEFEND'; /*+ String.fromCharCode(shapes[Math.floor(Math.random()*3)])*/details.colour = 'blue';
+					rcard.style.color = 'blue';break;
+			case 1: rcard.innerHTML = 'MOVE' /*+ shapes[Math.floor(Math.random()*3)]*/;rcard.style.color = 'darkorange';break;
+			case 2: rcard.innerHTML = 'ATTACK' /*+ shapes[Math.floor(Math.random()*3)]*/;rcard.style.color = 'red';break;
+		}
+		document.getElementById('hand').appendChild(rcard);
+	}
+
+	function battle(c1, c2){ // returns 0 if tie, 1 if move won, 2 if attack won and 3 if defend won
+		if (c1 == 0 && c2 == 2) c1 = 3;
+		else if (c2 == 0 && c1 == 2) c2 = 3;
+		
+		if (c1 == c2) return 0; // if tie
+		else if (c2 > c1) return c2;
+		else return c1;
+	}
+
+	function battleAlert(arg, val, currentOpp){
+		alert('You played '+arg+ " which has value: "+val + "\nOpponent chose to "+currentOpp);
+		let outcome = battle(val, options.indexOf(currentOpp));
+		if(outcome){ if(outcome==3) val+=3;
+			if (outcome == val) alert("Player won! "+arg + " beats " + currentOpp);
+			else alert("Opponent won! "+currentOpp + " beats " + arg);
+		}
+		else alert("It was a draw!");
+	}
+
+</script>
+<div id="playarea" class="container"></div>
+	<button id="starter" onclick="begin()">Start</button>
+	<button id="playButton" onclick="play()" >Play</button>
+<div id="hand" class="container">
+	<p id="0" class="card" draggable="true"></p>
+	<p id="1" class="card" draggable="true"></p>
+	<p id="2" class="card" draggable="true"></p>
+	<p id="3" class="card" draggable="true"></p>
+	<p id="4" class="card" draggable="true"></p>
+</div>
+<div id="score" class="scoreboard" ></div>
+<div id="score2" class="scoreboard" ></div>
+</body>
+</html>
