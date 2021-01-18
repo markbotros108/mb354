@@ -87,7 +87,7 @@
 		function updateDisplay(){displayHand(); displayPlayed();}
 
 		function updateStats(){
-			document.getElementById('stats').innerHTML = 'Will: ' +will+ '/3<br> Assimilation: ' +ass+ ' /7<br> Rescue: ' + res +'/13';
+			document.getElementById('stats').innerHTML = 'Will: ' +will+ '/3<br> Assimilation: ' +ass+ '/7<br> Rescue: ' + res +'/13';
 
 			if(will==0) setTimeout(lostwill, 300);
 			if(ass==7) alert("You were assimilated. You lose..");
@@ -198,14 +198,14 @@
 				played.pop();				
 			}
 
-			else if(word == 'wreck') res++;
+			else if(word == 'wreck') {res++; updateStats();}
 
 			else console.log(word+' card action not implemented');
 		}
 	</script>
 </head>
 <body>
-<span id="stats">Will: 3 <br> Assimilation: 0 <br> Rescue: 0</span>
+<span id="stats">Will: 3/3<br> Assimilation: 0/7<br> Rescue: 0/13</span>
 <div id="marker"></div>
 <div id="played">Played</div>
 <div id="hand"></div>
