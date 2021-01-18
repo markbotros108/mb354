@@ -3,16 +3,26 @@
 <head> 
 	<title>Not Alone</title>
 	<style type="text/css">
-		#hand, #stats {
+		#hand, #stats, #played {
 			color: blue;
 			position: absolute;
-			left: 6%;
-			top: 50%;
+			left: 7%;
+			top: 60%;
 		}
 
 		img {
 			padding: 8px;
 			cursor: pointer;
+		}
+
+		#played{
+			border: solid;
+			left: 5%;
+			width: 90%;
+			height: 235px;
+			color: black;
+			top: 30%;
+			font-size: 30px;
 		}
 
 		#stats{
@@ -38,13 +48,14 @@
 		}
 
 		function play(name){ //let currHtml = this.innerHTML;
-			let fixedName = name.slice( name.indexOf('es/')+3, name.indexOf('.') );
+			let fixedName = name.slice( name.indexOf('images/')+7, name.indexOf('.') );
 			alert('You played '+ fixedName);
 		}
 	</script>
 </head>
 <body>
-<div id="hand"></div>
 <span id="stats">Will: 3 <br> Assimilation: 0 <br> Rescue: 0</span>
+<div id="played">Played</div>
+<div id="hand"></div>
 </body>
 </html>
