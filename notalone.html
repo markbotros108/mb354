@@ -3,7 +3,7 @@
 <head> 
 	<title>Not Alone</title>
 	<style type="text/css">
-		#hand, #stats, #played {
+		#hand, #stats, #played, #marker {
 			color: blue;
 			position: absolute;
 			left: 7%;
@@ -13,6 +13,7 @@
 		img {
 			padding: 8px;
 			cursor: pointer;
+			/*width: 18%;*/
 		}
 
 		#played{
@@ -25,36 +26,187 @@
 			font-size: 30px;
 		}
 
-		#stats{
+		#played img, #marker img {
+			cursor: initial;
+		}
+
+		#stats, #marker{
 			top: 5%;
 			font-size: 66px;
+		}
+
+		#marker {
+			left: 60%;
+		}
+
+		#marker img {
+			width: 200px;
 		}
 	</style>	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script type="text/javascript">
 		// Began 3:30pm 18/1/21
-		let cards = ['lair', 'jungle', 'river', 'beach', 'rover'];
+		// Began card #2 function 4:30am 19/1/21
+		// Added creature and began card #4 function 5:40am
+		// Added card #1 and cont card #4 image 6:15am
+		// Added card #5, card #6 and card #8 functions 7:10am 
+		const cards = ['lair', 'jungle', 'river', 'beach', 'rover'];
+		const reserve = ['swamp', 'shelter', 'wreck', 'source', 'artefact'];
+		let hand = [], played = [];
+		let will = 3, ass = 0, res = 0, caught = false, marker = false;
+		var lurked;
 		
 		$(document).ready( function(){ init(); }); 
 
 		function init(){
-			for (var i = 0; i < cards.length; i++) {
-			var newcard = document.createElement('img');
-			newcard.src = 'images/' + cards[i] + '.png';
-			newcard.style.width = '18%';
-			newcard.onclick = function() {play(this.src);}
-			document.getElementById('hand').append(newcard);
+			hand = hand.concat(cards);
+			displayHand();
+		}
+
+		function displayHand(){ document.getElementById('hand').innerHTML = '';
+			if(!hand.length) { lostwill();
+				hand = hand.concat(played);
+				played = [];
+			}
+			for (var i = 0; i < hand.length; i++) {
+				var newcard = document.createElement('img');
+				newcard.src = 'images/' + hand[i] + '.png';
+				newcard.onclick = function() {play(this.src);}
+				document.getElementById('hand').append(newcard);
 			}
 		}
 
+		function displayPlayed(){ document.getElementById('played').innerHTML = '';
+			for (var i = 0; i < played.length; i++) {
+				var newcard = document.createElement('img');
+				newcard.src = 'images/' + played[i] + '.png';
+				document.getElementById('played').append(newcard);
+			}
+		}
+
+		function updateDisplay(){displayHand(); displayPlayed();}
+
+		function updateStats(){
+			document.getElementById('stats').innerHTML = 'Will: ' +will+ '/3<br> Assimilation: ' +ass+ ' /7<br> Rescue: ' + res +'/13';
+
+			if(will==0) setTimeout(lostwill, 300);
+			if(ass==7) alert("You were assimilated. You lose..");
+			if(res==13) alert("You were rescued! YOU WIN!");
+		}
+
+		function lostwill() { ass++; will=3;
+			alert("You lost all your will! Assimilation increases...");
+			updateStats();
+		}
+
 		function play(name){ //let currHtml = this.innerHTML;
-			let fixedName = name.slice( 45, -4 );
-			alert('You played '+ fixedName);
+			let fixedName = name.slice( name.indexOf('images/')+7, name.indexOf('.') );
+			console.log('You played '+ fixedName); // 45, -4
+			var creature = Math.floor(Math.random()*hand.length);
+			lurked = hand[creature].toString();
+			alert("The creature was in the "+lurked);
+			let chosen = hand.splice(hand.indexOf(fixedName), 1);
+			played.push(chosen.toString());
+			if(chosen == lurked) { caught = true;
+				alert("The creature caught you! Lose 1 Will.");
+				will--; 
+				if (lurked == 'lair') {will--;
+					alert("The creature caught you in its LAIR! Lose 1 EXTRA Will.");
+				}
+			}
+
+			updateStats();
+			updateDisplay();
+			if(!caught) setTimeout(action, 200);
+			caught = false;
+		}
+
+		function action(){ let word = played[played.length-1]; var foundCard;
+			if(word == "jungle" && played.length>1){ let found = false;
+				do {let input = parseInt(prompt('Which number would you like returned to your hand?'));
+					if (input==2) alert('Cannot pick 2.');
+					else {for (var i = 0; i < played.length; i++) {
+								if (played[i] == cards[input-1]) {found=true;
+									foundCard = played.splice(i, 1);
+									played.splice(played.indexOf('jungle'), 1);
+								}
+							}
+							if (!found) alert('Could not find matching played card number ' + input);
+						}
+				} while (!found)
+			
+				// Card found. return it to hand along with 2
+				if(!hand.includes('jungle')) hand.push('jungle');
+				hand.push(foundCard);
+				updateDisplay();
+			}
+
+			else if (word == "beach"){
+				if (marker) { marker = false;
+					document.getElementById('marker').innerHTML = '';
+					res++;
+					updateStats();
+				}
+				else {marker = true; 
+					var newmark = document.createElement('img');
+					newmark.src = 'images/pawn.png';
+					document.getElementById('marker').append(newmark);
+				}
+			}
+
+			else if (word == "rover"){ var rover =0;
+				while (rover < 6 || rover > 10) rover = parseInt(prompt("Which card number would you like to add?"));
+				hand.push(reserve[rover - 6]);
+				displayHand();
+			}
+
+			else if(word == "lair"){
+				if(confirm("Would you like to copy the power of the creature's location?")){
+					alert("The creature was in the "+lurked);
+					played.push(lurked);
+					action();
+					played.pop();
+				}
+				else {alert("Returning all cards from discard pile."); 
+					for (var i = 0; i < played.length-1; i++) {
+						hand.push(played[i]);
+					}
+					played = ['lair'];
+					updateDisplay();
+				}
+			}
+
+			else if(word == 'swamp' && played.length>1){let found = false;
+				do {let input = parseInt(prompt('Which number would you like returned to your hand?'));
+					if (input==2) alert('Cannot pick 2.');
+					else {for (var i = 0; i < played.length; i++) {
+								if (played[i] == cards[input-1]) {found=true;
+									foundCard = played.splice(i, 1);
+									played.splice(played.indexOf('jungle'), 1);
+								}
+							}
+							if (!found) alert('Could not find matching played card number ' + input);
+						}
+				} while (!found)
+			
+				// Card found. return it to hand along with 2
+				hand.push(cards[1]);
+				hand.push(foundCard);
+				updateDisplay();
+				played.push('jungle');
+				action();
+				played.pop();				
+			}
+
+			else if(word == 'wreck') res++;
+
+			else console.log(word+' card action not implemented');
 		}
 	</script>
 </head>
 <body>
 <span id="stats">Will: 3 <br> Assimilation: 0 <br> Rescue: 0</span>
+<div id="marker"></div>
 <div id="played">Played</div>
 <div id="hand"></div>
 </body>
