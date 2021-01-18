@@ -100,7 +100,7 @@
 		}
 
 		function play(name){ //let currHtml = this.innerHTML;
-			let fixedName = name.slice( name.indexOf('images/')+7, name.indexOf('.') );
+			let fixedName = name.slice( 45, -4 );
 			console.log('You played '+ fixedName); // 45, -4
 			var creature = Math.floor(Math.random()*hand.length);
 			lurked = hand[creature].toString();
