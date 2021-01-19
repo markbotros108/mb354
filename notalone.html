@@ -202,7 +202,7 @@
 				  
 			else if(word == 'source') {
 				if(confirm("Would you like to regain 1 Will?")) {
-					will++; updateStats();
+					if(will<3) will++; updateStats();
 				}
 				else alert("Drawing 1 Survival card."); 
 			}
