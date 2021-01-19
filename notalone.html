@@ -137,7 +137,7 @@
 			
 				// Card found. return it to hand along with 2
 				if(!hand.includes('jungle')) hand.push('jungle');
-				hand.push(foundCard);
+				hand.push(foundCard.toString());
 				updateDisplay();
 			}
 
@@ -155,8 +155,8 @@
 			}
 
 			else if (word == "rover"){ var rover =0;
-				while (rover < 6 || rover > 10) rover = parseInt(prompt("Which card number would you like to add?"));
-				hand.push(reserve[rover - 6]);
+				while (rover < 6 || rover > 10 || hand.includes(reserve[rover - 6]) || played.includes(reserve[rover - 6])) rover = parseInt(prompt("Which card number would you like to add?"));
+				hand.push(reserve[rover - 6].toString());
 				displayHand();
 			}
 
@@ -178,7 +178,7 @@
 
 			else if(word == 'swamp' && played.length>1){let found = false;
 				do {let input = parseInt(prompt('Which number would you like returned to your hand?'));
-					if (input==2) alert('Cannot pick 2.');
+					if (input==6) alert('Cannot pick 6.');
 					else {for (var i = 0; i < played.length; i++) {
 								if (played[i] == cards[input-1]) {found=true;
 									foundCard = played.splice(i, 1);
@@ -189,9 +189,9 @@
 						}
 				} while (!found)
 			
-				// Card found. return it to hand along with 2
-				hand.push(cards[1]);
-				hand.push(foundCard);
+				// Card found. return it to hand then play action again
+				if(!hand.includes('swamp')) hand.push('swamp');
+				hand.push(foundCard.toString());
 				updateDisplay();
 				played.push('jungle');
 				action();
@@ -199,6 +199,15 @@
 			}
 
 			else if(word == 'wreck') {res++; updateStats();}
+				  
+			else if(word == 'source') {
+				if(confirm("Would you like to regain 1 Will?")) {
+					will++; updateStats();
+				}
+				else alert("Drawing 1 Survival card."); 
+			}
+
+			else if(word == 'shelter') alert("Drawing 2 Survival cards. Choose one."); 	  
 
 			else console.log(word+' card action not implemented');
 		}
