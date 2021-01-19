@@ -22,6 +22,7 @@
 			width: 90%;
 			height: 235px;
 			color: black;
+			/*text-align: right;*/
 			top: 30%;
 			font-size: 30px;
 		}
@@ -50,11 +51,12 @@
 		// Added creature and began card #4 function 5:40am
 		// Added card #1 and cont card #4 image 6:15am
 		// Added card #5, card #6 and card #8 functions 7:10am 
+		// TODO 7, 9, 10, 3
 		const cards = ['lair', 'jungle', 'river', 'beach', 'rover'];
 		const reserve = ['swamp', 'shelter', 'wreck', 'source', 'artefact'];
 		let hand = [], played = [];
 		let will = 3, ass = 0, res = 0, caught = false, marker = false;
-		var lurked;
+		var lurked, prevChosen, creatureMoved;
 		
 		$(document).ready( function(){ init(); }); 
 
@@ -102,23 +104,36 @@
 		function play(name){ //let currHtml = this.innerHTML;
 			let fixedName = name.slice(name.indexOf('images/')+7, -4);
 			console.log('You played '+ fixedName); // 45, -4
+			
+				// Player moves
+				let chosen = hand.splice(hand.indexOf(fixedName), 1);
+				played.push(chosen.toString());
+	
+				// Creature moves
+				if(!creatureMoved) moveCreature();
+		
+				// CHeck for creature caught player
+				if(chosen == lurked) { caught = true;
+					alert("The creature caught you! Lose 1 Will.");
+					will--; 
+					if (lurked == 'lair') {will--;
+						alert("The creature caught you in its LAIR! Lose 1 EXTRA Will.");
+					}
+				}
+	
+				updateStats();
+				updateDisplay();
+				if(!caught) setTimeout(action, 200);
+			// }
+			caught = false;
+			prevChosen = chosen;
+			creatureMoved = false;
+		}
+
+		function moveCreature(){ creatureMoved = true;
 			var creature = Math.floor(Math.random()*hand.length);
 			lurked = hand[creature].toString();
 			alert("The creature was in the "+lurked);
-			let chosen = hand.splice(hand.indexOf(fixedName), 1);
-			played.push(chosen.toString());
-			if(chosen == lurked) { caught = true;
-				alert("The creature caught you! Lose 1 Will.");
-				will--; 
-				if (lurked == 'lair') {will--;
-					alert("The creature caught you in its LAIR! Lose 1 EXTRA Will.");
-				}
-			}
-
-			updateStats();
-			updateDisplay();
-			if(!caught) setTimeout(action, 200);
-			caught = false;
 		}
 
 		function action(){ let word = played[played.length-1]; var foundCard;
@@ -154,7 +169,7 @@
 				}
 			}
 
-			else if (word == "rover"){ var rover =0;
+			else if (word == "rover"){ var rover =0; // accepts null
 				while (rover < 6 || rover > 10 || hand.includes(reserve[rover - 6]) || played.includes(reserve[rover - 6])) rover = parseInt(prompt("Which card number would you like to add?"));
 				hand.push(reserve[rover - 6].toString());
 				displayHand();
@@ -180,9 +195,10 @@
 				do {let input = parseInt(prompt('Which number would you like returned to your hand?'));
 					if (input==6) alert('Cannot pick 6.');
 					else {for (var i = 0; i < played.length; i++) {
-								if (played[i] == cards[input-1] || played[i] == reserve[input-6]) {found=true;
+								if (played[i] == cards[input-1] || played[i] == reserve[input-6]) {
+									found=true;
 									foundCard = played.splice(i, 1);
-									played.splice(played.indexOf('jungle'), 1);
+									played.splice(played.indexOf('swamp'), 1);
 								}
 							}
 							if (!found) alert('Could not find matching played card number ' + input);
@@ -190,8 +206,8 @@
 				} while (!found)
 			
 				// Card found. return it to hand then play action again
-				if(!hand.includes('swamp')) hand.push('swamp');
 				hand.push(foundCard.toString());
+				if(!hand.includes('swamp')) hand.push('swamp');
 				updateDisplay();
 				played.push('swamp');
 				action();
@@ -199,17 +215,63 @@
 			}
 
 			else if(word == 'wreck') {res++; updateStats();}
-				  
+
 			else if(word == 'source') {
 				if(confirm("Would you like to regain 1 Will?")) {
-					if(will<3) will++; updateStats();
+					if (will<3) { will++; updateStats(); }
 				}
 				else alert("Drawing 1 Survival card."); 
 			}
 
-			else if(word == 'shelter') alert("Drawing 2 Survival cards. Choose one."); 	  
+			else if(word == 'shelter') alert("Drawing 2 Survival cards. Choose one.");
+
+			else if(word == 'river' || word == 'artefact') {
+				const cardSelect = document.querySelectorAll('img');
+
+				cardSelect.forEach(card => {
+					card.onclick = select;
+				})
+			}
 
 			else console.log(word+' card action not implemented');
+		}
+
+		function select() {
+			this.style.background = 'tomato';
+			setTimeout(selectResolve, 300);
+		}
+
+		function selectResolve() { 
+			const cardSelect = document.getElementById('hand').children;
+			let selected = 0, selectArray=[];
+			for (var i = 0; i < cardSelect.length; i++) {
+				if (cardSelect[i].style.background == 'tomato') {selected++;
+					let cardName = cardSelect[i].src;
+					selectArray.push(cardName.slice( cardName.indexOf('images/')+7, cardName.indexOf('.') ));}
+			}
+			
+			if(selected==2) {
+				let choice = confirm('Would you like to select ['+selectArray+ '] as your choices for the '+prevChosen +' card?' );
+						if(choice) { moveCreature(); //alert('You selected '+selectArray);
+							if(prevChosen == "river"){ let chooseOne;
+								while(!hand.includes(chooseOne))
+								chooseOne = prompt('Which card would you like to play?');
+								// hand[hand.indexOf(cards[chooseOne-1])]
+								play('images/'+ chooseOne +'.png'); // will not work online
+							}
+							else if (prevChosen == "artefact") {
+								play('images/'+selectArray[0] +'.png');
+								creatureMoved = true;
+								play('images/'+selectArray[1] +'.png');
+							}
+						}
+		
+						const cardSelect = document.querySelectorAll('img');
+						cardSelect.forEach(card => {
+							if(choice) card.onclick = function() {play(this.src, this);}
+							card.style.background = 'initial';
+						})
+					}
 		}
 	</script>
 </head>
