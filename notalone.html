@@ -79,7 +79,8 @@
 		// Added card #5, card #6 and card #8 functions 7:10am
 		// Added card #3, card #10 and half of card #9 3:10am 20/1/21
 		// As well as card list's togglable size with resize function 
-		// TODO 7 (Survival cards)
+		// Playable randomised survival cards added! 6am
+		// TODO #7 (FINALLY), player should start with a surv card
 		const cards = ['lair', 'jungle', 'river', 'beach', 'rover'];
 		const reserve = ['swamp', 'shelter', 'wreck', 'source', 'artefact'];
 		const survival = ['ADRENALINE', 'VACCINE', 'INGENUITY', 'AMPLIFIER'];
@@ -93,7 +94,6 @@
 			hand = hand.concat(cards);
 			displayHand();
 			initialiseSurvivalCards();
-			survivalList = shuffle(survivalList);
 		}
 
 		function shuffle(list) {
@@ -266,6 +266,7 @@
 					if (will<3) { will++; updateStats(); }
 				}
 				else {alert("Drawing 1 Survival card.");
+					if(!survivalList.length) initialiseSurvivalCards();  
 					mySurvival.push(survivalList.pop());
 					document.getElementById('survivalcards').innerHTML = 'SURVIVAL CARDS <br> ('+ mySurvival.length +')';
 				}
@@ -371,6 +372,7 @@
 				var survObj = {name: survival[i], desc: survivalDescs(i)};
 				survivalList.push(survObj);
 			}
+			survivalList = shuffle(survivalList);
 		}
 
 		function survivalDescs(no) {
