@@ -266,13 +266,25 @@
 					if (will<3) { will++; updateStats(); }
 				}
 				else {alert("Drawing 1 Survival card.");
-					if(!survivalList.length) initialiseSurvivalCards();  
+					if(!survivalList.length) initialiseSurvivalCards();
 					mySurvival.push(survivalList.pop());
 					document.getElementById('survivalcards').innerHTML = 'SURVIVAL CARDS <br> ('+ mySurvival.length +')';
 				}
 			}
 
-			else if(word == 'shelter') alert("Drawing 2 Survival cards. Choose one.");
+			else if(word == 'shelter') {alert("Drawing 2 Survival cards. Choose one."); let survivalChoices = [];
+				for (var i = 0; i < 2; i++) {
+					if(!survivalList.length) initialiseSurvivalCards();  
+					survivalChoices.push(survivalList.pop());
+				}
+				// Display survivalChoices
+				let chooseOne=''; alert("You drew " + survivalChoices[0].name+ " or " + survivalChoices[1].name);
+				while(survivalChoices[0].name != chooseOne.toUpperCase() &&survivalChoices[1].name != chooseOne.toUpperCase() &&chooseOne!='0') chooseOne = prompt('Which survival card would you like to keep?');
+				var survObj=survivalChoices[1];
+				if(survivalChoices[0].name == chooseOne.toUpperCase()) survObj = survivalChoices[0];
+				mySurvival.push(survObj);
+				document.getElementById('survivalcards').innerHTML = 'SURVIVAL CARDS <br> ('+ mySurvival.length +')';
+			}
 
 			else if(word == 'river' || word == 'artefact') {
 				const cardSelect = document.querySelectorAll('img');
@@ -306,7 +318,7 @@
 								while(!hand.includes(chooseOne))
 								chooseOne = prompt('Which card would you like to play?');
 								// hand[hand.indexOf(cards[chooseOne-1])]
-								play('images/'+ chooseOne +'.png'); // will not work online
+								play('images/'+ chooseOne +'.png');
 							}
 							else if (prevChosen == "artefact") {
 								play('images/'+selectArray[0] +'.png');
@@ -370,7 +382,7 @@
 		function initialiseSurvivalCards() {
 			for (var i = 0; i < survival.length; i++) {
 				var survObj = {name: survival[i], desc: survivalDescs(i)};
-				survivalList.push(survObj);
+				if(!mySurvival.includes(survival[i])) survivalList.push(survObj);
 			}
 			survivalList = shuffle(survivalList);
 		}
