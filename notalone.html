@@ -231,10 +231,10 @@
 
 			else if(word == 'river' || word == 'artefact') {
 				const cardSelect = document.querySelectorAll('img');
-
 				cardSelect.forEach(card => {
 					card.onclick = select;
 				})
+				document.getElementById('cardList').onclick = resizeCardlist;
 			}
 
 			else console.log(word+' card action not implemented');
@@ -275,6 +275,7 @@
 							if(choice) card.onclick = function() {play(this.src, this);}
 							card.style.background = 'initial';
 						})
+						document.getElementById('cardList').onclick = resizeCardlist;
 					}
 		}
 
@@ -298,6 +299,6 @@
 <div id="marker"></div>
 <div id="played">Played</div>
 <div id="hand"></div>
-<img src="images/allcards.png" id="cardList" style="position: absolute; width: 10%; right: 0%;" onclick="resizeCardlist();">
+<img src="images/allcards.png" id="cardList" style="position: absolute; width: 10%; right: -1%;" onclick="resizeCardlist();">
 </body>
 </html>
