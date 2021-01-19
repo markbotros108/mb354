@@ -56,7 +56,7 @@
 		const reserve = ['swamp', 'shelter', 'wreck', 'source', 'artefact'];
 		let hand = [], played = [];
 		let will = 3, ass = 0, res = 0, caught = false, marker = false;
-		var lurked, prevChosen, creatureMoved;
+		var lurked, prevChosen, creatureMoved, swamped=0, resized = false;
 		
 		$(document).ready( function(){ init(); }); 
 
@@ -169,10 +169,12 @@
 				}
 			}
 
-			else if (word == "rover"){ var rover =0; // accepts null
-				while (rover < 6 || rover > 10 || hand.includes(reserve[rover - 6]) || played.includes(reserve[rover - 6])) rover = parseInt(prompt("Which card number would you like to add?"));
-				hand.push(reserve[rover - 6].toString());
-				displayHand();
+			else if (word == "rover"){ 
+				if (reserveLeft()) {var rover =1; // 0 to cancel
+					while (rover < 6 || rover > 10 || hand.includes(reserve[rover - 6]) || played.includes(reserve[rover - 6])) rover = parseInt(prompt("Which card number would you like to add?"));
+					if(rover != 0) hand.push(reserve[rover - 6].toString());
+					displayHand();
+				}
 			}
 
 			else if(word == "lair"){
@@ -209,9 +211,11 @@
 				hand.push(foundCard.toString());
 				if(!hand.includes('swamp')) hand.push('swamp');
 				updateDisplay();
-				played.push('swamp');
-				action();
-				played.pop();				
+				swamped++;
+				if (swamped%2 == 1) {	
+					played.push('swamp');
+					action();
+					played.pop();}				
 			}
 
 			else if(word == 'wreck') {res++; updateStats();}
@@ -273,6 +277,20 @@
 						})
 					}
 		}
+
+		function reserveLeft(){ let check=0;
+			for (var i = 0; i < reserve.length; i++) {
+				if (hand.includes(reserve[i]) || played.includes(reserve[i]))
+					check++;
+			}
+			if(check==5) return false;
+			return true;
+		}
+
+		function resizeCardlist(){ resized = !resized;
+			if(resized)	document.getElementById('cardList').style.width = '10%';
+			else document.getElementById('cardList').style.width = '100%';
+		}
 	</script>
 </head>
 <body>
@@ -280,5 +298,6 @@
 <div id="marker"></div>
 <div id="played">Played</div>
 <div id="hand"></div>
+<img src="images/allcards.png" id="cardList" style="position: absolute; width: 10%; right: 0%;" onclick="resizeCardlist();">
 </body>
 </html>
