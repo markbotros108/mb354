@@ -247,7 +247,7 @@
 			for (var i = 0; i < cardSelect.length; i++) {
 				if (cardSelect[i].style.background == 'tomato') {selected++;
 					let cardName = cardSelect[i].src;
-					selectArray.push(cardName.slice( cardName.indexOf('images/')+7, cardName.indexOf('.') ));}
+					selectArray.push(cardName.slice( cardName.indexOf('images/')+7, -4 ));}
 			}
 			
 			if(selected==2) {
