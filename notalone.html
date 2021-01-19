@@ -89,9 +89,9 @@
 		function updateStats(){
 			document.getElementById('stats').innerHTML = 'Will: ' +will+ '/3<br> Assimilation: ' +ass+ '/7<br> Rescue: ' + res +'/13';
 
-			if(will==0) setTimeout(lostwill, 300);
-			if(ass==7) alert("You were assimilated. You lose..");
-			if(res==13) alert("You were rescued! YOU WIN!");
+			if(will<=0) setTimeout(lostwill, 300);
+			if(ass>=7) alert("You were assimilated. You lose..");
+			if(res>=13) alert("You were rescued! YOU WIN!");
 		}
 
 		function lostwill() { ass++; will=3;
