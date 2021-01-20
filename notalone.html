@@ -169,8 +169,9 @@
 	
 				updateStats();
 				updateDisplay();
-				if(!caught&&!droned&&!gated&&played[played.length-1]=='jungle') setTimeout(action, 100);
-				else if(!caught&&!droned&&!gated) action();
+				/*if(!caught&&!droned&&!gated&&played[played.length-1]=='jungle') setTimeout(action, 100);
+				else*/ 
+				if(!caught&&!droned&&!gated) action(played[played.length-1]);
 				else if(droned) { alert('You have used the DRONE. Copying the Power of the Rover.');
 					played.push('rover');
 					action();
@@ -207,7 +208,7 @@
 			alert("The creature was in the "+lurked);
 		}
 
-		function action(){ let word = played[played.length-1]; var foundCard; console.log('actioning '+word);
+		function action(word){ var foundCard; console.log('actioning '+word);
 			if(word == "jungle" && played.length>1){ let found = false;
 				do {let input = parseInt(prompt('Which number would you like returned to your hand?'));
 					if (input==2) alert('Cannot pick 2.');
