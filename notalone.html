@@ -83,13 +83,14 @@
 		// 4 Playable randomised survival cards added! 6am
 		// Added final card #7 with choose survival card interface 5:30pm
 		// Added 2 more surv cards + bug fixes 2:40am 21/1/21
+		// Completed adding all 10 survival cards! 6am
 		const cards = ['lair', 'jungle', 'river', 'beach', 'rover'];
 		const reserve = ['swamp', 'shelter', 'wreck', 'source', 'artefact'];
-		const survival = ['ADRENALINE', 'VACCINE', 'INGENUITY', 'AMPLIFIER', 'DOUBLE BACK', 'DODGE', 'DRONE', 'GATE'];
+		const survival = ['ADRENALINE', 'VACCINE', 'INGENUITY', 'AMPLIFIER', 'DOUBLE BACK', 'DODGE', 'DRONE', 'GATE', 'VORTEX', 'SIXTH SENSE'];
 		let hand = [], played = [], unlocked=[], survivalList = [], mySurvival = [];
 		let will = 3, ass = 0, res = 0, caught = false, marker = false;
 		var lurked, prevChosen, creatureMoved, swamped=0, resized = true;
-		var dodged=false, droned=false, gated=false;
+		var dodged=false, droned=false, gated=false, vortex=false;
 		
 		$(document).ready( function(){ init(); }); 
 
@@ -171,7 +172,7 @@
 				updateDisplay();
 				/*if(!caught&&!droned&&!gated&&played[played.length-1]=='jungle') setTimeout(action, 100);
 				else*/ 
-				if(!caught&&!droned&&!gated) action(played[played.length-1]);
+				if(!caught&&!droned&&!gated&&!vortex) action(played[played.length-1]);
 				else if(droned) { alert('You have used the DRONE. Copying the Power of the Rover.');
 					played.push('rover');
 					action();
@@ -189,6 +190,12 @@
 						gateChoices.push(cards[gateLocation]);
 					}
 					while (!gateChoices.includes(gateChosen)) gateChosen = prompt('You have used the GATE. Pick from these locations: ' + gateChoices);
+					played.push(gateChosen);
+					action();
+					played.pop();
+				}
+				else if(vortex) { let gateChosen = 'fixedName';
+					while (!played.includes(gateChosen)||gateChosen==fixedName) prompt('You have used the VORTEX. Choose a card from your Played cards.');
 					played.push(gateChosen);
 					action();
 					played.pop();
@@ -462,6 +469,8 @@
 				case 5: return 'Avoid the effects of the Creature token.';
 				case 6: return 'Instead of using the Power of your Place card, copy the Rover.';
 				case 7: return 'Instead of using the Power of your Place card, copy an adjacent Place.';
+				case 8: return 'Swap your played Place card for one Place card from your Discard pile.';
+				case 9: return 'Take back to your hand 2 Place cards from your Discard pile.';
 				default: return 'not implemented';
 			}
 		}
@@ -486,9 +495,25 @@
 				case survival[6]: droned = true;
 								break;	
 				case survival[7]: gated = true;
+								break;
+				case survival[8]: vortex = true;
+								break;
+				case survival[9]: for (var i = 0; i < 2; i++) {
+									if(played.length>1){ let found = false;
+										do {let input = parseInt(prompt('Which number would you like returned to your hand?'));
+											for (var i = 0; i < played.length; i++) {
+												if (played[i] == cards[input-1] || played[i] == reserve[input-6]) {
+													foundCard = played.splice(i, 1);
+													found=true; break;
+												}
+											}
+											if (!found) alert('Could not find matching played card number ' + input);
+										} while (!found)
+										hand.push(foundCard.toString());
+								   	}
+								}
 								break;				
 				// case sixth sense: brute force the power of the swamp but can include picking up swamp
-				// case vortex: splicing chosen card from played, playing a card BUT actioning chosen card instead
 				default: alert('not implemented');
 			}
 
@@ -518,9 +543,9 @@
 4 DODGE (Phase 3): Avoid the effects of the Creature token.
 6 DRONE (Phase 3): Instead of using the Power of your Place card, copy the Power of the Rover.
 7 GATE (Phase 3): Instead of using the Power of your Place card, copy the Power of an adjacent Place.
-
-11 SIXTH SENSE (Phase 1): Take back to your hand 2 Place cards from your Discard pile.
 15 VORTEX (Phase 2): Swap your played Place card for one Place card from your Discard pile.
+11 SIXTH SENSE (Phase 1): Take back to your hand 2 Place cards from your Discard pile.
+
 ----MAJOR GAME UPDATE: Separating each phase----
 16 WRONG TRACK (Phase 3): Move the Creature token to an adjacent Place. 
 -->
