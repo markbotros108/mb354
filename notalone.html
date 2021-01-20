@@ -400,7 +400,7 @@
 				survivalWindow = document.getElementById(elem);
 				survivalWindow.style.cursor = 'initial';
 				survivalWindow.style.width = '80%';
-				survivalWindow.style.height = '80%';
+				survivalWindow.style.height = '90%';
 				survivalWindow.style.top = "0%";
 				survivalWindow.style.backgroundColor = 'aliceblue';
 				survivalWindow.innerHTML = 'Click here to cancel<br>';
@@ -409,7 +409,7 @@
 					var newSurvCard = document.createElement('span');
 					newSurvCard.className = 'survCard';
 					newSurvCard.title = mySurvival[i].name;
-					newSurvCard.innerHTML = '<u>'+mySurvival[i].name+'</u><br>' + mySurvival[i].desc ;
+					newSurvCard.innerHTML = '<u>'+mySurvival[i].name+'</u><br><br>' + mySurvival[i].desc ;
 					newSurvCard.onclick = function() {playSurvival(this.title); };
 					survivalWindow.append(newSurvCard);
 				}
