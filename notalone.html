@@ -30,12 +30,13 @@
 			cursor: initial;
 		}
 
-		#stats, #marker{
-			top: 5%;
+		#stats{
+			top: 3%;
 			font-size: 66px;
 		}
 
 		#marker {
+			top: 5%;
 			left: 67%;
 		}
 
@@ -80,10 +81,10 @@
 		// Added card #3, card #10 and half of card #9 3:10am 20/1/21
 		// As well as card list's togglable size with resize function 
 		// Playable randomised survival cards added! 6am
-		// TODO #7 (FINALLY), player should start with a surv card
+		// Added final card #7 with choose survival card interface 5:30pm
 		const cards = ['lair', 'jungle', 'river', 'beach', 'rover'];
 		const reserve = ['swamp', 'shelter', 'wreck', 'source', 'artefact'];
-		const survival = ['ADRENALINE', 'VACCINE', 'INGENUITY', 'AMPLIFIER'];
+		const survival = ['ADRENALINE', 'VACCINE', 'INGENUITY', 'AMPLIFIER', 'DOUBLE BACK'];
 		let hand = [], played = [], survivalList = [], mySurvival = [];
 		let will = 3, ass = 0, res = 0, caught = false, marker = false;
 		var lurked, prevChosen, creatureMoved, swamped=0, resized = true;
@@ -94,6 +95,7 @@
 			hand = hand.concat(cards);
 			displayHand();
 			initialiseSurvivalCards();
+			mySurvival.push(survivalList.pop()); // Player starts with a survival card
 		}
 
 		function shuffle(list) {
@@ -272,18 +274,20 @@
 				}
 			}
 
-			else if(word == 'shelter') {alert("Drawing 2 Survival cards. Choose one."); let survivalChoices = [];
+			else if(word == 'shelter') {alert("Drawing 2 Survival cards."); 
+				let survivalChoices = [];
 				for (var i = 0; i < 2; i++) {
 					if(!survivalList.length) initialiseSurvivalCards();  
 					survivalChoices.push(survivalList.pop());
 				}
 				// Display survivalChoices
-				let chooseOne=''; alert("You drew " + survivalChoices[0].name+ " or " + survivalChoices[1].name);
-				while(survivalChoices[0].name != chooseOne.toUpperCase() &&survivalChoices[1].name != chooseOne.toUpperCase() &&chooseOne!='0') chooseOne = prompt('Which survival card would you like to keep?');
-				var survObj=survivalChoices[1];
-				if(survivalChoices[0].name == chooseOne.toUpperCase()) survObj = survivalChoices[0];
-				mySurvival.push(survObj);
-				document.getElementById('survivalcards').innerHTML = 'SURVIVAL CARDS <br> ('+ mySurvival.length +')';
+				// let chooseOne=''; alert("You drew " + survivalChoices[0].name+ " or " + survivalChoices[1].name);
+				// while(survivalChoices[0].name != chooseOne.toUpperCase() &&survivalChoices[1].name != chooseOne.toUpperCase() &&chooseOne!='0') chooseOne = prompt('Which survival card would you like to keep?');
+				// var survObj=survivalChoices[1];
+				// if(survivalChoices[0].name == chooseOne.toUpperCase()) survObj = survivalChoices[0];
+				// mySurvival.push(survObj);
+				chooseSurvivalCards(survivalChoices);
+				// document.getElementById('survivalcards').innerHTML = 'SURVIVAL CARDS <br> ('+ mySurvival.length +')';
 			}
 
 			else if(word == 'river' || word == 'artefact') {
@@ -379,6 +383,31 @@
 			}
 		}
 
+		function chooseSurvivalCards(arr) { resized=!resized;
+			 	let survivalWindow = document.getElementById('survivalcards');
+				survivalWindow.style.cursor = 'initial';
+				survivalWindow.style.width = '80%';
+				survivalWindow.style.height = '40%';
+				survivalWindow.style.top = "25%";
+				survivalWindow.style.backgroundColor = 'aliceblue';
+				survivalWindow.innerHTML = 'CHOOSE ONE:<br>';
+
+				for (var i = 0; i < 2; i++) {
+					var newSurvCard = document.createElement('span');
+					newSurvCard.className = 'survCard';
+					var survObj = arr.pop();
+					newSurvCard.title = survObj.name;
+					newSurvCard.innerHTML = '<u>'+survObj.name+'</u><br>' + survObj.desc ;
+					newSurvCard.onclick = function() {survivalChoice(this.title); };
+					survivalWindow.append(newSurvCard);
+				}
+		}
+
+		function survivalChoice(choice){
+			var survObj = {name: choice, desc: survivalDescs(survival.indexOf(choice))};
+			mySurvival.push(survObj);
+		}
+
 		function initialiseSurvivalCards() {
 			for (var i = 0; i < survival.length; i++) {
 				var survObj = {name: survival[i], desc: survivalDescs(i)};
@@ -393,6 +422,7 @@
 				case 1: return 'Decrease the Assimilation counter by 1.';
 				case 2: return 'Place the Marker counter on the Beach.';
 				case 3: return 'Remove the Marker & immediately increase the Rescue counter +1.';
+				case 4: return 'Take back the Place card you just played.';
 				default: return 'not implemented';
 			}
 		}
@@ -410,12 +440,17 @@
 								document.getElementById('marker').innerHTML = '';
 								res++;}
 								break;
+				case survival[4]: if(played.length) hand.push(played.pop());
+								break;
+				// case sixth sense: brute force the power of the swamp but can include picking up swamp
+				// case vortex: splicing chosen card from played, playing a card BUT actioning chosen card instead
 				default: alert('not implemented');
 			}
 
 			mySurvival.splice(mySurvival.indexOf(name), 1);
 			document.getElementById('survivalcards').innerHTML = 'SURVIVAL CARDS <br> ('+ mySurvival.length +')';
 			updateStats();
+			updateDisplay();
 		}
 	</script>
 </head>
@@ -425,7 +460,7 @@
 <div id="played">Played</div>
 <div id="hand"></div>
 <img src="images/allcards.png" id="cardList" style="position: absolute; width: 10%; right: -1%;" onclick="resizeCardlist('cardList');">
-<p id="survivalcards" onclick="resizeCardlist('survivalcards');">SURVIVAL CARDS</p>
+<p id="survivalcards" onclick="resizeCardlist('survivalcards');">SURVIVAL CARDS (1)</p>
 </body>
 </html>
 
@@ -434,10 +469,11 @@
 14 VACCINE (Phase 1): Move the Assimilation counter back by 1 space.
 9 INGENUITY (Phase 1): Place the Marker counter on the Beach.
 2. AMPLIFIER (Phase 4): Remove the Marker counter from the Beach to immediately move the Rescue counter forward	1 space.
-
 5 DOUBLE BACK (Phase 4): Take back the Place card you just played.
+
 11 SIXTH SENSE (Phase 1): Take back to your hand 2 Place cards from your Discard pile.
 15 VORTEX (Phase 2): Swap your played Place card for one Place card from your Discard pile.
+----MAJOR GAME UPDATE: Separating each phase----
 4 DODGE (Phase 3): Avoid the effects of the Creature token.
 6 DRONE (Phase 3): Instead of using the Power of your Place card, copy the Power of the Rover.
 7 GATE (Phase 3): Instead of using the Power of your Place card, copy the Power of an adjacent Place.
