@@ -127,6 +127,7 @@
 
 		function displayPlayed(){ 
 			if(!played.length) document.getElementById('played').innerHTML = 'Played';
+			else document.getElementById('played').innerHTML = '';
 			document.getElementById('played').style.height = '243px';
 			for (var i = 0; i < played.length; i++) {
 				var newcard = document.createElement('img');
