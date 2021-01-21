@@ -335,10 +335,8 @@
 			else if(word == 'river' || word == 'artefact') { alert('Choose 2 cards.');
 				const cardSelect = document.querySelectorAll('img');
 				cardSelect.forEach(card => {
-					card.onclick = select;
+					if(!card.src.includes('allcards')) card.onclick = select;
 				})
-				document.getElementById('cardList').onclick = function() {resizeCardlist('cardList');}
-				document.getElementById('survivalcards').onclick = function() {resizeCardlist('survivalcards');}
 			}
 
 			else console.log(word+' card action not implemented');
