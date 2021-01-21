@@ -265,10 +265,8 @@
 			else if(word == "lair"){
 				if(confirm("Would you like to copy the power of the creature's location? (" + lurked + ")")){
 					alert("Copied power of the "+lurked);
-					played.push(lurked);
-					action();
-					played.pop();
-				}
+					action(lurked); // played.push(); played.pop();
+				}	
 				else {alert("Returning all cards from discard pile."); 
 					for (var i = 0; i < played.length-1; i++) {
 						hand.push(played[i]);
@@ -297,10 +295,8 @@
 				if(!hand.includes('swamp')&&unlocked.includes('swamp')) hand.push('swamp');
 				updateDisplay();
 				swamped++;
-				if (swamped%2 == 1) {	
-					played.push('swamp');
-					action();
-					played.pop();}				
+				if (swamped%2 == 1) action('swamp');	
+					// played.push(); played.pop();}				
 			}
 
 			else if(word == 'wreck') {res++; updateStats();}
