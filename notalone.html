@@ -126,6 +126,7 @@
 		}
 
 		function displayPlayed(){ document.getElementById('played').innerHTML = 'Played';
+			document.getElementById('played').style.height = '243px';
 			for (var i = 0; i < played.length; i++) {
 				var newcard = document.createElement('img');
 				newcard.src = 'images/' + played[i] + '.png';
