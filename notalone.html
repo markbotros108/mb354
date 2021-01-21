@@ -254,7 +254,7 @@
 
 			else if (word == "rover"){ 
 				if (unlocked.length!=5) {var rover =1; // 0 to cancel
-					while (rover<6 || rover>10 || unlocked.includes(reserve[rover - 6]) ) {rover = parseInt(prompt("Which card number would you like to add?")); if(rover==0) break; }
+					while (rover==null || rover<6 || rover>10 || unlocked.includes(reserve[rover - 6]) ) {rover = parseInt(prompt("Which card number would you like to add?")); if(rover==0) break; }
 					if(rover != 0) {hand.push(reserve[rover - 6].toString());
 										unlocked.push(hand[hand.length-1]);}
 					displayHand();
