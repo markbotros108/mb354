@@ -20,7 +20,7 @@
 			border: solid;
 			left: 5%;
 			width: 90%;
-			height: auto;
+			height: 235px;
 			color: black;
 			top: 30%;
 			font-size: 30px;
@@ -65,9 +65,9 @@
 			cursor: pointer;
 			border: solid;
 			padding: : 20px;
-			/*padding-bottom: 500px;*/
+			/*padding-bottom: 50px;*/
 			width: 350px;
-			height: auto;
+			height: 250px;
 			margin-left: 50px;
 		}
 	</style>	
@@ -84,6 +84,7 @@
 		// Added final card #7 with choose survival card interface 5:30pm
 		// Added 2 more surv cards + bug fixes 2:40am 21/1/21
 		// Completed adding all 10 survival cards! 6am
+		// TODO end game & restart? + debugging
 		const cards = ['lair', 'jungle', 'river', 'beach', 'rover'];
 		const reserve = ['swamp', 'shelter', 'wreck', 'source', 'artefact'];
 		const survival = ['ADRENALINE', 'VACCINE', 'INGENUITY', 'AMPLIFIER', 'DOUBLE BACK', 'DODGE', 'DRONE', 'GATE', 'VORTEX', 'SIXTH SENSE'];
@@ -124,7 +125,7 @@
 			}
 		}
 
-		function displayPlayed(){ document.getElementById('played').innerHTML = '';
+		function displayPlayed(){ document.getElementById('played').innerHTML = 'Played';
 			for (var i = 0; i < played.length; i++) {
 				var newcard = document.createElement('img');
 				newcard.src = 'images/' + played[i] + '.png';
@@ -353,19 +354,19 @@
 					selectArray.push(cardName.slice( cardName.indexOf('images/')+7, -4 ));}
 			}
 			
-			if(selected==2) { selected=0; console.log(selectArray);
+			if(selected>=2||selected==hand.length) { selected=0; console.log(selectArray);
 				let choice = confirm('Would you like to select ['+selectArray+ '] as your choices for the '+prevChosen +' card?' );
 						if(choice) { moveCreature(); //alert('You selected '+selectArray);
-							if(prevChosen == "river"||droned){ let chooseOne;
-								while(!hand.includes(chooseOne))
+							if(prevChosen == "river"||droned||gated||vortex){ let chooseOne='.';
+								while(!hand.includes(chooseOne)||chooseOne!="")
 								chooseOne = prompt('Which card would you like to play?');
 								// hand[hand.indexOf(cards[chooseOne-1])]
-								play('images/'+ chooseOne +'.png');
+								if(chooseOne!="") play('images/'+ chooseOne +'.png');
 							}
-							else if (prevChosen == "artefact"||droned) {
-								play('images/'+selectArray[0] +'.png');
-								creatureMoved = true;
-								play('images/'+selectArray[1] +'.png');
+							else if (prevChosen == "artefact"||droned||gated||vortex) {
+								if(hand.includes(selectArray[0])) play('images/'+selectArray[0] +'.png');
+								if(hand.includes(selectArray[1])){ creatureMoved = true;
+																 play('images/'+selectArray[1] +'.png');}
 							}
 						}
 		
