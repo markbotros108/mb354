@@ -204,7 +204,7 @@
 					action();
 					played.pop();
 				}
-			swamped = 0;
+			if(swamped >= 2) swamped = 0;
 			caught = false;
 			dodged = false;
 			droned = false;
