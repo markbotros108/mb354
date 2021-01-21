@@ -341,7 +341,8 @@
 		}
 
 		function select() {
-			this.style.background = 'tomato';
+			if(this.style.background=='tomato') this.style.background = 'initial';
+			else this.style.background = 'tomato';
 			setTimeout(selectResolve, 300);
 		}
 
@@ -354,7 +355,7 @@
 					selectArray.push(cardName.slice( cardName.indexOf('images/')+7, -4 ));}
 			}
 			
-			if(selected>=2||selected==hand.length) { selected=0; console.log(selectArray);
+			if(selected==2||(selected<2&&selected==hand.length) ) { selected=0; console.log(selectArray);
 				let choice = confirm('Would you like to select ['+selectArray+ '] as your choices for the '+prevChosen +' card?' );
 						if(choice) { moveCreature(); //alert('You selected '+selectArray);
 							if(prevChosen == "river"||droned||gated||vortex){ let chooseOne='.';
