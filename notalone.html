@@ -362,7 +362,7 @@
 		
 						const cardSelect = document.querySelectorAll('img');
 						cardSelect.forEach(card => {
-							if(choice) card.onclick = function() {play(this.src, this);}
+							if(choice&&!card.src.includes('allcards')) card.onclick = function() {play(this.src, this);}
 							card.style.background = 'initial';
 						})
 						
