@@ -337,7 +337,8 @@
 				cardSelect.forEach(card => {
 					card.onclick = select;
 				})
-				document.getElementById('cardList').onclick = resizeCardlist;
+				document.getElementById('cardList').onclick = function() {resizeCardlist('cardList');}
+				document.getElementById('survivalcards').onclick = function() {resizeCardlist('survivalcards');}
 			}
 
 			else console.log(word+' card action not implemented');
@@ -359,6 +360,13 @@
 			}
 			
 			if(selected==2||(selected<2&&selected==hand.length) ) { selected=0; console.log(selectArray);
+		
+						const cardSelect = document.querySelectorAll('img');
+						cardSelect.forEach(card => {
+							if(choice) card.onclick = function() {play(this.src, this);}
+							card.style.background = 'initial';
+						})
+						
 				let choice = confirm('Would you like to select ['+selectArray+ '] as your choices for the '+prevChosen +' card?' );
 						if(choice) { moveCreature(); //alert('You selected '+selectArray);
 							if(prevChosen == "river"||droned||gated||vortex){ let chooseOne='.';
@@ -375,14 +383,6 @@
 																 play('images/'+selectArray[1] +'.png');}
 							}
 						}
-		
-						const cardSelect = document.querySelectorAll('img');
-						cardSelect.forEach(card => {
-							if(choice) card.onclick = function() {play(this.src, this);}
-							card.style.background = 'initial';
-						})
-						document.getElementById('cardList').onclick = function() {resizeCardlist('cardList');}
-						document.getElementById('survivalcards').onclick = function() {resizeCardlist('survivalcards');}
 					}
 		}
 
