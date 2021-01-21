@@ -178,9 +178,9 @@
 				else*/ 
 				if(!caught&&!droned&&!gated&&!vortex) action(played[played.length-1]);
 				else if(droned) { alert('You have used the DRONE. Copying the Power of the Rover.');
-					played.push('rover');
-					action();
-					played.pop();
+					// played.push('');
+					action('rover');
+					// played.pop();
 				}
 				else if(gated) { let gateChosen = fixedName, gateLocation = 11, gateChoices=[];
 					if(cards.includes(gateChosen)) { gateLocation = cards.indexOf(gateChosen);
@@ -194,15 +194,15 @@
 						gateChoices.push(cards[gateLocation]);
 					}
 					while (!gateChoices.includes(gateChosen)) gateChosen = prompt('You have used the GATE. Pick from these locations: ' + gateChoices);
-					played.push(gateChosen);
-					action();
-					played.pop();
+					// played.push();
+					action(gateChosen);
+					// played.pop();
 				}
 				else if(vortex) { let gateChosen = 'fixedName';
 					while (!played.includes(gateChosen)||gateChosen==fixedName) prompt('You have used the VORTEX. Choose a card from your Played cards.');
-					played.push(gateChosen);
-					action();
-					played.pop();
+					// played.push();
+					action(gateChosen);
+					// played.pop();
 				}
 			if(swamped >= 2) swamped = 0;
 			caught = false;
@@ -221,7 +221,7 @@
 
 		function action(word){ var foundCard; console.log('actioning '+word);
 			if(word == "jungle" && played.length>1){ let found = false;
-				do {let input = parseInt(prompt('Which number would you like returned to your hand?'));
+				do {let input = parseInt(prompt('Which number would you like returned to your hand? Choose from '+ played));
 					if (input==2) alert('Cannot pick 2.');
 					else {for (var i = 0; i < played.length; i++) {
 								if (played[i] == cards[input-1] || played[i] == reserve[input-6]) {found=true;
@@ -362,7 +362,7 @@
 		
 						const cardSelect = document.querySelectorAll('img');
 						cardSelect.forEach(card => {
-							if(choice&&!card.src.includes('allcards')) card.onclick = function() {play(this.src, this);}
+							if(choice && !card.src.includes('allcards')) card.onclick = function() {play(this.src, this);}
 							card.style.background = 'initial';
 						})
 						
