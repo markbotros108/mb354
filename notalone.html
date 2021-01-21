@@ -360,6 +360,7 @@
 			}
 			
 			if(selected==2||(selected<2&&selected==hand.length) ) { selected=0; console.log(selectArray);
+				let choice = confirm('Would you like to select ['+selectArray+ '] as your choices for the '+prevChosen +' card?' );
 		
 						const cardSelect = document.querySelectorAll('img');
 						cardSelect.forEach(card => {
@@ -367,7 +368,6 @@
 							card.style.background = 'initial';
 						})
 						
-				let choice = confirm('Would you like to select ['+selectArray+ '] as your choices for the '+prevChosen +' card?' );
 						if(choice) { moveCreature(); //alert('You selected '+selectArray);
 							if(prevChosen == "river"||droned||gated||vortex){ let chooseOne='.';
 								while(!hand.includes(chooseOne)){
