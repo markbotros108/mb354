@@ -221,7 +221,7 @@
 		}
 
 		function action(word){ var foundCard; console.log('actioning '+word);
-			if(word == "jungle" && played.length>1){ let found = false;
+			if(word == "jungle" && played.length>1){ let found = false; played.pop();
 				do {let input = parseInt(prompt('Which number would you like returned to your hand? Choose from '+ played));
 					if (input==2) alert('Cannot pick 2.');
 					else {for (var i = 0; i < played.length; i++) {
@@ -276,8 +276,9 @@
 				}
 			}
 
-			else if(word == 'swamp' && played.length>1){let found = false;
-				do {let input = parseInt(prompt('Which number would you like returned to your hand?'));
+			else if(word == 'swamp' && played.length>1){ if(played[length-1]=='swamp') played.pop();
+				let found = false; 
+				do {let input = parseInt(prompt('Which number would you like returned to your hand? Choose from ' + played));
 					if (input==6) alert('Cannot pick 6.');
 					else {for (var i = 0; i < played.length; i++) {
 								if (played[i] == cards[input-1] || played[i] == reserve[input-6]) {
