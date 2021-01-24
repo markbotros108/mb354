@@ -276,9 +276,11 @@
 				}
 			}
 
-			else if(word == 'swamp' && played.length>1){ if(played[length-1]=='swamp') played.pop();
+			else if(word == 'swamp' && played.length>1){ var currdiscards = []; 
+					currdiscards = currdiscards.concat(played);
+				 if(currdiscards[length-1]=='swamp') currdiscards.pop();
 				let found = false; 
-				do {let input = parseInt(prompt('Which number would you like returned to your hand? Choose from ' + played));
+				do {let input = parseInt(prompt('Which number would you like returned to your hand? Choose from ' + currdiscards));
 					if (input==6) alert('Cannot pick 6.');
 					else {for (var i = 0; i < played.length; i++) {
 								if (played[i] == cards[input-1] || played[i] == reserve[input-6]) {
@@ -295,7 +297,7 @@
 				hand.push(foundCard.toString());
 				if(!hand.includes('swamp')&&unlocked.includes('swamp')) hand.push('swamp');
 				updateDisplay();
-				swamped++;
+				swamped++; swamped
 				if (swamped%2 == 1) action('swamp');	
 					// played.push(); played.pop();}				
 			}
