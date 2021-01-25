@@ -92,6 +92,7 @@
 		let will = 3, ass = 0, res = 0, caught = false, marker = false;
 		var lurked, prevChosen, creatureMoved, swamped=0, resized = true;
 		var dodged=false, droned=false, gated=false, vortex=false;
+		var currdiscards = [];
 		
 		$(document).ready( function(){ init(); }); 
 
@@ -164,7 +165,7 @@
 				played.push(chosen.toString());
 		
 				// CHeck for creature caught player
-				if(chosen == lurked && !dodged) { caught = true;
+				if(chosen == lurked && !dodged) { caught = true; console.log('Creature caught Player in the '+lurked);
 					alert("The creature caught you! Lose 1 Will.");
 					will--; 
 					if (lurked == 'lair') {will--;
@@ -179,9 +180,8 @@
 				else*/ 
 				if(!caught&&!droned&&!gated&&!vortex) action(played[played.length-1]);
 				else if(droned) { alert('You have used the DRONE. Copying the Power of the Rover.');
-					// played.push('');
+					// played.push(''); played.pop();
 					action('rover');
-					// played.pop();
 				}
 				else if(gated) { let gateChosen = fixedName, gateLocation = 11, gateChoices=[];
 					if(cards.includes(gateChosen)) { gateLocation = cards.indexOf(gateChosen);
@@ -195,15 +195,13 @@
 						gateChoices.push(cards[gateLocation]);
 					}
 					while (!gateChoices.includes(gateChosen)) gateChosen = prompt('You have used the GATE. Pick from these locations: ' + gateChoices);
-					// played.push();
+					// played.push(); played.pop();
 					action(gateChosen);
-					// played.pop();
 				}
 				else if(vortex) { let gateChosen = 'fixedName';
 					while (!played.includes(gateChosen)||gateChosen==fixedName) prompt('You have used the VORTEX. Choose a card from your Played cards.');
-					// played.push();
+					// played.push();played.pop();
 					action(gateChosen);
-					// played.pop();
 				}
 			if(swamped >= 2) swamped = 0;
 			caught = false;
@@ -221,13 +219,15 @@
 		}
 
 		function action(word){ var foundCard; console.log('actioning '+word);
-			if(word == "jungle" && played.length>1){ let found = false; played.pop();
-				do {let input = parseInt(prompt('Which number would you like returned to your hand? Choose from '+ played));
+			if(word == "jungle" && played.length>1){ let found = false; currdiscards = []; 
+					currdiscards = currdiscards.concat(played); //console.log(currdiscards);
+				 if(currdiscards[currdiscards.length-1]=='jungle') currdiscards.pop();
+				do {let input = parseInt(prompt('Which number would you like returned to your hand? Choose from '+ currdiscards));
 					if (input==2) alert('Cannot pick 2.');
 					else {for (var i = 0; i < played.length; i++) {
 								if (played[i] == cards[input-1] || played[i] == reserve[input-6]) {found=true;
-									foundCard = played.splice(i, 1);
-									played.splice(played.indexOf('jungle'), 1);
+									foundCard = played.splice(i, 1); console.log(played);
+									if(played.includes('jungle')) played.splice(played.indexOf('jungle'), 1); //console.log(played);
 								}
 							}
 							if (!found) alert('Could not find matching played card number ' + input);
@@ -236,7 +236,7 @@
 			
 				// Card found. return it to hand along with 2
 				if(!hand.includes('jungle')) hand.push('jungle');
-				hand.push(foundCard.toString());
+				hand.push(foundCard.toString()); console.log('about to update display, played ='+ played);
 				updateDisplay();
 			}
 
@@ -276,9 +276,9 @@
 				}
 			}
 
-			else if(word == 'swamp' && played.length>1){ var currdiscards = []; 
-					currdiscards = currdiscards.concat(played);
-				 if(currdiscards[length-1]=='swamp') currdiscards.pop();
+			else if(word == 'swamp' && played.length>1){ currdiscards = []; 
+					currdiscards = currdiscards.concat(played); //console.log(currdiscards);
+				 if(currdiscards[currdiscards.length-1]=='swamp') currdiscards.pop();
 				let found = false; 
 				do {let input = parseInt(prompt('Which number would you like returned to your hand? Choose from ' + currdiscards));
 					if (input==6) alert('Cannot pick 6.');
@@ -286,7 +286,7 @@
 								if (played[i] == cards[input-1] || played[i] == reserve[input-6]) {
 									found=true;
 									foundCard = played.splice(i, 1);
-									played.splice(played.indexOf('swamp'), 1);
+									if(played.includes('swamp') && swamped%2) played.splice(played.indexOf('swamp'), 1);
 								}
 							}
 							if (!found) alert('Could not find matching played card number ' + input);
@@ -297,9 +297,9 @@
 				hand.push(foundCard.toString());
 				if(!hand.includes('swamp')&&unlocked.includes('swamp')) hand.push('swamp');
 				updateDisplay();
-				swamped++; swamped
-				if (swamped%2 == 1) action('swamp');	
-					// played.push(); played.pop();}				
+				swamped++; 
+				if (swamped%2 == 1) {action('swamp');updateDisplay();}	
+					// played.push(); played.pop();}	swamped			
 			}
 
 			else if(word == 'wreck') {res++; updateStats();}
