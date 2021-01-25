@@ -199,8 +199,7 @@
 					action(gateChosen);
 				}
 				else if(vortex) { let gateChosen = 'fixedName';
-					while (!played.includes(gateChosen)||gateChosen==fixedName) prompt('You have used the VORTEX. Choose a card from your Played cards.');
-					// played.push();played.pop();
+					while (!played.includes(gateChosen)||gateChosen==fixedName) gateChosen = prompt('You have used the VORTEX. Choose a card from your Played cards.');
 					action(gateChosen);
 				}
 			if(swamped >= 2) swamped = 0;
@@ -504,8 +503,8 @@
 				case survival[8]: vortex = true;
 								break;
 				case survival[9]: for (var i = 0; i < 2; i++) {
-									if(played.length>1){ let found = false;
-										do {let input = parseInt(prompt('Which number would you like returned to your hand?'));
+									if(played.length){ let found = false;
+										do {let input = parseInt(prompt('Which number would you like returned to your hand? Choose from '+ played));
 											for (var i = 0; i < played.length; i++) {
 												if (played[i] == cards[input-1] || played[i] == reserve[input-6]) {
 													foundCard = played.splice(i, 1);
