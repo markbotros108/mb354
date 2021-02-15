@@ -4,24 +4,24 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<title>Jaipur</title>
 <style type="text/css">
-	#starter {
+	#starter, #player {
 		padding: 15px 35px;
 		font-size: 137px;
 	}
 
 	#hand, #starter, #market {
 		position: absolute;
-		left: 25%;
+		left: 2.5%;
 		top: 60%;
 	}
 
 	#hand {
 		font-size: 36px;
-
+		/*left: 23.5%;*/
 	}
 
 	.card {
-		cursor: pointer;
+		/*cursor: pointer;*/
 		color: blue;
 		width: 170px;
 		text-align: center;
@@ -29,6 +29,25 @@
 		padding: 5px;
 		border: solid black;
 		display: inline-block;
+	}
+
+	#player, #discarder {
+		position: absolute;
+		right: 25%;
+		top: 50%;
+		font-size: 26px;
+	}
+
+	.choiceWindow {
+		text-align: center;
+		font-size: 36px;
+		position: absolute;
+		left: 2.5%;
+		top: 45%;
+		border: double black;
+		background-color: aliceblue;
+		width: 50%;
+		height: 15%;
 	}
 
 	#market {
@@ -42,22 +61,31 @@
 	}
 </style>
 <script type="text/javascript">
-	let goods = ["silver", "gold", "diamond", "silk", "spice"];
-	let deck = [], hand2 = [];
+	// Take functionality complete 2pm 11/2/21
+	// Sell function partially completed 5pm 12/2/21? but without scoring
+	// Herd function completed 10pm 13/2/21
+	// Opponent turn (dumb AI) completed 4:20pm 15/2/21 
+	// TODO: Opponent => values alphabetical or value more?
+	// TODO: Scoring and end game
+	// TODO: Ensure Opponent caps hand limit at 7
+	// let goods = ["silver", "gold", "diamond", "silk", "spice"];
+	let value = ['camel', "leather", "spice", "silk", "silver", "gold", "diamond"];
+	let deck = [], hand = [], hand2 = [], market=[];
+	var onecard = false, herd = 0, discardOne = false;
 	$(document).ready( function(){ init(); }); 
 
 	function init() { let iter = 0;
 		for (var i = 0; i < 11; i++) {
 			if (i<6) {
-				deck.push(goods[0]);
-				deck.push(goods[1]);
-				deck.push(goods[2]);
+				deck.push(value[4]);
+				deck.push(value[5]);
+				deck.push(value[6]);
 			}
-			if (i<8) {deck.push(goods[3]);
-					deck.push(goods[4]);
-					deck.push('camel');
+			if (i<8) {deck.push(value[0]);
+					deck.push(value[2]);
+					deck.push(value[3]);
 				}
-			if(i < 10) deck.push('leather');
+			if(i < 10) deck.push(value[1]);
 		}
 		deck = shuffle(deck);
 	}
@@ -72,62 +100,375 @@
 		return newOrder;
 	}
 
-	function start() {
-		document.getElementById('starter').style.display = 'none';
+	function start() { let turnButton = document.getElementById('starter');
+		turnButton.style.left = '45%';
+		turnButton.style.top = '50%';
+		turnButton.style.fontSize = '26px';
+		turnButton.innerHTML = 'Next turn';
+		turnButton.onclick = turn;
 		document.getElementById('market').style.display = 'initial';
 		for (var i = 0; i < 5; i++) {
-			var newcard = document.createElement('div');
-			newcard.className = 'card';
-			newcard.onclick = play;
-			let cardName = deck.pop();
-			newcard.innerHTML = cardName.toUpperCase() +'<hr>';
-			var cardImg = document.createElement('img');
-			cardImg.src = 'images/'+cardName+'.png';// cardImg.style.width = "153px";
-			newcard.appendChild(cardImg);
-			document.getElementById('hand').append(newcard);
+			// Deal hand
+			hand.push(deck.pop());
 
 			// Deal opponent hand
 			hand2.push(deck.pop());
 
-			if(i<3) {
-				var newcamel = document.createElement('div');
-				newcamel.className = 'card';
-				newcamel.innerHTML = 'CAMEL<hr>';
-				var cardImg = document.createElement('img');
-				cardImg.src = 'images/camel.png';// cardImg.style.width = "153px";
-				newcamel.appendChild(cardImg);
-				document.getElementById('market').append(newcamel);
-			}
-			else {
-				var newMarket = document.createElement('div');
-				newMarket.className = 'card';
-				let cardName = deck.pop();
-				newMarket.innerHTML = cardName.toUpperCase()+ '<hr>';
-				var cardImg = document.createElement('img');
-				cardImg.src = 'images/'+cardName+'.png';
-				newMarket.appendChild(cardImg);
-				document.getElementById('market').append(newMarket);
-			}
+			// Deal market
+			if(i<3) market.push('camel'); // cardImg.style.width = "153px";
+			else market.push(deck.pop());
+			
+		}
+		updateDisplay('hand');
+		updateDisplay('market');
+	}
+
+	function displayCard(name){
+		var newcard = document.createElement('div');
+		newcard.className = 'card';
+		newcard.onclick = nothing;
+		newcard.innerHTML = name.toUpperCase() +'<hr>';
+		var cardImg = document.createElement('img');
+		cardImg.src = 'images/'+name+'.png';// cardImg.style.width = "153px";
+		newcard.appendChild(cardImg);
+		return newcard;
+	}
+
+	function updateDisplay(area){ let dispArr = [];
+		switch(area){
+			case 'hand': dispArr = hand; herd = 0; break;
+			case 'market': dispArr = market; break;
+			default: alert("Problem with updateDisplay function.");
+		}
+		document.getElementById(area).innerHTML = '';
+		for (var i = 0; i < dispArr.length; i++) {
+			document.getElementById(area).append(displayCard(dispArr[i]));
+			if(area==='hand' && dispArr[i].includes('camel')) herd++;
+		}
+		if(area==='hand' && hand.length-herd > 7) { discardOne = true;
+			alert('Exceeded hand limit. Discard '+ ((hand.length-herd)-7) +' cards.');
+			selectCards('discard');
 		}
 	}
 
-	function take(){
+	function turn() { document.getElementById('starter').style.display = 'none';
+		var turnChoiceWindow = document.getElementById('turner');
+		turnChoiceWindow.style.display = 'initial';
+		turnChoiceWindow.className = 'choiceWindow';
+		turnChoiceWindow.innerHTML = "Would you like to Take or Sell this turn?";
+		for (var i = 0; i < 2; i++) {
+			var turnChoiceButton = document.createElement('div');
+			turnChoiceButton.style.border = 'solid black';
+			turnChoiceButton.style.cursor = 'pointer';
+			turnChoiceButton.style.marginRight = '40px';
+			turnChoiceButton.style.height = '50%';
+			turnChoiceButton.style.width = '40%';
+			turnChoiceButton.style.display = 'inline-block';
+			if (i) turnChoiceButton.innerHTML = 'SELL';
+			else turnChoiceButton.innerHTML = 'TAKE';
+			turnChoiceButton.onclick = function(){action(this.innerHTML);}
+			turnChoiceWindow.appendChild(turnChoiceButton);
+		}
+		// document.body.appendChild(turnChoiceWindow);
+	}
 
+	function action(choice){
+		document.getElementById('turner').style.display = 'none';
+		if(choice==='TAKE') take(); //setTimeout(take, 100);
+		else if(choice==='SELL') sell(); //setTimeout(sell, 100);
+		else alert("Problem with action function");
+		//document.getElementById('starter').style.display = 'initial'; //DELAY THIS TIL AFTER ACTION
+	}
+
+	function take(){ //alert("You chose to take");
+		var turnChoiceWindow = document.getElementById('turner');
+		turnChoiceWindow.style.display = 'initial';
+		// turnChoiceWindow.className = 'choiceWindow';
+		turnChoiceWindow.innerHTML = "~~~~Which option would you like to Take?~~~~\n\n";
+		for (var i = 0; i < 3; i++) {
+			var turnChoiceButton = document.createElement('div');
+			turnChoiceButton.style.border = 'solid black';
+			turnChoiceButton.style.cursor = 'pointer';
+			turnChoiceButton.style.marginRight = '40px';
+			// turnChoiceButton.style.height = '75px';
+			turnChoiceButton.style.width = '23%';
+			turnChoiceButton.style.fontSize = '33px';
+			turnChoiceButton.style.display = 'inline-block';
+			if(i>1) turnChoiceButton.innerHTML = 'TAKE CAMELS';
+			else if (i) turnChoiceButton.innerHTML = 'TAKE 1 GOOD';
+			else turnChoiceButton.innerHTML = 'EXCHANGE GOODS';
+			turnChoiceButton.onclick = function(){takeAction(this.innerHTML);}
+			turnChoiceWindow.appendChild(turnChoiceButton);
+		}
+	}
+
+	function takeAction(choice){
+		switch(choice.toString()){
+			case "TAKE 1 GOOD": alert("Pick 1 good from the market.");
+								onecard = true;
+								selectCards('table');
+								break;
+			case "EXCHANGE GOODS": alert("Pick goods to exchange.");
+								selectCards('all');
+								break;
+			case "TAKE CAMELS": alert("Took "+ takeCamels() +' camels from market.');
+								break;
+			default: alert('incomplete');
+		}
+
+		document.getElementById('turner').style.display = 'none';
+	}
+
+	function takeCamels() { let camelCountr = 0;
+		let allMarket = document.querySelectorAll('#market .card');
+		allMarket.forEach( card => { if(card.innerHTML.includes('camel')) camelCountr++; });
+
+		// Replace camels with cards from deck and place camels in hand
+		for (var i = 0; i < camelCountr; i++) {
+			market.splice(market.indexOf('camel'), 1);
+			market.push(deck.pop());
+			hand.push('camel');
+		}
+		updateDisplay('hand');
+		updateDisplay('market');
+		setTimeout(oppTurn, 1000); // Opp turn before starter button displays again
+		// document.getElementById('starter').style.display = 'initial';
+		return camelCountr;
 	}
 
 	function sell(){
-		
+		alert("You chose to sell. Click a card to sell.");
+		selectCards('sell');	
 	}
 
-	function play(){ let currHtml = this.innerHTML;
-		currHtml = currHtml.slice( 0, currHtml.indexOf('<') );
-		alert('You played '+ currHtml);
+	function selectCards(arg){
+		let allCards = document.querySelectorAll('.card');
+		switch(arg){
+			case 'table': allCards.forEach( card => {
+				 if(card.parentElement.id == 'market') {
+					card.style.cursor = 'pointer';
+				 	card.onclick = selectOne;
+				 }
+			}); break;
+			case 'all': allCards.forEach( card => {
+				card.style.cursor = 'pointer';
+				card.onclick = select;
+			}); break;
+			case 'sell': allCards.forEach( card => {
+				if(card.parentElement.id != 'market') {
+					card.style.cursor = 'pointer';
+				 	card.onclick = selectSame;
+				 }
+			}); break;
+			case 'off': allCards.forEach( card => {
+				card.style.cursor = 'initial';
+				card.style.backgroundColor = 'initial';
+				card.onclick = nothing;
+			}); break;
+			case 'discard': allCards.forEach( card => {
+				 if(card.parentElement.id == 'hand') {console.log('passed '+card.parentElement.id);
+					card.style.cursor = 'pointer';
+				 	card.onclick = selectOne;
+				 } 
+			}); break;
+			default: alert('Problem with selectCards arg');
+		}
+	}
+
+	function select() { //console.log('you selected '+this.innerHTML);
+		let currentColour = this.style.backgroundColor;
+		if  (currentColour == 'cornsilk') this.style.backgroundColor = 'initial';
+		else this.style.backgroundColor = 'cornsilk';
+		document.getElementById('player').style.display = 'initial';
+	}
+
+	function selectSame() {
+		// Unselect everything & Select only this one
+		let handCards = document.querySelectorAll('#hand .card');
+		handCards.forEach( card => {
+				card.style.backgroundColor = 'initial';
+			});
+		this.style.backgroundColor = 'cornsilk';
+
+		// Find out which card type to sell and how many
+		let sellType = this.innerHTML.slice( 0, this.innerHTML.indexOf('<') );
+		let typeCount = 0;
+
+		// Select all cards with that type
+		handCards.forEach( card => {
+				if(card.innerHTML.includes(sellType)){ typeCount++;
+				card.style.backgroundColor = 'cornsilk';}
+			});
+
+		if( typeCount<2 && (sellType == 'diamond' || sellType == 'silver' || sellType == 'gold')){
+			alert("Precious goods must be sold with 2 cards minimum.");
+			handCards.forEach( card => { card.style.backgroundColor = 'initial'; });
+			document.getElementById('player').style.display = 'none';
+		}
+		else setTimeout(confirmSelection, 200, typeCount, sellType.toLowerCase(), handCards);
+		// console.log();
+	}
+
+	function confirmSelection(typeCount, sellType, handCards){
+		var sellString = "Selling "+ typeCount +' '+ sellType;
+			if(typeCount>1 && sellType!='gold') sellString += 's';
+			sellString += '?';
+		var selectConfirmation = confirm(sellString);
+		// var currLength = hand.length;
+		if(selectConfirmation){
+			// Discard goods and update score
+			for (var i = 0; i < hand.length; i++) {
+				if(hand[i] === sellType) {hand.splice(i, 1); i--;}
+			}
+
+			// Begin new round/ opponent turn
+			console.log('Sold' + typeCount+sellType);
+			updateDisplay('hand');
+			oppTurn();
+		}
+		else { handCards.forEach( card => { card.style.backgroundColor = 'initial'; });
+			document.getElementById('player').style.display = 'none'; } 
+	}
+
+	function selectOne() {
+		let allCards = document.querySelectorAll('.card');
+		allCards.forEach( card => {
+				card.style.backgroundColor = 'initial';
+			});
+		this.style.backgroundColor = 'cornsilk';
+
+		if(discardOne) document.getElementById('discarder').style.display = 'initial';
+		else document.getElementById('player').style.display = 'initial';
+	}
+
+	function discardSelected() { discardOne = false; let currentSelected = '';
+		let allCards = document.querySelectorAll('.card');
+		allCards.forEach( card => {
+				if(card.style.backgroundColor == 'cornsilk') currentSelected = card.innerHTML;
+			});
+		currentSelected = currentSelected.slice( 0, currentSelected.indexOf('<') ).toLowerCase();
+		for (var i = 0; i < hand.length; i++) {
+			if (hand[i] === currentSelected){ hand.splice(i, 1); break;}
+		}
+
+		updateDisplay('hand');
+		document.getElementById('discarder').style.display = 'none';
+		if(!discardOne)document.getElementById('starter').style.display = 'initial';		
+	}
+
+	function nothing(){
+		this.style.cursor = 'initial';
+	}
+
+	function mostOf(arr){ let max = 0, count = 0, mostGood = '';
+		for (var j = 1; j < value.length; j++) { count = 0;
+			for (var i = 0; i < arr.length; i++) if(value[j] === arr[i]) count++;
+			if(count >= max) {max = count; mostGood = value[j]; }
+		}
+
+		return mostGood;
+	}
+
+	function oppTurn(){ let currMax = mostOf(hand2.reverse()); var oppCount = 0; alert('Opponent turn.');
+		for (var i = 0; i < hand2.length; i++) {
+			if(hand2[i]===currMax) oppCount++;
+		}
+
+		if(oppCount >= 3) oppSell(currMax);
+
+		//If currMax is in market then take 1
+		else if (market.includes(currMax)) {
+			hand2.push(market.splice(market.indexOf(currMax), 1).toString());
+			alert('Opponent took a '+hand2[hand2.length-1] + ' from the market.');
+			market.push(deck.pop());
+		}
+
+		// Otherwise swap pop() for most valued good in market (TODO MIN 2)
+		else {
+			oppGood = hand2.pop();
+			marketGood = market.pop();
+			hand2.push(marketGood.toString());
+			market.push(oppGood.toString());
+			alert('Opponent Exchanges 1 '+oppGood+' for 1 ' +marketGood+ ' from the market.');
+		}
+
+		updateDisplay('market');
+		if(!discardOne) document.getElementById('starter').style.display = 'initial';
+	}
+
+	function oppSell(mostGood){
+		for (var i = 0; i < hand2.length; i++) {
+			if(hand2[i]===mostGood) {hand2.splice(i, 1); i--; alert('Opponent sold 1 '+mostGood);}
+		}
+	}
+
+	function play(){ let currentSelected = []; let handSelected = 0, marketSelected = 0;
+		let allCards = document.querySelectorAll('.card');
+		allCards.forEach( card => {
+				if (card.style.backgroundColor == 'cornsilk') {
+					let currHtml = card.innerHTML;
+					currHtml = currHtml.slice( 0, currHtml.indexOf('<') );
+					currentSelected.push(currHtml.toLowerCase());
+					if(card.parentElement.id == 'market') marketSelected++;
+					else handSelected++;
+				}
+			});
+		let currString = "You're taking ";
+		for (var i = 0; i < marketSelected; i++) {
+			currString += currentSelected[i];
+			if(i+1 < marketSelected) currString += ', ';
+		}
+		currString += ' from the market '
+		if(handSelected) currString += 'and exchanging it with ';
+		for (var i = marketSelected; i < currentSelected.length; i++) {
+			currString += currentSelected[i];
+			if(i+1 < currentSelected.length) currString += ', ';
+		}
+		if(handSelected) currString += ' from your hand.';
+		if((marketSelected != handSelected) && !onecard) currString += '\nWARNING: Selections unequal.';
+		if (handSelected == 1) currString += '\nWARNING: Exchanges must be 2 cards minimum.';
+
+		let confirmed = confirm(currString);
+		if(confirmed){
+			if(currentSelected.length==1 && onecard) { // Take 1 card
+				// Remove selected card from market to hand
+				hand.push(market.splice(market.indexOf(currentSelected[0]), 1).toString()); 
+
+				market.push(deck.pop()); // Replace with deck pop
+			}
+
+			else { // EXCHANGE GOODS
+				if(handSelected == marketSelected){ let returnToMarket = [];
+					for (var i = 0; i < currentSelected.length; i++) {
+						if(i < marketSelected) hand.push(market.splice(market.indexOf(currentSelected[i]), 1).toString());
+						else returnToMarket.push(hand.splice(hand.indexOf(currentSelected[i]), 1).toString());
+					}
+
+					for (var i = 0; i < returnToMarket.length; i++) { //console.log(returnToMarket[i]);
+						market.push(returnToMarket[i].toString());
+					}
+					// market = market.concat(returnToMarket);
+				}
+				else alert('EXCHANGE failed. Selections were unequal.');
+			}
+			selectCards('off');
+			updateDisplay('market');
+			updateDisplay('hand');
+			onecard = false;
+			document.getElementById('player').style.display = 'none';
+			setTimeout(oppTurn, 1000); // AFTER opponent turn 
+		}
+		else { allCards.forEach( card => { card.style.backgroundColor = 'initial'; });
+			document.getElementById('player').style.display = 'none'; }
 	}
 </script>
 </head>
 <body>
 <button id="starter" onclick="start()">Start</button>
+<button id="player" onclick="play()" style="display: none;">Play</button>
+<button id="discarder" onclick="discardSelected()" style="display: none;">Discard</button>
 <div id="market" style="display: none;"></div>
 <div id="hand"></div>
 </body>
+<div id="turner"></div>
 </html>
