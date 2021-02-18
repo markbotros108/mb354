@@ -374,7 +374,7 @@
 			if(hand2[i]===currMax) oppCount++;
 		}
 
-		if(oppCount >= 3) oppSell(currMax);
+		if(oppCount >= 3) {oppSell(currMax); alert('Opponent sold '+ oppCount + currMax) }
 
 		//If currMax is in market then take 1
 		else if (market.includes(currMax)) {
