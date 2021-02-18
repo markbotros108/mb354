@@ -324,7 +324,7 @@
 			// Begin new round/ opponent turn
 			console.log('Sold' + typeCount+sellType);
 			updateDisplay('hand');
-			oppTurn();
+			setTimeout(oppTurn, 1000);
 		}
 		else { handCards.forEach( card => { card.style.backgroundColor = 'initial'; });
 			document.getElementById('player').style.display = 'none'; } 
