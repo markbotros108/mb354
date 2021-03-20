@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>RPG</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript">	var lvl=1, rm=3, items=[], itemShown = [];
+	var coins = 0, inv = [];
+		$(document).ready( function(){
+		var clientRect = document.getElementById('char').getBoundingClientRect();
+		var clientRect2 = document.getElementById('gameMap').getBoundingClientRect();
+		var mapX = clientRect2.left, mapY = clientRect2.top;
+		var x = clientRect.left - mapX-3, y = clientRect.top - mapY;
+
+		document.addEventListener('keydown', function(e) {
+			// LEFT
+		if (e.keyCode == '37') { if (x > 100) x-=150;
+			// else x = 950;
+			else if(y>150 && y<175 && rm > 2 && lvl > 1) {x=910; rm--;}
+		}
+			// RIGHT
+		else if (e.keyCode == '39') { if (x < mapX*2.5-150)  x += 150;
+			// else x = 0;
+			else if(y<230 && y>120 && lvl > 1 && (rm < 4 || inv.includes('key'))) { x=10; rm++;}		
+		}
+			// UP
+		else if (e.keyCode == '38') { if (y > 100)  y -= 150;
+			// else y = 500;
+			else if(x<600 && x>400 && rm%2 == 1 && lvl < 3) {y=460; lvl++;}
+		}
+			// DOWN
+		else if (e.keyCode == '40') { if (y < 450)  y += 150;
+			// else y = 0;
+			else if(x<600 && x>400 && rm%2 == 1 && lvl > 1) {y=10; lvl--;}	
+		}
+
+		document.getElementById('gameMap').style.backgroundImage = 'url(images/map'+lvl+rm+'.png)';
+		hideItem();
+		displayItem();
+		document.getElementById('char').style.left = x+'px';
+		document.getElementById('char').style.top = y+'px';
+		pickupItem(x, y);
+		document.getElementById('coinCount').innerHTML = 'Coins: '+coins;
+		document.getElementById('levelCount').innerHTML = 'Level: '+lvl;
+		document.getElementById('roomCount').innerHTML = 'Room: '+rm;
+		});
+
+		function createItem(name, itemx, itemy){
+			var item = document.createElement('img');
+			item.id = 'item'+itemShown.length;
+			item.src = 'images/'+name+'.png';
+			item.style.width = '100px';
+			item.style.height = '100px';
+			item.style.position = 'relative';
+			item.style.top = itemx+'px';
+			item.style.left = itemy+'px';
+			document.getElementById('gameMap').append(item);
+		}
+
+		function displayItem(){ 
+			// creates
+			if(lvl==2&&rm==2) {
+				if(!itemShown.includes('attack')) {
+				createItem('attack',285,490);
+				itemShown.push('attack'); 
+				}
+			// displays
+			if(!inv.includes('attack') && itemShown.includes('attack')){
+			 document.getElementById('item'+ itemShown.indexOf('attack')).style.display = 'initial';}
+			}
+
+			 if(lvl==2&&rm==4) {
+			 	if(!itemShown.includes('coin')) {
+			 	createItem('open-chest',285,490);
+				itemShown.push('coin');
+			 }
+			 if(!inv.includes('coin') && itemShown.includes('coin')){
+			 document.getElementById('item'+ itemShown.indexOf('coin')).style.display = 'initial';}
+			}
+
+			if(lvl==3&&rm==2) {
+			 	if(!itemShown.includes('key')) {
+			 	createItem('key',145,30);
+				itemShown.push('key');
+			 }
+			 if(!inv.includes('key') && itemShown.includes('key')){
+			 document.getElementById('item'+ itemShown.indexOf('key')).style.display = 'initial';}
+			}
+		}
+
+		function hideItem(){
+			for (var i = 0; i < itemShown.length; i++) {
+				document.getElementById('item'+i).style.display = 'none';
+			}
+		}
+
+		function pickupItem(Xpos, Ypos) {
+			if(rm==2&&lvl==2){
+			if(Xpos>600 && Xpos<620 && Ypos > 300 && Ypos < 320 && !inv.includes('attack')) {
+				hideItem(); inv.push('attack'); displayInv();
+				/* TODO add sword to man.png
+				var currChar = document.getElementById('char').src; 
+				document.getElementById('char').src = currChar;*/
+			}}
+			else if(rm==4&&lvl==2){ //console.log('picked up coin at '+Xpos + ' '+Ypos);
+			if(Xpos>600 && Xpos<620 && Ypos > 300 && Ypos < 320 && !inv.includes('coin')) {
+				hideItem(); inv.push('coin'); coins++; 
+			}}
+			else if(rm==2&&lvl==3){
+			if(Xpos==160 && Ypos == Xpos && !inv.includes('key')) {
+				hideItem(); inv.push('key'); displayInv(); 
+			}}
+		}
+
+		function displayInv() {
+			for (var i = 0; i < 4; i++) {// dont display coins..
+				var currItem = document.getElementById('slot'+i);
+				if(inv[i] != null && inv[i] != 'coin') currItem.src = 'images/'+inv[i] + '.png';
+				else currItem.src = 'images/white.png';
+				currItem.style.width = '150px';
+			}
+		}
+	});</script>
+</head>
+<body>
+<p id="gameMap" style="background-image: url('images/mapintro.png'); border: none; 
+		position: absolute; left: 20%; top: 10%; width: 1068px; height: 618px;"> 
+	<img id="char" src="images/swordman.png" style="position: relative; left: 43%; top: 74%;"> 
+</p>
+<span id="coinCount" style="position: absolute; left: 21%; top: 80%; font-size: 82px;">Coins: 0</span>
+<span id="levelCount" style="position: absolute; left: 22.5%; top: 0%; font-size: 82px;">Level: 0</span>
+<span id="roomCount" style="position: absolute; left: 57.5%; top: 00%; font-size: 82px;">Room: 0</span>
+<div id="inventory" style=" border: solid; display: inline-flex; position: absolute; left: 37.5%; top: 80%; font-size: 32px;">Inventory:
+<img id="slot0" src="images/white.png"><img id="slot2" src="images/white.png"><img id="slot3" src="images/white.png"><img id="slot1" src="images/white.png">
+</div>
+</body>
+</html>
