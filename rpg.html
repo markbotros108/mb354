@@ -4,35 +4,61 @@
 	<title>RPG</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script type="text/javascript">	var lvl=1, rm=3, items=[], itemShown = [];
-	var coins = 0, inv = [];
-		$(document).ready( function(){
+	var coins = 0, inv = [], mobRight = false, mobY, mobInterval;
+	var leftAble = ['15', '23', '24', '33', '34', '35', '36', '37'],
+		rightAble = ['14', '22', '23', '32', '33', '35', '36'],
+		upAble = ['13', '15', '23', '25', '26'],//, '37'
+		downAble = ['23', '25', '33', '35', '36'],
+		dir = ['down', 'up', 'left', 'right'];
+		dirSymbol = ['v', '^', '<', '>'];
+
+	function createDirButtons() {
+		for (var i = 0; i < 4; i++) {
+			var dirButton = document.createElement('button');
+			dirButton.id = dir[i];
+			dirButton.innerHTML = dirSymbol[i];
+			dirButton.style.fontSize = '172px';
+			dirButton.style.position = 'absolute';
+			document.body.appendChild(dirButton);
+		}
+	}
+
+		$(document).ready( function(){ createDirButtons();
 		var clientRect = document.getElementById('char').getBoundingClientRect();
 		var clientRect2 = document.getElementById('gameMap').getBoundingClientRect();
 		var mapX = clientRect2.left, mapY = clientRect2.top;
 		var x = clientRect.left - mapX-3, y = clientRect.top - mapY;
+		for (var i = 0; i < dir.length; i++) {
+			document.getElementById(dir[i]).onclick = function(){go(this.id);}
+			if(i%2 == 0) document.getElementById(dir[i]).style.top = '500px';
+			else document.getElementById(dir[i]).style.left = '190px';
+			if(i<2) document.getElementById(dir[i]).style.left = '110px';
+			else document.getElementById(dir[i]).style.top = '250px';
+		}
 
 		document.addEventListener('keydown', function(e) {
+		var currRoom = document.getElementById('gameMap').style.backgroundImage.slice(15, 17);
 			// LEFT
 		if (e.keyCode == '37') { if (x > 100) x-=150;
 			// else x = 950;
-			else if(y>150 && y<175 && rm > 2 && lvl > 1) {x=910; rm--;}
+			else if(y>150 && y<175 && leftAble.includes(currRoom)) {x=910; rm--;}
 		}
 			// RIGHT
 		else if (e.keyCode == '39') { if (x < mapX*2.5-150)  x += 150;
 			// else x = 0;
-			else if(y<230 && y>120 && lvl > 1 && (rm < 4 || inv.includes('key'))) { x=10; rm++;}		
+			else if(y<230 && y>120 && rightAble.includes(currRoom)) { x=10; rm++;}		
 		}
 			// UP
 		else if (e.keyCode == '38') { if (y > 100)  y -= 150;
 			// else y = 500;
-			else if(x<600 && x>400 && rm%2 == 1 && lvl < 3) {y=460; lvl++;}
+			else if(x<600 && x>400 && upAble.includes(currRoom)) {y=460; lvl++;}
 		}
 			// DOWN
 		else if (e.keyCode == '40') { if (y < 450)  y += 150;
 			// else y = 0;
-			else if(x<600 && x>400 && rm%2 == 1 && lvl > 1) {y=10; lvl--;}	
+			else if(x<600 && x>400 && downAble.includes(currRoom)) {y=10; lvl--;}	
 		}
-
+		if (e.keyCode == '37'||e.keyCode == '38'||e.keyCode == '39'||e.keyCode == '40') {
 		document.getElementById('gameMap').style.backgroundImage = 'url(images/map'+lvl+rm+'.png)';
 		hideItem();
 		displayItem();
@@ -42,7 +68,35 @@
 		document.getElementById('coinCount').innerHTML = 'Coins: '+coins;
 		document.getElementById('levelCount').innerHTML = 'Level: '+lvl;
 		document.getElementById('roomCount').innerHTML = 'Room: '+rm;
+		}
 		});
+
+		function go(arg) { console.log(arg+'was clicked');
+		var currRoom = document.getElementById('gameMap').style.backgroundImage.slice(15, 17);
+			switch(arg){
+				case 'left': if (x > 100) x-=150;
+						else if(y>150 && y<175 && leftAble.includes(currRoom)) {x=910; rm--;}
+							break;
+				case 'right': if (x < mapX*2.5-150)  x += 150;
+						else if(y<230 && y>120 && rightAble.includes(currRoom)) { x=10; rm++;}	
+							break;
+				case 'up':  if (y > 100)  y -= 150;
+						else if(x<600 && x>400 && upAble.includes(currRoom)) {y=460; lvl++;}
+							break;
+				case 'down': if (y < 450)  y += 150;
+						else if(x<600 && x>400 && downAble.includes(currRoom)) {y=10; lvl--;}
+							break;
+			}
+			document.getElementById('gameMap').style.backgroundImage = 'url(images/map'+lvl+rm+'.png)';
+			hideItem();
+			displayItem();
+			document.getElementById('char').style.left = x+'px';
+			document.getElementById('char').style.top = y+'px';
+			pickupItem(x, y);
+			document.getElementById('coinCount').innerHTML = 'Coins: '+coins;
+			document.getElementById('levelCount').innerHTML = 'Level: '+lvl;
+			document.getElementById('roomCount').innerHTML = 'Room: '+rm;
+		}
 
 		function createItem(name, itemx, itemy){
 			var item = document.createElement('img');
@@ -85,6 +139,55 @@
 			 if(!inv.includes('key') && itemShown.includes('key')){
 			 document.getElementById('item'+ itemShown.indexOf('key')).style.display = 'initial';}
 			}
+
+			if(lvl==3&&rm==4) {
+			 	if(!itemShown.includes('locked-door')) {
+			 	createItem('locked-door',155,850);
+				itemShown.push('locked-door');
+			 	document.getElementById('item'+itemShown.indexOf('locked-door')).style.height = '150px';
+			 }
+			 if(!inv.includes('key') && itemShown.includes('locked-door')){
+			 document.getElementById('item'+ itemShown.indexOf('locked-door')).style.display = 'initial';}
+			}
+
+			if(lvl==2&&rm==6) {
+			 	if(!itemShown.includes('thwomp')) {
+			 	createItem('thwomp',155,450);
+				itemShown.push('thwomp');
+				mobInterval = setInterval(mobMove, 300);
+			 	// document.getElementById('item'+itemShown.indexOf('thwomp')).style.height = '150px';
+			 }
+			 if(!inv.includes('thwomp') && itemShown.includes('thwomp')){
+			 document.getElementById('item'+ itemShown.indexOf('thwomp')).style.display = 'initial';}
+			}
+			if(lvl!=2||rm!=6) clearInterval(mobInterval);
+		}
+
+		function mobMove() { 
+			mobY = document.getElementById('item'+itemShown.indexOf('thwomp')).style.left;
+			mobY = mobY.slice(0,3); mobY = parseInt(mobY); //console.log(mobY); 
+			if(mobRight){
+				if(mobY <= 550) mobY += 150;
+				else {mobY += 150; mobRight = false;}
+			}
+			else {
+				if (mobY >= 150) mobY -= 150;
+				else {mobRight = true; mobY -= 150;}
+			}
+			
+			document.getElementById('item'+itemShown.indexOf('thwomp')).style.left = mobY +'px';
+
+			if(y==160 && (diff(x, mobY)<100 || (mobY==735 && x==910))) {
+				charDies(); 
+			}
+		}
+
+		function diff (num1, num2) {
+		  if (num1 > num2) {
+		    return num1 - num2
+		  } else {
+		    return num2 - num1
+		  }
 		}
 
 		function hideItem(){
@@ -107,8 +210,12 @@
 			}}
 			else if(rm==2&&lvl==3){
 			if(Xpos==160 && Ypos == Xpos && !inv.includes('key')) {
-				hideItem(); inv.push('key'); displayInv(); 
+				hideItem(); inv.push('key'); rightAble.push('34'); displayInv(); 
 			}}
+			// else if(rm==6&&lvl==2){
+			// if(Xpos==160 && ((Ypos-mobY < 100)||(mobY-Ypos < 100))) {
+			// 	charDies(); 
+			// }}
 		}
 
 		function displayInv() {
@@ -119,6 +226,10 @@
 				currItem.style.width = '150px';
 			}
 		}
+
+		function charDies() { clearInterval(mobInterval);
+			alert('You died at..' + x +', ' + y + '. mob was at' + mobY + ' and diff: ' +diff(x, mobY));
+		}
 	});</script>
 </head>
 <body>
@@ -126,6 +237,10 @@
 		position: absolute; left: 20%; top: 10%; width: 1068px; height: 618px;"> 
 	<img id="char" src="images/swordman.png" style="position: relative; left: 43%; top: 74%;"> 
 </p>
+<!-- <button id="LEFT" onclick="go('left');">&#60;</button>
+<button id="RIGHT" onclick="go('right');">&#62;</button>
+<button id="UP" onclick="go('up');">&#94;</button>
+<button id="DOWN" onclick="go('down');">&#118;</button> -->
 <span id="coinCount" style="position: absolute; left: 21%; top: 80%; font-size: 82px;">Coins: 0</span>
 <span id="levelCount" style="position: absolute; left: 22.5%; top: 0%; font-size: 82px;">Level: 0</span>
 <span id="roomCount" style="position: absolute; left: 57.5%; top: 00%; font-size: 82px;">Room: 0</span>
