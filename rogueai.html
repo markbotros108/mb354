@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Rogue AI</title>
+	<script type="text/javascript">
+		var currLevel = 25, currTurn = true;
+
+		function sub(arg) { choice = parseInt(arg);
+			if(currLevel-choice >= 0) currLevel -= choice;
+			document.getElementById('level').innerHTML = currLevel;
+			setTimeout(checkWinCon, 100);
+			// if(!currTurn) setTimeout(oppTurn, 1000);
+		}
+
+		function oppTurn() { buttonDisplay();
+			if(currLevel == 4 || currLevel == 3 || currLevel == 1) {
+
+				currLevel = 0;
+			}
+			else alert(Math.floor(Math.random()*4)+1);
+			checkWinCon();
+		}
+
+		function buttonDisplay() {
+			if(!currTurn) {document.getElementById('buttonBox').style.display = 'none';
+				document.getElementById('buttonToggle').style.display = 'initial';
+			}
+			else{ document.getElementById('buttonBox').style.display = 'initial';
+						document.getElementById('buttonToggle').style.display = 'none';}
+		}
+
+		function checkWinCon() { 
+			if (currLevel == 0 && currTurn) alert('You WIN!');
+			else if (currLevel == 0) alert('Mark wins.\nYou LOSE!');
+			else currTurn = !currTurn;
+			// alert(currTurn);
+		}
+	</script>
+	<style type="text/css">
+		button{
+			font-size: 225px;
+			cursor: pointer;
+			margin-left: 50px;
+			padding: 0px 30px;
+		}
+
+		#buttonBox {
+			position: absolute;
+			top: 60%;
+		}
+	</style>
+</head>
+<body>
+<p id="level" style="font-size: 225px; position: relative; left: 20%;">25</p>
+<div id="buttonBox">
+<button id="1" onclick="sub(this.id);">-1</button>
+<button id="3" onclick="sub(this.id);">-3</button>
+<button id="4" onclick="sub(this.id);">-4</button>
+</div>
+<button id="buttonToggle" onclick="buttonDisplay();" style="display: none;">My turn</button>
+</body>
+</html>
