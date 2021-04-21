@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Rogue AI</title>
+	<script type="text/javascript">
+		var currLevel = 25, currTurn = true, choice, randComp;
+		console.log('Start of game: 25');
+
+		function sub(arg) { choice = parseInt(arg);
+			if(currLevel-choice >= 0) currLevel -= choice;
+			
+			setTimeout(checkWinCon, 100);
+			if(currLevel>0) setTimeout(oppTurn, 1000);
+		}
+
+		function oppTurn() { buttonDisplay();
+			if(currLevel <= 4 && currLevel != 2) {
+				document.getElementById('compChoice').innerHTML = '-'+currLevel;
+				currLevel = 0;
+			}
+			else if (currLevel == 2) {
+				document.getElementById('compChoice').innerHTML = '-1';
+				currLevel--;
+			}
+			else {
+				randComp = Math.floor(Math.random()*3)+1;
+				if(randComp >= 2) randComp++;
+				document.getElementById('compChoice').innerHTML = '-'+randComp;
+				currLevel -= randComp;
+			}
+			if(!currTurn) checkWinCon();
+		}
+
+		function buttonDisplay() {
+			if(!currTurn) {document.getElementById('buttonBox').style.display = 'none';
+				document.getElementById('buttonToggle').style.display = 'initial';
+				document.getElementById('compChoice').style.display = 'initial';
+			}
+			else{ document.getElementById('buttonBox').style.display = 'initial';
+				document.getElementById('buttonToggle').style.display = 'none';
+				document.getElementById('compChoice').style.display = 'none';}
+		}
+
+		function checkWinCon() { document.getElementById('level').innerHTML = currLevel;
+			if (currLevel == 0) {
+				if(currTurn) alert('You WIN!');
+				else alert('Computer wins.\nYou LOSE!');
+				endGame();
+			}
+			else currTurn = !currTurn;
+			if(!currTurn) console.log('my turn: -'+choice+' = '+currLevel);
+			else console.log('comp turn: -'+randComp+' = '+currLevel);
+		}
+
+		function endGame() { currTurn = false; 
+			document.getElementById('buttonToggle').innerHTML = 'New Game';
+			document.getElementById('buttonToggle').onclick = restart;
+			buttonDisplay();
+		}
+
+		function restart() { console.log('~~~~~~~~~~~~~~~~~~\nNew game: 25');
+			currLevel = 25; currTurn = true;buttonDisplay();
+			document.getElementById('level').innerHTML = currLevel;
+			document.getElementById('compChoice').style.display = 'none';
+			document.getElementById('buttonToggle').innerHTML = 'My turn';
+			document.getElementById('buttonToggle').onclick = buttonDisplay;
+			alert('Game restarted.');
+		}
+	</script>
+	<style type="text/css">
+		button{
+			font-size: 225px;
+			cursor: pointer;
+			margin-left: 50px;
+			padding: 0px 30px;
+		}
+
+		#buttonBox {
+			position: absolute;
+			top: 60%;
+		}
+
+		#compChoice {
+			font-size: 200px;
+			color: red;
+			position: absolute;
+			left: 40%;
+			top: 15%;
+		}
+	</style>
+</head>
+<body>
+<p id="level" style="font-size: 225px; position: relative; left: 20%;">25</p>
+<span id="compChoice" style="display: none;">-3</span>
+<div id="buttonBox">
+<button id="1" onclick="sub(this.id);">-1</button>
+<button id="3" onclick="sub(this.id);">-3</button>
+<button id="4" onclick="sub(this.id);">-4</button>
+</div>
+<button id="buttonToggle" onclick="buttonDisplay();" style="display: none;">My turn</button>
+</body>
+</html>
