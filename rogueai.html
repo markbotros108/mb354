@@ -3,37 +3,46 @@
 <head>
 	<title>Rogue AI</title>
 	<script type="text/javascript">
-		var currLevel = 25, currTurn = true;
+		var currLevel = 25, currTurn = true, choice, randComp;
+		console.log('Start of game: 25');
 
 		function sub(arg) { choice = parseInt(arg);
 			if(currLevel-choice >= 0) currLevel -= choice;
-			document.getElementById('level').innerHTML = currLevel;
+			
 			setTimeout(checkWinCon, 100);
-			// if(!currTurn) setTimeout(oppTurn, 1000);
+			setTimeout(oppTurn, 1000);
 		}
 
 		function oppTurn() { buttonDisplay();
-			if(currLevel == 4 || currLevel == 3 || currLevel == 1) {
-
+			if(currLevel <= 4 && currLevel != 2) {
+				document.getElementById('compChoice').innerHTML = '-'+currLevel;
 				currLevel = 0;
 			}
-			else alert(Math.floor(Math.random()*4)+1);
+			else {
+				randComp = Math.floor(Math.random()*4)+1;
+				if(randComp == 2) randComp++;
+				document.getElementById('compChoice').innerHTML = '-'+randComp;
+				currLevel -= randComp;
+			}
 			checkWinCon();
 		}
 
 		function buttonDisplay() {
 			if(!currTurn) {document.getElementById('buttonBox').style.display = 'none';
 				document.getElementById('buttonToggle').style.display = 'initial';
+				document.getElementById('compChoice').style.display = 'initial';
 			}
 			else{ document.getElementById('buttonBox').style.display = 'initial';
-						document.getElementById('buttonToggle').style.display = 'none';}
+				document.getElementById('buttonToggle').style.display = 'none';
+				document.getElementById('compChoice').style.display = 'none';}
 		}
 
-		function checkWinCon() { 
+		function checkWinCon() { document.getElementById('level').innerHTML = currLevel;
 			if (currLevel == 0 && currTurn) alert('You WIN!');
-			else if (currLevel == 0) alert('Mark wins.\nYou LOSE!');
+			else if (currLevel == 0) alert('Computer wins.\nYou LOSE!');
 			else currTurn = !currTurn;
-			// alert(currTurn);
+			if(!currTurn) console.log('my turn: -'+choice+' = '+currLevel);
+			else console.log('comp turn: -'+randComp+' = '+currLevel);
 		}
 	</script>
 	<style type="text/css">
@@ -48,10 +57,19 @@
 			position: absolute;
 			top: 60%;
 		}
+
+		#compChoice {
+			font-size: 200px;
+			color: red;
+			position: absolute;
+			left: 40%;
+			top: 15%;
+		}
 	</style>
 </head>
 <body>
 <p id="level" style="font-size: 225px; position: relative; left: 20%;">25</p>
+<span id="compChoice" style="display: none;">-3</span>
 <div id="buttonBox">
 <button id="1" onclick="sub(this.id);">-1</button>
 <button id="3" onclick="sub(this.id);">-3</button>
