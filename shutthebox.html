@@ -39,6 +39,7 @@
 
 		function roll(){ 
 			document.getElementById('roller').style.display = 'none';
+			document.getElementById('starter').style.display = 'initial';
 			let currDie1 = Math.floor(Math.random()*6)+1;
 			document.getElementById('die1').innerHTML = currDie1;
 			let currDie2 = Math.floor(Math.random()*6)+1;
@@ -51,6 +52,7 @@
 			if(arg){ var currSelectedTotal = currentSelection.reduce((a, b) => a+b);
 				if(currSelectedTotal == currTotal){
 					document.getElementById('roller').style.display = 'initial';
+					document.getElementById('starter').style.display = 'none';
 					shutTiles = shutTiles.concat(currentSelection);
 				}
 				else { tileCleaner();
@@ -75,7 +77,13 @@
 
 		function newRound(){
 			document.getElementById('roller').style.display = 'initial';
-			// foreach tile(div) in tiles, tile.style.backgroundColor = 'initial';
+			document.getElementById('starter').style.display = 'none';
+			let score = 0;
+			for (var i = 0; i < 9; i++) {
+				if(document.getElementById('tiles').children[i].style.backgroundColor != 'red') score+=(i+1);
+			}
+			alert('Score for this round: '+score);
+			for (var i = 0; i < 9; i++)	document.getElementById('tiles').children[i].style.backgroundColor = 'initial';
 		}
 	</script>
 	<style type="text/css">
