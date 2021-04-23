@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Shut the Box</title>
+	<script type="text/javascript">
+		function begin() { document.getElementById('roller').style.display = 'initial';
+			document.getElementById('starter').innerHTML = 'End Round';
+			document.getElementById('starter').onclick = newRound;
+			for (var i = 0; i < 9; i++) {
+				var tile = document.createElement('div');
+				tile.style.border = 'solid';
+				tile.style.display = 'inline';
+				tile.style.fontSize = '123px';
+				tile.innerHTML = i+1;
+				tile.onclick = select;
+				tile.style.cursor = 'pointer';
+				tile.style.margin = '10px';
+				document.getElementById('tiles').appendChild(tile);
+			}
+		}
+
+		function select(){ var currColor = this.style.backgroundColor;
+			if(currColor != 'red') this.style.backgroundColor = 'red';
+			else this.style.backgroundColor = 'initial';
+		}
+
+		function roll(){
+			document.getElementById('roller').style.display = 'none';
+			document.getElementById('die1').innerHTML = Math.floor(Math.random()*6)+1;
+			document.getElementById('die2').innerHTML = Math.floor(Math.random()*6)+1;
+		}
+
+		function newRound(){
+			document.getElementById('roller').style.display = 'initial';
+			// foreach tile(div) in tiles, tile.style.backgroundColor = 'initial';
+		}
+	</script>
+</head>
+<body>
+	<p id="dice">
+		<span id="die1">1</span>
+		<span id="die2">2</span>
+	</p>
+<p id="tiles" style="position: absolute; left: 10%;"></p>
+	<button id="starter" onclick="begin()" style="position: absolute; top: 50%; left: 12%; font-size: 120px">Begin Game</button>
+	<button id="roller" onclick="roll()" style="display: none;">Roll</button>
+</body>
+</html>
