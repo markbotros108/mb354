@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Shut the Box</title>
+	<script type="text/javascript">
+		var shutTiles = [], currentSelection = [];
+		var currTotal = 0;
+		// BUGS: Shut tiles cannot be unselected
+		// Tiles cannot be selected until roll
+		// Cannot confirm when no new tiles selected
+		// End Round when tiles cannot match roll.. or whenever? Esp. when you shut the box
+		// Dice.pngs
+
+		function begin() { document.getElementById('dice').style.display = 'initial';
+			document.getElementById('roller').style.display = 'initial';
+			document.getElementById('starter').style.display = 'none';
+			document.getElementById('starter').innerHTML = 'End Round';
+			document.getElementById('starter').onclick = newRound;
+			for (var i = 0; i < 9; i++) {
+				var tile = document.createElement('div');
+				tile.style.border = 'solid';
+				tile.style.display = 'inline';
+				tile.style.fontSize = '123px';
+				tile.innerHTML = i+1;
+				tile.onclick = select;
+				tile.style.cursor = 'pointer';
+				tile.style.margin = '10px';
+				document.getElementById('tiles').appendChild(tile);
+			}
+		}
+
+		function select(){ var currColor = this.style.backgroundColor;
+			document.getElementById('confirmer').style.display = 'initial';
+
+			if(currColor != 'red') this.style.backgroundColor = 'red';
+			else this.style.backgroundColor = 'initial';
+			tileUpdater();
+		}
+
+		function roll(){ 
+			document.getElementById('roller').style.display = 'none';
+			let currDie1 = Math.floor(Math.random()*6)+1;
+			document.getElementById('die1').innerHTML = currDie1;
+			let currDie2 = Math.floor(Math.random()*6)+1;
+			document.getElementById('die2').innerHTML = currDie2;
+			currTotal = currDie1 + currDie2;
+		}
+
+		function confirmSelection(arg){
+			document.getElementById('confirmer').style.display = 'none';
+			if(arg){ var currSelectedTotal = currentSelection.reduce((a, b) => a+b);
+				if(currSelectedTotal == currTotal){
+					document.getElementById('roller').style.display = 'initial';
+					shutTiles = shutTiles.concat(currentSelection);
+				}
+				else { tileCleaner();
+					alert('Sum of selected tiles did not match dice roll.');}
+			}
+			else tileCleaner();
+		}
+
+		function tileUpdater(){ currentSelection = [];
+			for (var i = 0; i < 9; i++) {
+				if(document.getElementById('tiles').children[i].style.backgroundColor == 'red')
+					if(!shutTiles.includes(i+1)) currentSelection.push(i+1);
+			}
+		}
+
+		function tileCleaner(){
+			for (var i = 0; i < 9; i++) {
+				if(document.getElementById('tiles').children[i].style.backgroundColor == 'red')
+					if(!shutTiles.includes(i+1)) document.getElementById('tiles').children[i].style.backgroundColor = 'initial';
+			}
+		}
+
+		function newRound(){
+			document.getElementById('roller').style.display = 'initial';
+			// foreach tile(div) in tiles, tile.style.backgroundColor = 'initial';
+		}
+	</script>
+	<style type="text/css">
+		p span {
+			font-size: 170px;
+			position: absolute;
+			left: 35%;
+			top: 20%;
+		}
+		#die2{
+			left: 50%;
+			margin-left: 120px;
+		}
+
+		#roller, #starter, #confirmer{
+			position: absolute;
+			top: 50%;
+			left: 12%;
+			font-size: 120px;
+		}
+
+		#roller {
+			left: 75%;
+		}
+
+		#confirmer {
+			left: 60%;
+		}
+	</style>
+</head>
+<body>
+	<p id="dice" style="display: none;">
+		<span id="die1">1</span>
+		<span id="die2">2</span>
+	</p>
+<p id="tiles" style="position: absolute; left: 10%;"></p>
+	<button id="starter" onclick="begin()">Begin Game</button>
+	<button id="roller" onclick="roll()" style="display: none;">Roll</button>	
+	<button id="confirmer" onclick="confirmSelection(confirm('Would you like to select these tiles?'));" style="display: none;">Confirm</button>
+</body>
+</html>
