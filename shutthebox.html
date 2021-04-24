@@ -5,8 +5,7 @@
 	<script type="text/javascript">
 		var shutTiles = [], currentSelection = [];
 		var currTotal = 0;
-		// BUGS: Shut tiles cannot be unselected
-		// Tiles cannot be selected until roll
+		// TODO:
 		// Cannot confirm when no new tiles selected
 		// End Round when tiles cannot match roll.. or whenever? Esp. when you shut the box
 		// Dice.pngs
@@ -22,7 +21,7 @@
 				tile.style.display = 'inline';
 				tile.style.fontSize = '123px';
 				tile.innerHTML = i+1;
-				tile.onclick = select;
+				tile.id = i+1; // tile.onclick = select;
 				tile.style.cursor = 'pointer';
 				tile.style.margin = '10px';
 				document.getElementById('tiles').appendChild(tile);
@@ -33,11 +32,14 @@
 			document.getElementById('confirmer').style.display = 'initial';
 
 			if(currColor != 'red') this.style.backgroundColor = 'red';
-			else this.style.backgroundColor = 'initial';
+			else if(!shutTiles.includes(parseInt(this.id))) this.style.backgroundColor = 'initial';
 			tileUpdater();
 		}
 
 		function roll(){ 
+			for (var i = 0; i < 9; i++) {
+				document.getElementById('tiles').children[i].onclick = select;
+			}
 			document.getElementById('roller').style.display = 'none';
 			document.getElementById('starter').style.display = 'initial';
 			let currDie1 = Math.floor(Math.random()*6)+1;
@@ -48,9 +50,15 @@
 		}
 
 		function confirmSelection(arg){
+			for (var i = 0; i < 9; i++) {
+				document.getElementById('tiles').children[i].onclick = select;
+			}
 			document.getElementById('confirmer').style.display = 'none';
 			if(arg){ var currSelectedTotal = currentSelection.reduce((a, b) => a+b);
 				if(currSelectedTotal == currTotal){
+					for (var i = 0; i < 9; i++) {
+						document.getElementById('tiles').children[i].onclick = '';
+					}
 					document.getElementById('roller').style.display = 'initial';
 					document.getElementById('starter').style.display = 'none';
 					shutTiles = shutTiles.concat(currentSelection);
@@ -75,7 +83,10 @@
 			}
 		}
 
-		function newRound(){
+		function newRound(){ shutTiles=[];
+			for (var i = 0; i < 9; i++) {
+				document.getElementById('tiles').children[i].onclick = '';
+			}
 			document.getElementById('roller').style.display = 'initial';
 			document.getElementById('starter').style.display = 'none';
 			let score = 0;
