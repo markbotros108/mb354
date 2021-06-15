@@ -44,7 +44,11 @@
 		function turn(){ validValues(hand); let played = 0, options = [];
 			
 			if (!oppWin) {
-				while(passed || !user || user==='0' || !amounts.includes(parseInt(user)) ){ passed=false; user = prompt('How many cards would you like to play this turn?'); }}
+				while(passed || !user || user==='0'){ passed=false; 
+					do {user = prompt('How many cards would you like to play this turn?');}
+					while ( !amounts.includes( parseInt(user) ) )
+					}
+				}
 			/*if(user == null) user = prompt('Are you sure?');else*/ 
 			 for (var i = 0; i < amounts.length; i++) {
 						if(amounts[i] == user && i+1 <= high) options.push(i+1);
