@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- 10:15pm-11pm 14/6/21 Began adding computer opponent -->
+	<!-- 2:30pm 15/6 FIXed passing
+		 Switched to Dalmuti instead of custom heroes by 3pm
+		TODO: Check if amount of cards played is possible in amounts first
+	 -->
+	<title>Great Dalmuti</title>
+	<script type="text/javascript">
+		var cards = [], hand = [], hand2 = [], amounts = [], round = 1, passed = true, oppWin = false, user = '', table = [], high = 13;
+
+		function shuffle(list) {
+		var newOrder = [];
+		var len = list.length;
+		for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+			newOrder.push(list[r]);
+			list.splice(r, 1);
+		}
+		return newOrder;
+	}
+
+		function start() { document.getElementById('starter').onclick = turn;
+			document.getElementById('starter').innerHTML = 'Play';
+			document.getElementById('ender').style.display = 'initial';
+			for (var i = 0; i < 13; i++) {
+				for (var j = i; j>0; j--) {
+					cards.push(i);
+				}
+			}
+			// console.log(cards);
+			cards = shuffle(cards); 
+
+			for (var i = 0; i < 12; i++) {
+				hand.push(cards.pop());
+				hand2.push(cards.pop());
+				amounts.push(0);
+			}
+			document.getElementById('hand').innerHTML += hand.sort(function(a, b){return a-b});
+			hand2.sort(function(a,b){return b-a});
+		}
+
+		function turn(){ validValues(hand); let played = 0, options = [];
+			
+			if (!oppWin) {
+				while(passed || !user || user==='0'){ passed=false; user = prompt('How many cards would you like to play this turn?'); }}
+			/*if(user == null) user = prompt('Are you sure?');else*/ 
+			 for (var i = 0; i < amounts.length; i++) {
+						if(amounts[i] == user && i+1 <= high) options.push(i+1);
+					}
+				if(options.length) {
+							do{ alert('You may chose from the following values: '+options);
+								played = prompt('Which value would you like to play?');
+								high = parseInt(played);
+								} while (!options.includes(high));
+								console.log('Round '+round + ': ' + user +' ' + played + 's');
+			
+			document.getElementById('currRound').innerHTML += hand.splice(hand.indexOf(high), user)+',';
+			document.getElementById('hand').innerHTML = 'Your hand: ' + hand;}
+				else {alert('Cannot play any more this round.. you must Pass.'); oppWin = true;passTurn(); }
+			if(hand.length) oppTurn();
+			else alert("You win!");
+		}
+
+		function oppTurn(){ validValues(hand2); let follow = Math.max(...amounts), oppPlayed = [];
+			if(!passed && user)follow = user; //console.log(high + ' '+follow)
+			else user = follow;
+			for (var i = amounts.length; i > 0; i--) {//console.log('Check '+ (i+1)+amounts[i])
+						if(amounts[i] == follow && i+1 <= high){ high = i+1;
+							// for (var i = 0; i < follow; i++) {oppPlayed.push(high);}
+							oppPlayed = hand2.splice(hand2.indexOf(high), follow);
+							break;
+						}
+					}
+
+			if(oppPlayed.length) document.getElementById('currRound').innerHTML += oppPlayed +',';
+			else if(!passed && hand2.length) {alert('Opponent could not play any more this round.. you win the round!'); oppWin=false; passTurn(); }
+			else if(hand2.length) {alert("Opponent wins the round."); }
+			else alert("Opponent is out of cards! You LOSE");
+		}
+
+		function validValues(arr){ amounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+			for (var i = 0; i < amounts.length; i++) {
+				for (var j = 0; j < arr.length; j++) {
+					if(arr[j] == i+1) amounts[i]++;
+				}
+			}
+			// console.log(amounts);
+		}
+
+		function passTurn(){ passed = true;
+			high = 13;
+			round++;
+			document.getElementById('currRound').innerHTML += '<hr>Round '+round+': ';
+		}
+	</script>
+</head>
+<body>
+<p id="hand">Your Hand: </p>
+<button id="starter" onclick="start()">Start Game</button>
+<button id="ender" style="display: none;" onclick="passTurn()">Pass</button>
+<div id="currRound" style="font-size: 66px; position: absolute; left: 10%">Round 1: </div>
+</body>
+</html>
