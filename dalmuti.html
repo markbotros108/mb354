@@ -5,6 +5,7 @@
 	<!-- 2:30pm 15/6 FIXed passing
 		 Switched to Dalmuti instead of custom heroes by 3pm
 		TODO: Check if amount of cards played is possible in amounts first
+			Check lose condition before beginning turn
 	 -->
 	<title>Great Dalmuti</title>
 	<script type="text/javascript">
@@ -43,7 +44,7 @@
 		function turn(){ validValues(hand); let played = 0, options = [];
 			
 			if (!oppWin) {
-				while(passed || !user || user==='0'){ passed=false; user = prompt('How many cards would you like to play this turn?'); }}
+				while(passed || !user || user==='0' || !amounts.includes(parseInt(user)) ){ passed=false; user = prompt('How many cards would you like to play this turn?'); }}
 			/*if(user == null) user = prompt('Are you sure?');else*/ 
 			 for (var i = 0; i < amounts.length; i++) {
 						if(amounts[i] == user && i+1 <= high) options.push(i+1);
