@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Baldur's Gate</title>
+	<script type="text/javascript">
+		var deck1 = ['lightning', 'wolf', 'eldest','whip'], deck2 = ['krydle', 'time', 'squeaky', 'twice', 'eyesboo', 'wrap'];
+		var hand = [], discard = [];
+		var stillmyturn = 0, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 1, blocks2 = 0;
+
+		function init() {
+			for (var i = 0; i < 2; i++) {
+				deck1.push('silvanus');
+				deck1.push('balance');
+				deck1.push('nature');
+				deck1.push('primal');
+				deck1.push('bearnard');
+				deck1.push('poochie');
+				deck1.push('rush');
+				deck1.push('fox');
+				deck1.push('whip');
+				deck1.push('lightning');
+				deck1.push('bear');
+				deck1.push('wolf');
+				// deck2.push('squeaky');
+				// deck2.push('justice');
+				// deck2.push('twice');
+				// deck2.push('eyesboo');
+				// deck2.push('rodent');
+				// deck2.push('boowedo');
+				// deck2.push('mount');
+				// deck2.push('nerys');
+				// deck2.push('scouting');
+				// deck2.push('frenemies');
+				// deck2.push('swapportunity');
+			}
+
+			deck1 = shuffle(deck1);
+			deck2 = shuffle(deck2);
+
+			for (var i = 0; i < 5; i++) {
+				draw(2);
+				console.log('drawing2');
+			}
+		}
+
+		function draw(deckNo) { // Check deck.length, if empty deck = shuffle(discard);
+			switch(deckNo){
+				case 1: hand.push(deck1.pop()); break;
+				case 2: hand.push(deck2.pop()); break;
+				default: alert('error');
+			}
+
+			display(); 
+		}
+
+		function play(card) { playsLeft--; let cardName = '';
+			cardName = card.slice(card.indexOf('images/') + 7, card.indexOf('.'));
+			console.log('Played '+cardName.toUpperCase());
+			switch(cardName){
+				case 'twice': attack(2); break;
+				case 'eyesboo': attack(3); break;
+				case 'time': attack(2); extraPlay(1); break;
+				case 'squeaky': attack(1); extraPlay(1); break;
+				case 'wrap': heal(1); draw(2); break;
+				case 'krydle': block(3); break;
+				default: alert('Card not yet implemented..');
+			}
+			hand.splice(hand.indexOf(cardName), 1);
+			discard.push(cardName);
+			display();
+		}
+
+		function attack(arg){
+			hp2 -= arg;
+			display();
+		}
+
+		function extraPlay(argument) {
+			playsLeft += argument;
+			display();
+		}
+
+		function heal(arg){
+			hp+=arg;
+		}
+
+		function block(argument) {
+			blocks += argument;
+		}
+
+		function display() { document.getElementById('hand').innerHTML = '';
+			for (var i = 0; i < hand.length; i++) {
+				let newcard = document.createElement('img');
+				newcard.src = 'images/' + hand[i] + '.jpg';
+				newcard.width = 200;
+				newcard.onclick = function() {play(this.src)};
+				document.getElementById('hand').append(newcard);
+			}
+
+			document.getElementById('stats').innerHTML = 'HP: '+hp+'<br>Plays: '+playsLeft+'<br>Blocks: '+blocks;
+			document.getElementById('stats2').innerHTML = 'OPPONENT' +'<hr>HP: '+hp2+'<br>Plays: '+playsLeft2+'<br>Blocks: '+blocks2;
+		}
+		// alert(deck1.length +' ' + deck2.length);
+		function shuffle(list) {
+			var newOrder = [];
+			var len = list.length;
+			for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+				newOrder.push(list[r]);
+				list.splice(r, 1);
+			}
+			return newOrder;
+		}
+	</script>
+</head>
+<body>
+<div id="hand" style="position: absolute; left: 30%; top: 20%; width: fit-content;"></div>
+<button id="drawer" style="font-size: 72px; position: absolute; left: 40%; top: 80%;" onclick="init();">Draw</button>
+<p id="stats" style="border: solid; text-align: center; font-size: 52px; position: absolute; left: 60%; top: 50%;">HP: 10<br>Plays: 1<br>Blocks: 0</p>
+<div id="stats2" style="border: solid; text-align: center; font-size: 52px; position: absolute; left: 10%; top: 1%;">OPPONENT<hr>HP: 10<br>Plays: 1<br>Blocks: 0</div>
+</body>
+</html>

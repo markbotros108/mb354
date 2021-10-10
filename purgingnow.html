@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<!-- Began at 5-5:30am 4/10/21
+	Added table and festival cards 3:45am 7/10/21
+	Completed festival cards midday 7/10/21
+	Completed yourscore 2pm 8/10/21
+	TODO add findLargest() function to pick best score for opponent
+ -->
+<head>
+	<title>Look who's Purging Now</title>
+	<script type="text/javascript">
+		var deck = [], deck2 = [], hand = [], table = [], festival = [3, 4, 5, 6, 7, 8, -5, -4, -3, -2];
+		var score = 0, score2 = 0;
+
+		function init() { document.getElementById('starter').style.display = 'none';
+			for (var i = 0; i < 10; i++) {
+				deck.push(i+1);
+				deck2.push(i+1);
+				if(i<9) festival.push(i-10);
+				if(i>2) festival.push(i);
+				if(i<6) festival.push(i+10);
+			}
+			deck = shuffle(deck); //console.log(festival.sort(function(a, b){return a - b}));
+			deck2 = shuffle(deck2);
+			festival = shuffle(festival);
+			for (var i = 0; i < 3; i++) {
+				hand.push(deck.pop());
+				table.push(festival.pop());
+			}
+			displayUpdate();
+		}
+
+		function displayUpdate() {
+			// Update hand
+			document.getElementById('hand').innerHTML = '';
+
+			for (var i = 0; i < hand.length; i++) {
+				let newCard = document.createElement('span');
+				newCard.innerHTML = hand[i];
+				newCard.className = 'card';
+				newCard.onclick = play;
+				document.getElementById('hand').append(newCard);
+			}
+
+			// Update table
+			document.getElementById('table').innerHTML = '';
+
+			for (var i = 0; i < table.length; i++) {
+				let newCard = document.createElement('span');
+				newCard.innerHTML = table[i];
+				newCard.className = 'card';
+				document.getElementById('table').append(newCard);
+			}
+
+			// Update score
+			document.getElementById('score').innerHTML = 'Score: '+score + '<br>Rick\'s Score: ' +score2;
+		}
+
+		function play(){
+			let playerConfirm = true;//confirm('You are choosing to play ' + this.innerHTML + ' for this round.');
+			if(playerConfirm){ let played = parseInt(this.innerHTML);
+				hand.splice(hand.indexOf(played), 1);
+				if (deck.length) hand.push(deck.pop());
+
+				let rickPlayed = deck2.pop(); // Make smart AI
+				if(played > rickPlayed) { alert("You won! Rick played "+rickPlayed+'.');
+								yourScore(); 
+								}
+				else if (played == rickPlayed) {alert("You tied."); rickScore(-1);}
+				else {alert("You lost.. Rick chose "+rickPlayed); rickScore(1);}
+				// score += table.pop();
+				// if(festival.length > 3) table.push(festival.pop()); 
+				displayUpdate();
+			}
+		}
+
+		function yourScore() { let playerChoice = -1;
+				do{playerChoice = parseInt(prompt('Choose your prize: '+table))} while(!table.includes(playerChoice));
+					score += playerChoice;
+					table.splice(table.indexOf(playerChoice), 1);
+		}
+
+		function rickScore(result) { // Result: 1 = won, 0 = lost, -1 = tied?
+			// Find largest score and remove it.
+			switch(result){
+				case -1: break;
+				default: return 0;
+			}
+		}
+
+		function shuffle(list) {
+			var newOrder = [];
+			var len = list.length;
+			for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+				newOrder.push(list[r]);
+				list.splice(r, 1);
+			}
+			return newOrder;
+		}
+	</script>
+	<style type="text/css">
+		#starter {
+			position: absolute;
+			left: 40%;
+			top: 80%;
+			font-size: 53px;
+		}
+
+		#hand {
+			position: absolute;
+			left: 35%;
+			top: 40%;
+			font-size: 110px;
+		}
+
+		#table {
+			position: absolute;
+			left: 30%;
+			border: solid brown;
+			padding: 100px;
+			/*margin: 0px 50px;*/
+			width: fit-content;
+			font-size: 50px;
+		}
+
+		.card {
+			border: solid blue;
+			padding: 5px;
+			margin: 10px;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+<div id="table"></div>
+<p id="hand"></p>
+<button id="starter" onclick="init();">Start</button>
+<p id="score">Score: 0</p>
+</body>
+</html>
