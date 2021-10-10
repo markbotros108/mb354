@@ -54,7 +54,7 @@
 		}
 
 		function play(card) { playsLeft--; let cardName = '';
-			cardName = card.slice(card.indexOf('images/') + 7, card.indexOf('.'));
+			cardName = card.slice(card.indexOf('images/') + 7, card.indexOf('.jpg'));
 			console.log('Played '+cardName.toUpperCase());
 			switch(cardName){
 				case 'twice': attack(2); break;
