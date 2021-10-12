@@ -3,24 +3,28 @@
 <head>
 	<title>Baldur's Gate</title>
 	<script type="text/javascript">
-		var deck1 = ['lightning', 'wolf', 'eldest','whip'], deck2 = ['krydle', 'time', 'squeaky', 'twice', 'eyesboo', 'wrap'];
-		var hand = [], discard = [];
-		var stillmyturn = 0, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 1, blocks2 = 0;
+		var deck1 = ['lightning', 'wolf', 'eldest','whip'], 
+			deck2 = ['krydle', 'time', 'squeaky', 'twice', 'eyesboo', 'wrap'],
+			deck3 = ['banishing', 'fluffy', 'cure', 'justice', 'smite', 'words'];
+		var hand = [], discard = [], hand2 = [];
+		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0;
 
-		function init() {
+		function init() { document.getElementById('drawer').onclick = end;
+			document.getElementById('drawer').style.display = 'none';
+			document.getElementById('drawer').innerHTML = 'End Turn';
 			for (var i = 0; i < 2; i++) {
-				deck1.push('silvanus');
-				deck1.push('balance');
-				deck1.push('nature');
-				deck1.push('primal');
-				deck1.push('bearnard');
-				deck1.push('poochie');
-				deck1.push('rush');
-				deck1.push('fox');
-				deck1.push('whip');
-				deck1.push('lightning');
-				deck1.push('bear');
-				deck1.push('wolf');
+				// deck1.push('silvanus');
+				// deck1.push('balance');
+				// deck1.push('nature');
+				// deck1.push('primal');
+				// deck1.push('bearnard');
+				// deck1.push('poochie');
+				// deck1.push('rush');
+				// deck1.push('fox');
+				// deck1.push('whip');
+				// deck1.push('lightning');
+				// deck1.push('bear');
+				// deck1.push('wolf');
 				// deck2.push('squeaky');
 				// deck2.push('justice');
 				// deck2.push('twice');
@@ -32,13 +36,26 @@
 				// deck2.push('scouting');
 				// deck2.push('frenemies');
 				// deck2.push('swapportunity');
+				deck3.push('inspiration');
+				// deck3.push('shield');
+				// deck3.push('smite');
+				// deck3.push('words');
+				// deck3.push('fingerwag');
+				// deck3.push('justice');
+				// deck3.push('morejust');
+				// deck3.push('morejust');
+				// deck3.push('mostjust');
+				// deck3.push('charisma');
+				// deck3.push('spinparry');
 			}
 
 			deck1 = shuffle(deck1);
 			deck2 = shuffle(deck2);
+			deck3 = shuffle(deck3);
 
 			for (var i = 0; i < 5; i++) {
 				draw(2);//console.log('drawing2');
+				hand2.push(deck3.pop());
 			}
 		}
 
@@ -46,41 +63,57 @@
 			switch(deckNo){
 				case 1: hand.push(deck1.pop()); break;
 				case 2: hand.push(deck2.pop()); break;
+				case 3: hand.push(deck3.pop()); break;
 				default: alert('error');
 			}
 
 			display(); 
 		}
 
-		function play(card) { playsLeft--; let cardName = '';
-			cardName = card.slice(card.indexOf('images/') + 7, card.indexOf('.jpg'));
+		function play(card) { playsLeft--; document.getElementById('drawer').style.display = 'initial';
+			let cardName = card.slice(card.indexOf('images/') + 7, card.indexOf('.jpg'));
 			console.log('Played '+cardName.toUpperCase());
 			switch(cardName){
+				case 'words': heal(1);
 				case 'twice': attack(2); break;
+				case 'smite': heal(1);
 				case 'eyesboo': attack(3); break;
+				case 'cure': heal(1); draw(3);draw(3); break;
+				case 'justice': attack(1); extraPlay(1); break;
 				case 'time': attack(2); extraPlay(1); break;
 				case 'squeaky': attack(1); extraPlay(1); break;
 				case 'wrap': heal(1); draw(2); break;
+				case 'fluffy': block(2); break;
 				case 'krydle': block(3); break;
+				case 'banishing': blocks2 = 0; extraPlay(1); break;
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
 			discard.push(cardName);
+			if(playsLeft==0) {myturn = !myturn; // myturn could be used for drawing
+				if(myturn) {console.log('now drawing from deck2');}//playsLeft++; 
+				else{ console.log('now drawing from deck3');}
+				// end();
+				playsLeft2++;
+			}
 			display();
 		}
 
 		function attack(arg){
-			hp2 -= arg;
-			display();
+			while(blocks2){
+					arg--;
+					blocks2--;
+			}
+			if(arg) hp2 -= arg;
 		}
 
 		function extraPlay(argument) {
 			playsLeft += argument;
-			display();
 		}
 
 		function heal(arg){
-			hp+=arg;
+			if( (hp+arg) <= 10) hp+=arg;
+			else hp = 10;   
 		}
 
 		function block(argument) {
@@ -92,7 +125,9 @@
 				let newcard = document.createElement('img');
 				newcard.src = 'images/' + hand[i] + '.jpg';
 				newcard.width = 200;
-				newcard.onclick = function() {play(this.src)};
+				if(playsLeft) newcard.style.cursor = 'pointer';
+				newcard.style.marginRight = '40px';
+				if(playsLeft) newcard.onclick = function() {play(this.src)};
 				document.getElementById('hand').append(newcard);
 			}
 
@@ -109,12 +144,45 @@
 			}
 			return newOrder;
 		}
+
+		function end() { document.getElementById('drawer').style.display = 'none';
+			// for (var i = 0; i < 5; i++) {
+			// 	draw(1);//console.log('drawing2');
+			// }
+			let temp=[];
+			temp = hand2;
+			hand2 = hand;
+			hand = temp;
+
+			// swap(hp, hp2);
+			let temp2=0;
+			temp2 = hp2;
+			hp2 = hp;
+			hp = temp2;
+
+			// swap(playsLeft, playsLeft2);
+			temp2 = playsLeft2;
+			playsLeft2 = playsLeft;
+			playsLeft = temp2;
+			// swap(blocks, blocks2);
+			temp2 = blocks2;
+			blocks2 = blocks;
+			blocks = temp2;
+			display();
+		}
+
+		function swap(arg1, arg2) {
+			let temp=0;
+			temp = arg2;
+			arg2 = arg1;
+			arg1 = temp;
+		}
 	</script>
 </head>
 <body>
-<div id="hand" style="position: absolute; left: 30%; top: 20%; width: fit-content;"></div>
+<div id="hand" style="position: absolute; left: 20%; top: 20%; width: fit-content;"></div>
 <button id="drawer" style="font-size: 72px; position: absolute; left: 40%; top: 80%;" onclick="init();">Draw</button>
-<p id="stats" style="border: solid; text-align: center; font-size: 52px; position: absolute; left: 60%; top: 50%;">HP: 10<br>Plays: 1<br>Blocks: 0</p>
-<div id="stats2" style="border: solid; text-align: center; font-size: 52px; position: absolute; left: 10%; top: 1%;">OPPONENT<hr>HP: 10<br>Plays: 1<br>Blocks: 0</div>
+<p id="stats" style="border: solid; text-align: center; font-size: 52px; position: absolute; right: 6%; top: 50%;">HP: 10<br>Plays: 1<br>Blocks: 0</p>
+<div id="stats2" style="border: solid; text-align: center; font-size: 52px; position: absolute; top: 1%;">OPPONENT<hr>HP: 10<br>Plays: 0<br>Blocks: 0</div>
 </body>
 </html>
