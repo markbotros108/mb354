@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- TODO: If ever run out of cards in hand with playsleft, draw 2 cards -->
+	<!-- TODO: endgame() -->
 	<title>Baldur's Gate</title>
 	<script type="text/javascript">
 		var deck1 = ['lightning', 'wolf', 'eldest','whip'], 
@@ -161,8 +161,12 @@
 			return newOrder;
 		}
 
-		function end() { if(playsLeft) alert('You cannot end turn with plays left.');
-			document.getElementById('drawer').style.display = 'none';
+		function end() { if(playsLeft) {alert('You cannot end turn with plays left.');
+				// Draw if no cards but plays left
+				if(myturn && !hand.length) { draw(decks[0]); draw(decks[0]); }                             
+	  			else if(!hand.length) { draw(decks[1]); draw(decks[1]); }
+			}
+			else {document.getElementById('drawer').style.display = 'none';
 			
 			// Draw for next turn
 			if(myturn) { if(!hand.length) draw(decks[0]);
@@ -189,7 +193,7 @@
 			temp2 = blocks2;
 			blocks2 = blocks;
 			blocks = temp2;
-			display();
+			display();}
 		}
 
 		function swap(arg1, arg2) {
