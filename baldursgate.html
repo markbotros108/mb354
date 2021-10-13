@@ -4,15 +4,20 @@
 	<!-- TODO: endgame() -->
 	<title>Baldur's Gate</title>
 	<script type="text/javascript">
-		var deck1 = ['lightning', 'wolf', 'eldest','whip'], 
-			deck2 = ['krydle', 'time', 'squeaky', 'twice', 'eyesboo', 'wrap'],
-			deck3 = ['banishing', 'fluffy', 'cure', 'justice', 'smite', 'words'];
-		var hand = [], discard = [], hand2 = [], discard2 = [], decks = [2, 3]; // decks for choosing and drawing b/w
-		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0;
+		var deck1, deck2, deck3;
+		var hand, discard, hand2, discard2, decks;
+		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0;  
 
 		function init() { document.getElementById('drawer').onclick = end;
 			document.getElementById('drawer').style.display = 'none';
 			document.getElementById('drawer').innerHTML = 'End Turn';
+      
+			deck1 = ['lightning', 'wolf', 'eldest','whip'];
+			deck2 = ['krydle', 'time', 'squeaky', 'twice', 'eyesboo', 'wrap'];
+			deck3 = ['banishing', 'fluffy', 'cure', 'justice', 'smite', 'words'];
+			hand = []; discard = []; hand2 = []; discard2 = []; decks = [2, 3]; // decks for choosing and drawing b/w
+			myturn = true; hp = 10; playsLeft = 1; blocks = 0; hp2 = 10; playsLeft2 = 0; blocks2 = 0;
+
 			for (var i = 0; i < 2; i++) {
 				// deck1.push('silvanus');
 				// deck1.push('balance');
@@ -116,7 +121,7 @@
 			}
 			else {atk -= blocks2; blocks2 = 0;}
 			if(hp2-atk > 0) hp2 -= atk;  
-			else hp2 = 0;
+			else {hp2 = 0; if(confirm('You win! Would you like to play again?')) init(); }
 		}  
 
 		function extraPlay(argument) {
