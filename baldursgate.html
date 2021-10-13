@@ -36,7 +36,7 @@
 				// deck2.push('nerys');
 				// deck2.push('scouting');
 				// deck2.push('frenemies');
-				// deck2.push('swapportunity');
+				deck2.push('swapportunity');
 				deck3.push('inspiration');
 				// deck3.push('shield');
 				deck3.push('smite');
@@ -99,6 +99,7 @@
 				case 'krydle': block(3); break;
 				case 'banishing': blocks = 0; blocks2 = 0; extraPlay(1); break;
 				case 'inspiration': chooseFromDiscard(); heal(2); break;    
+				case 'swapportunity': swaphp(); break;
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
@@ -183,26 +184,27 @@
 			hand2 = hand;
 			hand = temp;
 
-			// swap(hp, hp2);
-			let temp2=0;
-			temp2 = hp2;
-			hp2 = hp;
-			hp = temp2;
+			// temp2 = hp2;
+			// hp2 = hp;
+			// hp = temp2;
 
 			playsLeft = 1;
 			
 			// swap(blocks, blocks2);
+			let temp2=0;
 			temp2 = blocks2;
 			blocks2 = blocks;
 			blocks = temp2;
-			display();}
+			swaphp();//display();
+			}
 		}
 
-		function swap(arg1, arg2) {
-			let temp=0;
-			temp = arg2;
-			arg2 = arg1;
-			arg1 = temp;
+		function swaphp() {
+			let temp2=0;
+			temp2 = hp2;
+			hp2 = hp;                                                                                 
+			hp = temp2;
+			display();
 		}
 	</script>
 </head>
