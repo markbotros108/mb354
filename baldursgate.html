@@ -114,7 +114,7 @@
 				case 'banishing': blocks = 0; blocks2 = 0; extraPlay(1); break;
 				case 'inspiration': chooseFromDiscard(); heal(2); break;    
 				case 'swapportunity': swaphp(); break;
-				case 'frenemies': bonus++; break;
+				case 'frenemies': bonus++; extraPlay(1); break;
 				case 'scouting': if(decks[0] == 2) draw(decks[1]);
 								else draw(decks[0]); break;
 				default: alert('Card not yet implemented..');
