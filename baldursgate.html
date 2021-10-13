@@ -26,10 +26,10 @@
 				// deck1.push('lightning');
 				// deck1.push('bear');
 				// deck1.push('wolf');
-				// deck2.push('squeaky');
-				// deck2.push('justice');
-				// deck2.push('twice');
-				// deck2.push('eyesboo');
+				deck2.push('squeaky');
+				deck2.push('waits');
+				deck2.push('twice');
+				deck2.push('eyesboo');
 				// deck2.push('rodent');
 				// deck2.push('boowedo');
 				// deck2.push('mount');
@@ -39,10 +39,10 @@
 				// deck2.push('swapportunity');
 				deck3.push('inspiration');
 				// deck3.push('shield');
-				// deck3.push('smite');
-				// deck3.push('words');
+				deck3.push('smite');
+				deck3.push('words');
 				// deck3.push('fingerwag');
-				// deck3.push('justice');
+				deck3.push('justice');
 				// deck3.push('morejust');
 				// deck3.push('morejust');
 				// deck3.push('mostjust');
@@ -63,15 +63,15 @@
 
 		function draw(deckNo) { // Check deck.length, if empty deck = shuffle(discard); discard = 0
 			switch(deckNo){
-				case 1: if(!deck1.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.'+discard + ' ' + myturn);
+				case 1: if(!deck1.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.');
 											if(myturn) deck1 = shuffle(discard); 
 											else deck1 = shuffle(discard2);  }
 						hand.push(deck1.pop()); break;
-				case 2: if(!deck2.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.'+discard + ' ' + myturn);
+				case 2: if(!deck2.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.');
 											if(myturn) deck2 = shuffle(discard); 
 											else deck2 = shuffle(discard2);  }
 						hand.push(deck2.pop()); break;
-				case 3: if(!deck3.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.'+discard + ' ' + myturn);
+				case 3: if(!deck3.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.');
 											if(myturn) deck3 = shuffle(discard); 
 											else deck3 = shuffle(discard2);  }
 						hand.push(deck3.pop()); break;
@@ -90,6 +90,7 @@
 				case 'smite': heal(1);
 				case 'eyesboo': attack(3); break;
 				case 'cure': heal(1); draw(3);draw(3); break;
+				case 'waits':  extraPlay(2); break;                                       
 				case 'justice': attack(1); extraPlay(1); break;
 				case 'time': attack(2); extraPlay(1); break;
 				case 'squeaky': attack(1); extraPlay(1); break;
