@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<!-- TODO: endgame() -->
+	<!-- TODO: Choose player decks
+				Blocks should be arrau y       
+  	 	 	    Add Azzam -->
 	<title>Baldur's Gate</title>
 	<script type="text/javascript">
 		var deck0, deck1, deck2, deck3, characters = ['azzam', 'joheira', 'minsc', 'lia'];
@@ -68,15 +70,19 @@
 
 		function draw(deckNo) { // Check deck.length, if empty deck = shuffle(discard); discard = 0
 			switch(deckNo){
-				case 1: if(!deck1.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.');
+				case 0: if(!deck0.length){ alert(characters[deckNo].toUpperCase()+'\'s Deck is empty. Shuffling discard pile.');
+											if(myturn) deck0 = shuffle(discard); 
+											else deck0 = shuffle(discard2);  }
+						hand.push(deck0.pop()); break;
+				case 1: if(!deck1.length){ alert(characters[deckNo].toUpperCase()+'\'s Deck is empty. Shuffling discard pile.');
 											if(myturn) deck1 = shuffle(discard); 
 											else deck1 = shuffle(discard2);  }
 						hand.push(deck1.pop()); break;
-				case 2: if(!deck2.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.');
+				case 2: if(!deck2.length){ alert(characters[deckNo].toUpperCase()+'\'s Deck is empty. Shuffling discard pile.');
 											if(myturn) deck2 = shuffle(discard); 
 											else deck2 = shuffle(discard2);  }
 						hand.push(deck2.pop()); break;
-				case 3: if(!deck3.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.');
+				case 3: if(!deck3.length){ alert(characters[deckNo].toUpperCase()+'\'s Deck is empty. Shuffling discard pile.');
 											if(myturn) deck3 = shuffle(discard); 
 											else deck3 = shuffle(discard2);  }
 						hand.push(deck3.pop()); break;
@@ -227,8 +233,8 @@
 </head>
 <body>
 <img id="rules" src="" style="position: absolute; width: 300px; bottom: 10%;">
-<div id="hand" style="position: absolute; left: 20%; top: 20%; width: fit-content;"></div>
-<button id="drawer" style="font-size: 72px; position: absolute; left: 40%; top: 80%;" onclick="init();">Draw</button>
+<div id="hand" style="position: absolute; left: 20%; top: 20%; width: 80%;"></div>
+<button id="drawer" style="font-size: 72px; position: absolute; left: 40%; top: 80%;" onclick="init();">Play</button>
 <p id="stats" style="border: solid; text-align: center; font-size: 52px; position: absolute; right: 6%; top: 50%;">HP: 10<br>Plays: 1<br>Blocks: 0</p>
 <div id="stats2" style="border: solid; text-align: center; font-size: 52px; position: absolute; top: 1%;">OPPONENT<hr>HP: 10<br>Plays: 0<br>Blocks: 0</div>
 </body>
