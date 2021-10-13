@@ -4,14 +4,15 @@
 	<!-- TODO: endgame() -->
 	<title>Baldur's Gate</title>
 	<script type="text/javascript">
-		var deck1, deck2, deck3;
+		var deck0, deck1, deck2, deck3, characters = ['azzam', 'joheira', 'minsc', 'lia'];
 		var hand, discard, hand2, discard2, decks, bonus=0;
 		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0;  
 
 		function init() { document.getElementById('drawer').onclick = end;
 			document.getElementById('drawer').style.display = 'none';
 			document.getElementById('drawer').innerHTML = 'End Turn';
-      
+      		
+      		deck0 = [];
 			deck1 = ['lightning', 'wolf', 'eldest','whip'];
 			deck2 = ['krydle', 'time', 'squeaky', 'twice', 'eyesboo', 'wrap'];
 			deck3 = ['banishing', 'fluffy', 'cure', 'justice', 'smite', 'words'];
@@ -168,6 +169,8 @@
 
 			document.getElementById('stats').innerHTML = 'HP: '+hp+'<br>Plays: '+playsLeft+'<br>Blocks: '+blocks;
 			document.getElementById('stats2').innerHTML = 'OPPONENT' +'<hr>HP: '+hp2+'<br>Plays: '+playsLeft2+'<br>Blocks: '+blocks2;
+			if(myturn) document.getElementById('rules').src = 'images/'+ characters[decks[0]] +'rules.jpg';
+			else document.getElementById('rules').src = 'images/'+ characters[decks[1]] +'rules.jpg';
 		}
 		// alert(deck1.length +' ' + deck2.length);
 		function shuffle(list) {
@@ -199,11 +202,7 @@
 			let temp=[];
 			temp = hand2;
 			hand2 = hand;
-			hand = temp;
-
-			// temp2 = hp2;
-			// hp2 = hp;
-			// hp = temp2;
+			hand = temp; 
 
 			playsLeft = 1;
 			
@@ -212,7 +211,8 @@
 			temp2 = blocks2;
 			blocks2 = blocks;
 			blocks = temp2;
-			swaphp();//display();
+
+			swaphp();
 			}
 		}
 
@@ -226,6 +226,7 @@
 	</script>
 </head>
 <body>
+<img id="rules" src="" style="position: absolute; width: 300px; bottom: 10%;">
 <div id="hand" style="position: absolute; left: 20%; top: 20%; width: fit-content;"></div>
 <button id="drawer" style="font-size: 72px; position: absolute; left: 40%; top: 80%;" onclick="init();">Draw</button>
 <p id="stats" style="border: solid; text-align: center; font-size: 52px; position: absolute; right: 6%; top: 50%;">HP: 10<br>Plays: 1<br>Blocks: 0</p>
