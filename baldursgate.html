@@ -54,8 +54,7 @@
 			deck2 = shuffle(deck2);
 			deck3 = shuffle(deck3);
 
-			for (var i = 0; i < 3; i++) {
-				if(!i) draw(decks[0]);// Drawing extra for first turn
+			for (var i = 0; i < 4; i++) {// Drawing extra for first turn
 				draw(decks[0]);
 				hand2.push(deck3.pop());
 			}
