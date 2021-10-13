@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<!-- TODO: If ever run out of cards in hand with playsleft, draw 2 cards -->
 	<title>Baldur's Gate</title>
 	<script type="text/javascript">
 		var deck1 = ['lightning', 'wolf', 'eldest','whip'], 
 			deck2 = ['krydle', 'time', 'squeaky', 'twice', 'eyesboo', 'wrap'],
 			deck3 = ['banishing', 'fluffy', 'cure', 'justice', 'smite', 'words'];
-		var hand = [], discard = [], hand2 = [];
+		var hand = [], discard = [], hand2 = [], discard2 = [], decks = [2, 3]; // decks for choosing and drawing b/w
 		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0;
 
 		function init() { document.getElementById('drawer').onclick = end;
@@ -53,17 +54,27 @@
 			deck2 = shuffle(deck2);
 			deck3 = shuffle(deck3);
 
-			for (var i = 0; i < 5; i++) {
-				draw(2);//console.log('drawing2');
+			for (var i = 0; i < 3; i++) {
+				if(!i) draw(decks[0]);// Drawing extra for first turn
+				draw(decks[0]);
 				hand2.push(deck3.pop());
 			}
 		}
 
-		function draw(deckNo) { // Check deck.length, if empty deck = shuffle(discard);
+		function draw(deckNo) { // Check deck.length, if empty deck = shuffle(discard); discard = 0
 			switch(deckNo){
-				case 1: hand.push(deck1.pop()); break;
-				case 2: hand.push(deck2.pop()); break;
-				case 3: hand.push(deck3.pop()); break;
+				case 1: if(!deck1.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.'+discard + ' ' + myturn);
+											if(myturn) deck1 = shuffle(discard); 
+											else deck1 = shuffle(discard2);  }
+						hand.push(deck1.pop()); break;
+				case 2: if(!deck2.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.'+discard + ' ' + myturn);
+											if(myturn) deck2 = shuffle(discard); 
+											else deck2 = shuffle(discard2);  }
+						hand.push(deck2.pop()); break;
+				case 3: if(!deck3.length){ alert('Deck '+deckNo+ ' empty. Shuffling discard pile.'+discard + ' ' + myturn);
+											if(myturn) deck3 = shuffle(discard); 
+											else deck3 = shuffle(discard2);  }
+						hand.push(deck3.pop()); break;
 				default: alert('error');
 			}
 
@@ -85,27 +96,24 @@
 				case 'wrap': heal(1); draw(2); break;
 				case 'fluffy': block(2); break;
 				case 'krydle': block(3); break;
-				case 'banishing': blocks2 = 0; extraPlay(1); break;
+				case 'banishing': blocks = 0; blocks2 = 0; extraPlay(1); break;
+				case 'inspiration': chooseFromDiscard(); heal(2); break;    
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
-			discard.push(cardName);
-			if(playsLeft==0) {myturn = !myturn; // myturn could be used for drawing
-				if(myturn) {console.log('now drawing from deck2');}//playsLeft++; 
-				else{ console.log('now drawing from deck3');}
-				// end();
-				playsLeft2++;
-			}
+			if(myturn) discard.push(cardName);
+			else discard2.push(cardName); 
 			display();
 		}
 
-		function attack(arg){
-			while(blocks2){
-					arg--;
-					blocks2--;
+		function attack(arg){ let atk = arg;
+			if(blocks2 > atk){
+					blocks2-=atk; return;  
 			}
-			if(arg) hp2 -= arg;
-		}
+			else {atk -= blocks2; blocks2 = 0;}
+			if(hp2-atk > 0) hp2 -= atk;  
+			else hp2 = 0;
+		}  
 
 		function extraPlay(argument) {
 			playsLeft += argument;
@@ -118,6 +126,14 @@
 
 		function block(argument) {
 			blocks += argument;
+		}
+
+		function chooseFromDiscard() { let choice = 0;
+			if(myturn) while(!discard.includes(choice)) choice = prompt("Choose from your discard: "+discard); 
+			else while(!discard2.includes(choice)) choice = prompt("Choose from your discard: "+discard2);
+
+			hand.push(choice);
+			display();
 		}
 
 		function display() { document.getElementById('hand').innerHTML = '';
@@ -145,10 +161,17 @@
 			return newOrder;
 		}
 
-		function end() { document.getElementById('drawer').style.display = 'none';
-			// for (var i = 0; i < 5; i++) {
-			// 	draw(1);//console.log('drawing2');
-			// }
+		function end() { if(playsLeft) alert('You cannot end turn with plays left.');
+			document.getElementById('drawer').style.display = 'none';
+			
+			// Draw for next turn
+			if(myturn) { if(!hand.length) draw(decks[0]);
+				draw(decks[0]);   }                             
+  			else { if(!hand.length) draw(decks[1]);
+				draw(decks[1]);   }  
+
+			myturn = !myturn; // myturn used for drawing
+   
 			let temp=[];
 			temp = hand2;
 			hand2 = hand;
@@ -160,10 +183,8 @@
 			hp2 = hp;
 			hp = temp2;
 
-			// swap(playsLeft, playsLeft2);
-			temp2 = playsLeft2;
-			playsLeft2 = playsLeft;
-			playsLeft = temp2;
+			playsLeft = 1;
+			
 			// swap(blocks, blocks2);
 			temp2 = blocks2;
 			blocks2 = blocks;
