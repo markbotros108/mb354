@@ -5,7 +5,7 @@
 	<title>Baldur's Gate</title>
 	<script type="text/javascript">
 		var deck1, deck2, deck3;
-		var hand, discard, hand2, discard2, decks;
+		var hand, discard, hand2, discard2, decks, bonus=0;
 		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0;  
 
 		function init() { document.getElementById('drawer').onclick = end;
@@ -39,8 +39,8 @@
 				deck2.push('boowedo');
 				deck2.push('mount');
 				deck2.push('nerys');  
-				// deck2.push('scouting');
-				// deck2.push('frenemies');
+				deck2.push('scouting');
+				deck2.push('frenemies');
 				deck2.push('swapportunity');
 				deck3.push('inspiration');
 				deck3.push('shield');
@@ -114,6 +114,9 @@
 				case 'banishing': blocks = 0; blocks2 = 0; extraPlay(1); break;
 				case 'inspiration': chooseFromDiscard(); heal(2); break;    
 				case 'swapportunity': swaphp(); break;
+				case 'frenemies': bonus++; break;
+				case 'scouting': if(decks[0] == 2) draw(decks[1]);
+								else draw(decks[0]); break;
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
@@ -122,7 +125,7 @@
 			display();
 		}
 
-		function attack(arg){ let atk = arg;
+		function attack(arg){ let atk = arg + bonus;
 			if(blocks2 > atk){
 					blocks2-=atk; return;  
 			}
@@ -183,7 +186,7 @@
 					if(myturn) { draw(decks[0]); draw(decks[0]); }                             
 		  			else {draw(decks[1]); draw(decks[1]);} }
 			}
-			else {document.getElementById('drawer').style.display = 'none';
+			else {document.getElementById('drawer').style.display = 'none'; bonus = 0;
 			
 			// Draw for next turn
 			if(myturn) { if(!hand.length) draw(decks[0]);
