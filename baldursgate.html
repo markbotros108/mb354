@@ -48,9 +48,9 @@
 				deck3.push('words');
 				// deck3.push('fingerwag');
 				deck3.push('justice');
-				// deck3.push('morejust');
-				// deck3.push('morejust');
-				// deck3.push('mostjust');
+				deck3.push('morejust');
+				deck3.push('morejust');
+				deck3.push('mostjust');
 				// deck3.push('charisma');
 				// deck3.push('spinparry');
 			}
@@ -90,8 +90,10 @@
 			console.log('Played '+cardName.toUpperCase());
 			switch(cardName){
 				case 'words': heal(1);
+				case 'morejust':
 				case 'twice': attack(2); break;
 				case 'smite': heal(1);
+				case 'mostjust':
 				case 'eyesboo': attack(3); break;
 				case 'cure': heal(1); draw(3);draw(3); break;
 				case 'boowedo': draw(2); draw(2); break;
