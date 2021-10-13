@@ -52,7 +52,7 @@
 				deck3.push('morejust');
 				deck3.push('mostjust');
 				// deck3.push('charisma');
-				// deck3.push('spinparry');
+				deck3.push('spinparry');
 			}
 
 			deck1 = shuffle(deck1);
@@ -105,6 +105,7 @@
 				case 'time': attack(2); extraPlay(1); break;
 				case 'wrap': heal(1); draw(2); break;
 				case 'nerys': heal(1); block(1); break;
+				case 'spinparry': block(1); draw(3); break;
 				case 'mount': 
 				case 'fluffy': block(2); break;
 				case 'shield':        
