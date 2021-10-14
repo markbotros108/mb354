@@ -2,8 +2,8 @@
 <html>
 <head>
 	<!-- TODO: Choose player decks
-				Blocks should be arrau y       
-  	 	 	    Add Azzam -->
+				Blocks should be arrayed       
+  	 	 	    Add Fireball and Charm Azzam -->
 	<title>Baldur's Gate</title>
 	<script type="text/javascript">
 		var deck0, deck1, deck2, deck3, characters = ['azzam', 'joheira', 'minsc', 'lia'];
@@ -14,14 +14,26 @@
 			document.getElementById('drawer').style.display = 'none';
 			document.getElementById('drawer').innerHTML = 'End Turn';
       		
-      		deck0 = [];
+      		deck0 = ['burning', 'knowledge', 'missile', 'mirror', 'stoneskin', 'thought'];
 			deck1 = ['lightning', 'wolf', 'eldest','whip'];
 			deck2 = ['krydle', 'time', 'squeaky', 'twice', 'eyesboo', 'wrap'];
 			deck3 = ['banishing', 'fluffy', 'cure', 'justice', 'smite', 'words'];
-			hand = []; discard = []; hand2 = []; discard2 = []; decks = [2, 3]; // decks for choosing and drawing b/w
+			hand = []; discard = []; hand2 = []; discard2 = []; 
 			myturn = true; hp = 10; playsLeft = 1; blocks = 0; hp2 = 10; playsLeft2 = 0; blocks2 = 0;
+			decks = [2, 0]; // decks for choosing and drawing b/w
 
 			for (var i = 0; i < 2; i++) {
+				deck0.push('burning');
+				// deck0.push('charm');
+				deck0.push('sneer');
+				deck0.push('fireball');
+				deck0.push('bolt');
+				deck0.push('bolt');
+				deck0.push('shield');
+				deck0.push('vampiric');
+				deck0.push('missile');
+				deck0.push('knowledge');
+				deck0.push('thought');
 				// deck1.push('silvanus');
 				// deck1.push('balance');
 				// deck1.push('nature');
@@ -46,7 +58,7 @@
 				deck2.push('frenemies');
 				deck2.push('swapportunity');
 				deck3.push('inspiration');
-				deck3.push('shield');
+				deck3.push('divine');
 				deck3.push('smite');
 				deck3.push('words');
 				deck3.push('fingerwag');
@@ -58,13 +70,20 @@
 				deck3.push('spinparry');
 			}
 
+			deck0 = shuffle(deck0);
 			deck1 = shuffle(deck1);
 			deck2 = shuffle(deck2);
 			deck3 = shuffle(deck3);
 
 			for (var i = 0; i < 4; i++) {// Drawing extra for first turn
 				draw(decks[0]);
-				hand2.push(deck3.pop());
+				switch(decks[1]){
+					case 0: hand2.push(deck0.pop()); break;
+					case 1: hand2.push(deck1.pop()); break;
+					case 2: hand2.push(deck2.pop()); break;
+					case 3: hand2.push(deck3.pop()); break;
+					default: alert('error with initial draw..');
+				}
 			}
 		}
 
@@ -98,28 +117,42 @@
 			switch(cardName){
 				case 'rodent':
 				case 'words': heal(1);
+				case 'burning':
 				case 'morejust':
 				case 'twice': attack(2); break;
 				case 'smite': heal(1);
+				case 'fireball': attackself(3);
+				case 'bolt':
 				case 'mostjust':
 				case 'eyesboo': attack(3); break;
 				case 'cure': heal(1); 
-				case 'charisma': draw(3);draw(3); break;
-				case 'boowedo': draw(2); draw(2); break;
+				case 'charisma': if(myturn){ draw(decks[0]); draw(decks[0]); }
+									else { draw(decks[1]); draw(decks[1]); } break; 
+				case 'boowedo': if(myturn){ draw(decks[0]); draw(decks[0]); }
+									else { draw(decks[1]); draw(decks[1]); } break; 
+				case 'knowledge': if(myturn){ draw(decks[0]); draw(decks[0]); draw(decks[0]);}
+									else { draw(decks[1]); draw(decks[1]); draw(decks[1]);} break;
+				case 'thought':
 				case 'fingerwag':
-				case 'waits':  extraPlay(2); break;                                       
+				case 'waits':  extraPlay(2); break; 
+				case 'missile':                                      
 				case 'squeaky': 
 				case 'justice': attack(1); extraPlay(1); break;
 				case 'time': attack(2); extraPlay(1); break;
-				case 'wrap': heal(1); draw(2); break;
+				case 'wrap': heal(1); if(myturn) draw(decks[0]); else draw(decks[1]); break;
 				case 'nerys': heal(1); block(1); break;
-				case 'spinparry': block(1); draw(3); break;
+				case 'spinparry': 
+				case 'shield': block(1); if(myturn) draw(decks[0]); else draw(decks[1]); break;
+				case 'sneer': heal(1); extraPlay(1); break;
+				case 'stoneskin':
 				case 'mount': 
 				case 'fluffy': block(2); break;
-				case 'shield':        
+				case 'mirror':
+				case 'divine':        
 				case 'krydle': block(3); break;
 				case 'banishing': blocks = 0; blocks2 = 0; extraPlay(1); break;
-				case 'inspiration': chooseFromDiscard(); heal(2); break;    
+				case 'inspiration': chooseFromDiscard(); heal(2); break;
+				case 'vampiric':   
 				case 'swapportunity': swaphp(); break;
 				case 'frenemies': bonus++; extraPlay(1); break;
 				case 'scouting': if(decks[0] == 2) draw(decks[1]);
@@ -139,7 +172,16 @@
 			else {atk -= blocks2; blocks2 = 0;}
 			if(hp2-atk > 0) hp2 -= atk;  
 			else {hp2 = 0; if(confirm('You win! Would you like to play again?')) init(); }
-		}  
+		}
+
+		function attackself(arg){ let atk = arg;
+			if(blocks > atk){
+					blocks-=atk; return;  
+			}
+			else {atk -= blocks; blocks = 0;}
+			if(hp-atk > 0) hp -= atk;  
+			else {hp = 0; if(confirm('You lose! Would you like to play again?')) init(); }
+		}
 
 		function extraPlay(argument) {
 			playsLeft += argument;
