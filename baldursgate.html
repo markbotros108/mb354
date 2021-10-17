@@ -166,7 +166,6 @@
 				case 'morejust':
 				case 'twice': attack(2); break;
 				case 'smite': heal(1);
-				case 'fireball': attackself(3);
 				case 'bolt':
 				case 'mostjust':
 				case 'eyesboo': attack(3); break;
@@ -200,6 +199,7 @@
 				case 'vampiric':   
 				case 'swapportunity': swaphp(); break;
 				case 'frenemies': bonus++; extraPlay(1); break;
+				case 'fireball': attackself(3); break;
 				case 'scouting': if(decks[0] == 2) draw(decks[1]);
 								else draw(decks[0]); break;
 				default: alert('Card not yet implemented..');
