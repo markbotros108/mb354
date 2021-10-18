@@ -14,7 +14,7 @@
 		var gameInProgress = false; 
 
 	    function successFunc(data) {
-	      console.log(data[0]);
+	      console.log(data[0].gameInProgress);
 	    }
 	    Sheetsu.read("https://sheetsu.com/apis/v1.0su/2cd69248d865", {}, successFunc);
 
