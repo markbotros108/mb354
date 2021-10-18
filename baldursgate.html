@@ -14,7 +14,7 @@
 		var gameInProgress = false; 
 
 	    function successFunc(data) {
-	      let testjson = data[0];
+	    	let testjson = data[0];
 	      if(testjson.gameinprogress === 'FALSE') console.log('HP: ' + testjson.hp);
 	    }
 	    Sheetsu.read("https://sheetsu.com/apis/v1.0su/2cd69248d865", {}, successFunc);
@@ -59,8 +59,8 @@
 				deck0.push('missile');
 				deck0.push('knowledge');
 				deck0.push('thought');
-				// deck1.push('silvanus');
-				// deck1.push('balance');
+				deck1.push('silvanus');
+				deck1.push('balance');
 				// deck1.push('nature');
 				// deck1.push('primal');
 				// deck1.push('bearnard');
@@ -68,7 +68,7 @@
 				// deck1.push('rush');
 				// deck1.push('fox');
 				// deck1.push('whip');
-				// deck1.push('lightning');
+				deck1.push('lightning');
 				// deck1.push('bear');
 				// deck1.push('wolf');
 				deck2.push('squeaky');
@@ -144,13 +144,12 @@
 		}
 
 		function updateCharSelection(arg) { let theChosenOne = parseInt(arg.id);
-			if(theChosenOne==1) alert(characters[1].toUpperCase()+' COMING SOON..');
-			else {
-				alert('Player ' + (decks.length+1) + ' chose: '+ charSelect[theChosenOne].toUpperCase() );
+			if(theChosenOne==1) alert(characters[1].toUpperCase()+' NOT YET FULLY implemented..');
+			alert('Player ' + (decks.length+1) + ' chose: '+ charSelect[theChosenOne].toUpperCase() );
 			charSelect[theChosenOne] = '';
 			decks.push(theChosenOne) // update decks
 			chooseDecks();
-			}
+			
 		}
 
 		function draw(deckNo) { // Check deck.length, if empty deck = shuffle(discard); discard = 0
