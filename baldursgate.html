@@ -14,9 +14,20 @@
 		var gameInProgress = false; 
 
 	    function successFunc(data) {
-	      console.log(data[0]);
+	      console.log(data[0][1]);
 	    }
 	    Sheetsu.read("https://sheetsu.com/apis/v1.0su/2cd69248d865", {}, successFunc);
+
+	    function saveData() {
+	      // var first_name = gameInProgress, score = document.getElementsByName("score")[0].value;
+	      var data = {
+	        gameInProgress: gameInProgress,
+	        HP: hp
+	      };
+	      Sheetsu.write("https://sheetsu.com/apis/v1.0su/2cd69248d865", data, {}, function (result) {
+	        console.log(result);
+	      });
+	    }
  
 		$(document).ready(  function(){if (!gameInProgress) chooseDecks(); }); 
 
