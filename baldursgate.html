@@ -6,12 +6,19 @@
   	 	 	    Add Fireball and Charm Azzam -->
 	<title>Baldur's Gate</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="//script.sheetsu.com/"></script>
 	<script type="text/javascript">
 		var deck0, deck1, deck2, deck3, characters = ['azzam', 'joheira', 'minsc', 'lia'];
 		var hand, discard, hand2, discard2, decks=[], bonus=0, charSelect =[]; charSelect = charSelect.concat(characters);
-		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0;  
+		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0; 
+		var gameInProgress = false; 
 
-		$(document).ready( function(){ chooseDecks(); }); 
+	    function successFunc(data) {
+	      console.log(data);
+	    }
+	    // Sheetsu.read("https://sheetsu.com/apis/v1.0su/2cd69248d865", {}, successFunc);
+ 
+		$(document).ready(  function(){if (!gameInProgress) chooseDecks(); }); 
 
 		function init() { document.getElementById('drawer').onclick = end;
 			document.getElementById('drawer').style.display = 'none';
@@ -91,6 +98,8 @@
 					default: alert('error with initial draw..');
 				}
 			}
+
+			gameInProgress = true;
 		}
 
 		function chooseDecks(){ //let chosen = [];
