@@ -186,11 +186,12 @@
 				case 'morejust':
 				case 'twice': attack(2); break;
 				case 'smite': heal(1);
+				case 'lightning':
 				case 'bolt':
 				case 'mostjust':
 				case 'eyesboo': attack(3); break;
 				case 'cure': heal(1); 
-				case 'charisma':// if(myturn){ draw(decks[0]); draw(decks[0]); }else { draw(decks[1]); draw(decks[1]); } break; 
+				case 'charisma':
 				case 'boowedo': if(myturn){ draw(decks[0]); draw(decks[0]); }
 									else { draw(decks[1]); draw(decks[1]); } break; 
 				case 'knowledge': if(myturn){ draw(decks[0]); draw(decks[0]); draw(decks[0]);}
@@ -202,6 +203,7 @@
 				case 'squeaky': 
 				case 'justice': attack(1); extraPlay(1); break;
 				case 'time': attack(2); extraPlay(1); break;
+				case 'balance': attack(1);
 				case 'wrap': heal(1); if(myturn) draw(decks[0]); else draw(decks[1]); break;
 				case 'nerys': heal(1); block(1); break;
 				case 'spinparry': 
@@ -210,6 +212,7 @@
 				case 'stoneskin':
 				case 'mount': 
 				case 'fluffy': block(2); break;
+				case 'eldest':
 				case 'mirror':
 				case 'divine':        
 				case 'krydle': block(3); break;
