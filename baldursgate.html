@@ -62,15 +62,15 @@
 				deck1.push('silvanus');
 				deck1.push('balance');
 				// deck1.push('nature');
-				// deck1.push('primal');
-				// deck1.push('bearnard');
-				// deck1.push('poochie');
-				// deck1.push('rush');
-				// deck1.push('fox');
-				// deck1.push('whip');
+				deck1.push('primal');
+				deck1.push('bearnard');
+				deck1.push('poochie');
+				deck1.push('rush');
+				deck1.push('fox');
+				deck1.push('whip');
 				deck1.push('lightning');
-				// deck1.push('bear');
-				// deck1.push('wolf');
+				deck1.push('bear');
+				deck1.push('wolf');
 				deck2.push('squeaky');
 				deck2.push('waits');
 				deck2.push('twice');
@@ -180,6 +180,7 @@
 			let cardName = card.slice(card.indexOf('images/') + 7, card.indexOf('.jpg'));
 			console.log('Played '+cardName.toUpperCase());
 			switch(cardName){
+				case 'poochie': block(1); attack(1); break;
 				case 'rodent':
 				case 'words': heal(1);
 				case 'burning':
@@ -194,11 +195,15 @@
 				case 'charisma':
 				case 'boowedo': if(myturn){ draw(decks[0]); draw(decks[0]); }
 									else { draw(decks[1]); draw(decks[1]); } break; 
+				case 'rush': formPower();
 				case 'knowledge': if(myturn){ draw(decks[0]); draw(decks[0]); draw(decks[0]);}
 									else { draw(decks[1]); draw(decks[1]); draw(decks[1]);} break;
+				case 'fox':
 				case 'thought':
 				case 'fingerwag':
 				case 'waits':  extraPlay(2); break; 
+				case 'whip':
+				case 'primal':
 				case 'missile':                                      
 				case 'squeaky': 
 				case 'justice': attack(1); extraPlay(1); break;
@@ -225,7 +230,10 @@
 				case 'fireball': attack(3); attackself(3); break;
 				case 'scouting': if(decks[0] == 2) draw(decks[1]);
 								else draw(decks[0]); break;
-				case 'silvanus': attack(2); if (form != '') alert('Form is '+form); break;
+				case 'silvanus': attack(2); formPower(); break;
+				case 'bearnard': block(2); formPower(); break;
+				case 'bear':
+				case 'wolf': changeForm(cardName);
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
@@ -252,10 +260,15 @@
 			else {hp = 0; if(confirm('You lose! Would you like to play again?')) init(); }
 		}
 
+		function changeForm(newForm){
+			if (form != newForm) form = newForm;
+			else alert('Joheira is already in '+newForm+' form!');
+		}
+
 		function formPower(){
 			switch(form){
-				case 'BEAR': heal(1); break;
-				case 'WOLF': attack(1); break;
+				case 'bear': heal(1); break;
+				case 'wolf': attack(1); break;
 				default: alert('Joheira currently has no form.');
 			}
 		}
