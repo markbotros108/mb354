@@ -305,8 +305,13 @@
 				document.getElementById('hand').append(newcard);
 			}
 
-			document.getElementById('stats').innerHTML = characters[decks[0]].toUpperCase() +'<hr>HP: '+hp+'<br>Plays: '+playsLeft+'<br>Blocks: '+blocks;
-			document.getElementById('stats2').innerHTML = 'OPPONENT:<br>'+characters[decks[1]].toUpperCase() +'<hr>HP: '+hp2+'<br>Plays: '+playsLeft2+'<br>Blocks: '+blocks2;
+			if (myturn) {document.getElementById('stats').innerHTML = characters[decks[0]].toUpperCase();
+			document.getElementById('stats2').innerHTML = 'OPPONENT:<br>'+characters[decks[1]].toUpperCase();}
+			else {document.getElementById('stats').innerHTML = characters[decks[1]].toUpperCase();
+				document.getElementById('stats2').innerHTML = 'OPPONENT:<br>'+characters[decks[0]].toUpperCase();
+			}
+			document.getElementById('stats').innerHTML +='<hr>HP: '+hp+'<br>Plays: '+playsLeft+'<br>Blocks: '+blocks;
+			document.getElementById('stats2').innerHTML +='<hr>HP: '+hp2+'<br>Plays: '+playsLeft2+'<br>Blocks: '+blocks2;
 			if(decks[0] == 1) document.getElementById('stats').innerHTML += '<br>Form: '+form.toUpperCase();
 			else if(decks[1] == 1) document.getElementById('stats2').innerHTML += '<br>Form: '+form.toUpperCase();
 			if(myturn) document.getElementById('rules').src = 'images/'+ characters[decks[0]] +'rules.jpg';
