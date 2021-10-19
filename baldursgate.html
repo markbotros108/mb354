@@ -233,7 +233,7 @@
 				case 'silvanus': attack(2); formPower(); break;
 				case 'bearnard': block(2); formPower(); break;
 				case 'bear':
-				case 'wolf': changeForm(cardName);
+				case 'wolf': changeForm(cardName); alert('Joheira\'s Form is now '+cardName.toUpperCase()); break;
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
