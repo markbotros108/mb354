@@ -11,13 +11,13 @@
 		var deck0, deck1, deck2, deck3, characters = ['azzam', 'joheira', 'minsc', 'lia'];
 		var hand, discard, hand2, discard2, decks=[], bonus=0, charSelect =[]; charSelect = charSelect.concat(characters);
 		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0; 
-		var gameInProgress = false; 
+		var gameInProgress = false, form = ''; 
 
 	    function successFunc(data) {
 	    	let testjson = data[0];
 	      if(testjson.gameinprogress === 'FALSE') console.log('HP: ' + testjson.hp);
 	    }
-	    Sheetsu.read("https://sheetsu.com/apis/v1.0su/2cd69248d865", {}, successFunc);
+	    // Sheetsu.read("https://sheetsu.com/apis/v1.0su/2cd69248d865", {}, successFunc);
 
 	    function saveData() {
 	      // var first_name = gameInProgress, score = document.getElementsByName("score")[0].value;
@@ -216,14 +216,16 @@
 				case 'mirror':
 				case 'divine':        
 				case 'krydle': block(3); break;
+				// Special powers
 				case 'banishing': blocks = 0; blocks2 = 0; extraPlay(1); break;
 				case 'inspiration': chooseFromDiscard(); heal(2); break;
 				case 'vampiric':   
 				case 'swapportunity': swaphp(); break;
 				case 'frenemies': bonus++; extraPlay(1); break;
-				case 'fireball': attackself(3); break;
+				case 'fireball': attack(3); attackself(3); break;
 				case 'scouting': if(decks[0] == 2) draw(decks[1]);
 								else draw(decks[0]); break;
+				case 'silvanus': attack(2); if (form != '') alert('Form is '+form); break;
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
@@ -248,6 +250,14 @@
 			else {atk -= blocks; blocks = 0;}
 			if(hp-atk > 0) hp -= atk;  
 			else {hp = 0; if(confirm('You lose! Would you like to play again?')) init(); }
+		}
+
+		function formPower(){
+			switch(form){
+				case 'BEAR': heal(1); break;
+				case 'WOLF': attack(1); break;
+				default: alert('Joheira currently has no form.');
+			}
 		}
 
 		function extraPlay(argument) {
