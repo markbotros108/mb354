@@ -144,7 +144,7 @@
 		}
 
 		function updateCharSelection(arg) { let theChosenOne = parseInt(arg.id);
-			if(theChosenOne==1) alert(characters[1].toUpperCase()+' NOT YET FULLY implemented..');
+			// if(theChosenOne==1) alert(characters[1].toUpperCase()+' NOT YET FULLY implemented..');
 			alert('Player ' + (decks.length+1) + ' chose: '+ charSelect[theChosenOne].toUpperCase() );
 			charSelect[theChosenOne] = '';
 			decks.push(theChosenOne) // update decks
@@ -232,8 +232,8 @@
 								else draw(decks[0]); break;
 				case 'silvanus': attack(2); formPower(); break;
 				case 'bearnard': block(2); formPower(); break;
-				case 'bear':
-				case 'wolf': changeForm(cardName); alert('Joheira\'s Form is now '+cardName.toUpperCase()); break;
+				case 'bear': heal(2); changeForm(cardName); alert('Joheira\'s Form is now '+cardName.toUpperCase()); break;
+				case 'wolf': attack(2); changeForm(cardName); alert('Joheira\'s Form is now '+cardName.toUpperCase()); break;
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
@@ -305,8 +305,10 @@
 				document.getElementById('hand').append(newcard);
 			}
 
-			document.getElementById('stats').innerHTML = 'HP: '+hp+'<br>Plays: '+playsLeft+'<br>Blocks: '+blocks;
-			document.getElementById('stats2').innerHTML = 'OPPONENT' +'<hr>HP: '+hp2+'<br>Plays: '+playsLeft2+'<br>Blocks: '+blocks2;
+			document.getElementById('stats').innerHTML = characters[decks[0]].toUpperCase() +'<hr>HP: '+hp+'<br>Plays: '+playsLeft+'<br>Blocks: '+blocks;
+			document.getElementById('stats2').innerHTML = 'OPPONENT:<br>'+characters[decks[1]].toUpperCase() +'<hr>HP: '+hp2+'<br>Plays: '+playsLeft2+'<br>Blocks: '+blocks2;
+			if(decks[0] == 1) document.getElementById('stats').innerHTML += '<br>Form: '+form.toUpperCase();
+			else if(decks[1] == 1) document.getElementById('stats2').innerHTML += '<br>Form: '+form.toUpperCase();
 			if(myturn) document.getElementById('rules').src = 'images/'+ characters[decks[0]] +'rules.jpg';
 			else document.getElementById('rules').src = 'images/'+ characters[decks[1]] +'rules.jpg';
 		}
@@ -365,10 +367,10 @@
 </head>
 <body>
 <div id="characterSelect" style="position: absolute; left: 10%; top: 10%; font-size: 62px; text-align: center; display: inline-block; width: 85%;">Player 1, Choose you character:<hr></div>
-<img id="rules" src="" style="position: absolute; width: 300px; bottom: 10%;">
+<img id="rules" src="" style="position: absolute; width: 300px; bottom: 5%;">
 <div id="hand" style="position: absolute; left: 20%; top: 20%; width: 80%;"></div>
 <button id="drawer" style="display: none; font-size: 72px; position: absolute; left: 40%; bottom: 2%; padding: 20px 50px" onclick="init();">Play</button>
-<p id="stats" style="display: none; border: solid; text-align: center; font-size: 52px; position: absolute; right: 6%; top: 50%;">HP: 10<br>Plays: 1<br>Blocks: 0</p>
+<p id="stats" style="display: none; border: solid; text-align: center; font-size: 52px; position: absolute; right: 6%; top: 60%;">HP: 10<br>Plays: 1<br>Blocks: 0</p>
 <div id="stats2" style="display: none; border: solid; text-align: center; font-size: 52px; position: absolute; top: 1%;">OPPONENT<hr>HP: 10<br>Plays: 0<br>Blocks: 0</div>
 </body>
 </html>
