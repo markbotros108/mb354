@@ -10,7 +10,7 @@
 	<script type="text/javascript">
 		var deck0, deck1, deck2, deck3, characters = ['azzam', 'joheira', 'minsc', 'lia'];
 		var hand, discard, hand2, discard2, decks=[], bonus=0, charSelect =[]; charSelect = charSelect.concat(characters);
-		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, playsLeft2 = 0, blocks2 = 0; 
+		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, blocks2 = 0;//playsLeft2 = 0, 
 		var gameInProgress = false, form = ''; 
 
 	    function successFunc(data) {
@@ -178,7 +178,8 @@
 
 		function play(card) { playsLeft--; document.getElementById('drawer').style.display = 'initial';
 			let cardName = card.slice(card.indexOf('images/') + 7, card.indexOf('.jpg'));
-			console.log('Played '+cardName.toUpperCase());
+			if (myturn) console.log(characters[decks[0]].toUpperCase()+ ' played '+cardName.toUpperCase());
+			else console.log(characters[decks[1]].toUpperCase()+ ' played '+cardName.toUpperCase());
 			switch(cardName){
 				case 'poochie': block(1); attack(1); break;
 				case 'rodent':
@@ -232,8 +233,8 @@
 								else draw(decks[0]); break;
 				case 'silvanus': attack(2); formPower(); break;
 				case 'bearnard': block(2); formPower(); break;
-				case 'bear': heal(2); changeForm(cardName); alert('Joheira\'s Form is now '+cardName.toUpperCase()); break;
-				case 'wolf': attack(2); changeForm(cardName); alert('Joheira\'s Form is now '+cardName.toUpperCase()); break;
+				case 'bear': heal(2); changeForm(cardName); break;
+				case 'wolf': attack(2); changeForm(cardName); break;
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
@@ -261,7 +262,7 @@
 		}
 
 		function changeForm(newForm){
-			if (form != newForm) form = newForm;
+			if (form != newForm) {form = newForm; alert('Joheira\'s Form is now '+cardName.toUpperCase());}
 			else alert('Joheira is already in '+newForm+' form!');
 		}
 
@@ -369,7 +370,7 @@
 		function swaphp() {
 			let temp2=0;
 			temp2 = hp2;
-			hp2 = hp;                                                                                 
+			hp2 = hp;                     
 			hp = temp2;
 			display();
 		}
