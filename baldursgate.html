@@ -176,7 +176,8 @@
 			display(); 
 		}
 
-		function play(card) { playsLeft--; document.getElementById('drawer').style.display = 'initial';
+		function play(card) { if(playsLeft > 0) playsLeft--; 
+			document.getElementById('drawer').style.display = 'initial';
 			let cardName = card.slice(card.indexOf('images/') + 7, card.indexOf('.jpg'));
 			if (myturn) console.log(characters[decks[0]].toUpperCase()+ ' played '+cardName.toUpperCase());
 			else console.log(characters[decks[1]].toUpperCase()+ ' played '+cardName.toUpperCase());
@@ -235,7 +236,8 @@
 				case 'bearnard': block(2); formPower(); break;
 				case 'bear': heal(2); changeForm(cardName); break;
 				case 'wolf': attack(2); changeForm(cardName); break;
-				case 'nature': communing = true; break;
+				case 'nature': if(myturn){ draw(decks[0]); draw(decks[0]); }
+							else { draw(decks[1]); draw(decks[1]); } communing = true; break;
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
