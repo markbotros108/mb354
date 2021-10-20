@@ -11,7 +11,7 @@
 		var deck0, deck1, deck2, deck3, characters = ['azzam', 'joheira', 'minsc', 'lia'];
 		var hand, discard, hand2, discard2, decks=[], bonus=0, charSelect =[]; charSelect = charSelect.concat(characters);
 		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, blocks2 = 0;//playsLeft2 = 0, 
-		var gameInProgress = false, form = ''; 
+		var gameInProgress = false, form = '', communing = false;
 
 	    function successFunc(data) {
 	    	let testjson = data[0];
@@ -61,7 +61,7 @@
 				deck0.push('thought');
 				deck1.push('silvanus');
 				deck1.push('balance');
-				// deck1.push('nature');
+				deck1.push('nature');
 				deck1.push('primal');
 				deck1.push('bearnard');
 				deck1.push('poochie');
@@ -235,6 +235,7 @@
 				case 'bearnard': block(2); formPower(); break;
 				case 'bear': heal(2); changeForm(cardName); break;
 				case 'wolf': attack(2); changeForm(cardName); break;
+				case 'nature': communing = true; break;
 				default: alert('Card not yet implemented..');
 			}
 			hand.splice(hand.indexOf(cardName), 1);
@@ -300,9 +301,9 @@
 				let newcard = document.createElement('img');
 				newcard.src = 'images/' + hand[i] + '.jpg';
 				newcard.width = 200;
-				if(playsLeft) newcard.style.cursor = 'pointer';
+				if(playsLeft||(communing&&(hand[i]==='bear'||hand[i]==='wolf'))) newcard.style.cursor = 'pointer';
 				newcard.style.marginRight = '40px';
-				if(playsLeft) newcard.onclick = function() {play(this.src)};
+				if(playsLeft||(communing&&(hand[i]==='bear'||hand[i]==='wolf'))) newcard.onclick = function() {play(this.src)};
 				document.getElementById('hand').append(newcard);
 			}
 
@@ -340,7 +341,7 @@
 					if(myturn) { draw(decks[0]); draw(decks[0]); }                             
 		  			else {draw(decks[1]); draw(decks[1]);} }
 			}
-			else {document.getElementById('drawer').style.display = 'none'; bonus = 0;
+			else {document.getElementById('drawer').style.display = 'none'; bonus = 0; communing = false;
 			
 			// Draw for next turn
 			if(myturn) { if(!hand.length) draw(decks[0]);
