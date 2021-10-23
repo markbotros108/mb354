@@ -197,7 +197,8 @@
 				case 'charisma':
 				case 'boowedo': if(myturn){ draw(decks[0]); draw(decks[0]); }
 									else { draw(decks[1]); draw(decks[1]); } break; 
-				case 'rush': formPower();
+				case 'rush': formPower(); if(myturn){ draw(decks[0]); draw(decks[0]); }
+									else { draw(decks[1]); draw(decks[1]); } break; 
 				case 'knowledge': if(myturn){ draw(decks[0]); draw(decks[0]); draw(decks[0]);}
 									else { draw(decks[1]); draw(decks[1]); draw(decks[1]);} break;
 				case 'fox':
