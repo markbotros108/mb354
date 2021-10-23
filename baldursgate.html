@@ -11,7 +11,7 @@
 		var deck0, deck1, deck2, deck3, characters = ['azzam', 'joheira', 'minsc', 'lia'];
 		var hand, discard, hand2, discard2, decks=[], bonus=0, charSelect =[]; charSelect = charSelect.concat(characters);
 		var myturn = true, hp = 10, playsLeft = 1, blocks = 0,hp2 = 10, blocks2 = 0;//playsLeft2 = 0, 
-		var gameInProgress = false, form = '', communing = false;
+		var gameInProgress = false, form, communing;
 
 	    function successFunc(data) {
 	    	let testjson = data[0];
@@ -43,7 +43,7 @@
 			deck1 = ['lightning', 'wolf', 'eldest','whip'];
 			deck2 = ['krydle', 'time', 'squeaky', 'twice', 'eyesboo', 'wrap'];
 			deck3 = ['banishing', 'fluffy', 'cure', 'justice', 'smite', 'words'];
-			hand = []; discard = []; hand2 = []; discard2 = []; 
+			hand = []; discard = []; hand2 = []; discard2 = [], form = '', communing = false;
 			myturn = true; hp = 10; playsLeft = 1; blocks = 0; hp2 = 10; playsLeft2 = 0; blocks2 = 0;
 			// decks = [0,2]; // decks for choosing and drawing b/w
 
