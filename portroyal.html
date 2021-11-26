@@ -119,7 +119,7 @@
 		}
 
 		function trade() { let discarded = this.src;
-			let chosenShip = discarded.slice(discarded.indexOf('images')+7, discarded.indexOf('.'));
+			let chosenShip = discarded.slice(discarded.indexOf('images')+7, discarded.indexOf('.jpg'));
 			let cardsDrawn = document.getElementById('harbour');
 			for (var i = 0; i < cardsDrawn.children.length; i++) {
 				if(cardsDrawn.childNodes[i].src.includes(chosenShip)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
