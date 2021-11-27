@@ -7,7 +7,7 @@
 	<script type="text/javascript">
 		let deck = [], playerTurn = 1, playerToggler = true;
 		let colours = [ 'blue', 'green', 'yellow', 'red', 'black'];
-		var swordFinder = [], coins1 = 0, coins2 = 0, swords1 = 0, swords2 = 0, madams = 0, madams2 = 0;
+		var swordFinder = [], coins1 = 3, coins2 = 3, swords1 = 0, swords2 = 0, madams = 0, madams2 = 0, traders = [0, 0, 0, 0, 0], traders2 = [0, 0, 0, 0, 0];
 
 		class ship {
 			constructor(x, y, z) {
@@ -56,10 +56,16 @@
 				newShip = new ship(3, 'sailor', 1); deck.push(newShip);
 				if (i<3) {newShip = new ship(5, 'pirate', 2); deck.push(newShip);}
 			}
-			for (var i = 0; i < 4; i++) {
+			for (var i = 0; i < 2; i++) {
 				newShip = new ship(7, 'mademoiselle', 2); deck.push(newShip);
+				newShip = new ship(9, 'mademoiselle', 3); deck.push(newShip);
 			}
-			deck = shuffle(deck);
+			for (var i = 0; i < colours.length; i++) {
+				newShip = new ship(3, colours[i]+'trader', 1); deck.push(newShip);
+				if(!(i%2)&&i<4) newShip = new ship(3, colours[i]+'trader', 2);
+				deck.push(newShip);
+			}
+			// deck = shuffle(deck);
 		}
 
 		function swordCalc() {
@@ -103,9 +109,10 @@
 			let colourChecker = [0, 0, 0, 0, 0], swordsToBeat = 0;
 			for (var i = 0; i < currentHarbour.children.length; i++) {
 				for (var j = 0; j < colours.length; j++) {
-					if(currentHarbour.children[i].src.includes(colours[j])) {
+					let currentCard = currentHarbour.children[i].src;
+					if(currentCard.includes(colours[j]) && !currentCard.includes('trader')) {
 						colourChecker[j]++;
-						if(colourChecker[j] >= 2) {swordsToBeat = currentHarbour.children[i].src.slice(currentHarbour.children[i].src.indexOf('images')+7, currentHarbour.children[i].src.indexOf('.jpg'));
+						if(colourChecker[j] >= 2) {swordsToBeat = currentCard.slice(currentCard.indexOf('images')+7, currentCard.indexOf('.jpg'));
 							swordsToBeat = parseInt(swordsToBeat.slice(-1));
 							console.log(swordsToBeat);
 						}
@@ -121,7 +128,7 @@
 			document.getElementById('ender').onclick = end;
 			let currentHarbour = document.getElementsByTagName('img');
 			for (var i = 0; i < currentHarbour.length; i++) {
-				if (currentHarbour[i].src.includes('sailor')||currentHarbour[i].src.includes('pirate')||currentHarbour[i].src.includes('mademoiselle')) currentHarbour[i].onclick = hire;
+				if (currentHarbour[i].src.includes('sailor')||currentHarbour[i].src.includes('pirate')||currentHarbour[i].src.includes('mademoiselle')||currentHarbour[i].src.includes('trader')) currentHarbour[i].onclick = hire;
 				else currentHarbour[i].onclick = trade;
 				currentHarbour[i].style.cursor = 'pointer';
 			}
@@ -149,10 +156,11 @@
 			}
 			
 			let coinsGained = parseInt(chosenShip[0]);
-			if (playerToggler) { coins1 += coinsGained;
+			if (playerToggler) { coins1 += coinsGained + traders[colours.indexOf(chosenShip.slice(1, -1))];
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins1;
 			}
-			else {coins2 += coinsGained; document.getElementById('coins').innerHTML = 'Coins: '+ coins2;}
+			else {coins2 += coinsGained + traders2[colours.indexOf(chosenShip.slice(1, -1))]; 
+				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;}
 			
 			for (var i = 0; i < coinsGained; i++) deck.pop();
 			setTimeout(coinSwap, 1000);
@@ -172,6 +180,7 @@
 					alert('Player 1 now has '+swords1+' swords!');
 				}
 				else if(crewmate.includes('mademoiselle')) madams++;
+				else if(crewmate.includes('trader')) traders[colours.indexOf(crewmate.slice(1, -7))]++;
 
 				for (var i = 0; i < cardsDrawn.children.length; i++) {
 					if(cardsDrawn.childNodes[i].src.includes(crewmate)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
@@ -188,6 +197,7 @@
 					alert('Player 2 now has '+swords2+' swords!');
 				}
 				else if(crewmate.includes('mademoiselle')) madams2++;
+				else if(crewmate.includes('trader')) traders2[colours.indexOf(crewmate.slice(1, -7))]++;
 
 				for (var i = 0; i < cardsDrawn.children.length; i++) {
 					if(cardsDrawn.childNodes[i].src.includes(crewmate)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
