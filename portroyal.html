@@ -121,7 +121,7 @@
 			document.getElementById('ender').onclick = end;
 			let currentHarbour = document.getElementsByTagName('img');
 			for (var i = 0; i < currentHarbour.length; i++) {
-				if (currentHarbour[i].src.includes('sailor')||currentHarbour[i].src.includes('pirate')) currentHarbour[i].onclick = hire;
+				if (currentHarbour[i].src.includes('sailor')||currentHarbour[i].src.includes('pirate')||currentHarbour[i].src.includes('mademoiselle')) currentHarbour[i].onclick = hire;
 				else currentHarbour[i].onclick = trade;
 				currentHarbour[i].style.cursor = 'pointer';
 			}
