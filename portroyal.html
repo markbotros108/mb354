@@ -158,9 +158,9 @@
 			playerToggler = !playerToggler;
 		}
 
-		function hire() { let selectedCard = this.src, price = parseInt(crewmate[0]); 
+		function hire() { let selectedCard = this.src; 
 			let cardsDrawn = document.getElementById('harbour');
-			let crewmate = selectedCard.slice(selectedCard.indexOf('images')+7, selectedCard.indexOf('.jpg'));
+			let crewmate = selectedCard.slice(selectedCard.indexOf('images')+7, selectedCard.indexOf('.jpg')), price = parseInt(crewmate[0]);
 			if (coins1 >= price) { coins1 -= price;
 				swords1 += parseInt(crewmate.slice(-1));
 				for (var i = 0; i < cardsDrawn.children.length; i++) {
