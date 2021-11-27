@@ -168,6 +168,8 @@
 				for (var i = 0; i < cardsDrawn.children.length; i++) {
 					if(cardsDrawn.childNodes[i].src.includes(crewmate)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
 				}
+				if (!cardsDrawn.children.length) {cardsDrawn.style.display = 'none'; setTimeout(end, 200); }
+				setTimeout(coinSwap, 1000);
 				playerToggler = !playerToggler;
 			}
 			else if (!playerToggler && coins2 >= price) { coins2 -= price;
@@ -177,6 +179,8 @@
 				for (var i = 0; i < cardsDrawn.children.length; i++) {
 					if(cardsDrawn.childNodes[i].src.includes(crewmate)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
 				}
+				if (!cardsDrawn.children.length) {cardsDrawn.style.display = 'none'; setTimeout(end, 200); }
+				setTimeout(coinSwap, 1000);
 				playerToggler = !playerToggler;
 			}
 			else alert('You cannot afford to hire this ' + crewmate.slice(1,-1) + '.');
