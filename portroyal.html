@@ -109,7 +109,7 @@
 					}
 				}
 			}
-			if(colourChecker.includes(2) && swordsToBeat > swords1) setTimeout(function(){ alert('2 ships with same colour found! Harbour is discarded.'); end(); }, 350);
+			if(colourChecker.includes(2) && (!swordsToBeat || swordsToBeat > swords1)) setTimeout(function(){ alert('2 ships with same colour found! Harbour is discarded.'); end(); }, 350);
 			
 		}
 
@@ -162,7 +162,9 @@
 			let cardsDrawn = document.getElementById('harbour');
 			let crewmate = selectedCard.slice(selectedCard.indexOf('images')+7, selectedCard.indexOf('.jpg')), price = parseInt(crewmate[0]);
 			if (coins1 >= price) { coins1 -= price;
+				document.getElementById('coins').innerHTML = 'Coins: '+ coins1;
 				swords1 += parseInt(crewmate.slice(-1));
+				alert('You now have '+swords1+' swords!');
 				for (var i = 0; i < cardsDrawn.children.length; i++) {
 					if(cardsDrawn.childNodes[i].src.includes(crewmate)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
 				}
