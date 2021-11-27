@@ -161,10 +161,19 @@
 		function hire() { let selectedCard = this.src; 
 			let cardsDrawn = document.getElementById('harbour');
 			let crewmate = selectedCard.slice(selectedCard.indexOf('images')+7, selectedCard.indexOf('.jpg')), price = parseInt(crewmate[0]);
-			if (coins1 >= price) { coins1 -= price;
+			if (playerToggler && coins1 >= price) { coins1 -= price;
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins1;
 				swords1 += parseInt(crewmate.slice(-1));
-				alert('You now have '+swords1+' swords!');
+				alert('Player 1 now has '+swords1+' swords!');
+				for (var i = 0; i < cardsDrawn.children.length; i++) {
+					if(cardsDrawn.childNodes[i].src.includes(crewmate)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
+				}
+				playerToggler = !playerToggler;
+			}
+			else if (!playerToggler && coins2 >= price) { coins2 -= price;
+				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;
+				swords2 += parseInt(crewmate.slice(-1));
+				alert('Player 2 now has '+swords2+' swords!');
 				for (var i = 0; i < cardsDrawn.children.length; i++) {
 					if(cardsDrawn.childNodes[i].src.includes(crewmate)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
 				}
@@ -202,7 +211,7 @@
 	</script>
 </head>
 <body>
-<div id="harbour" style="display: none; border: solid; width: 80%; height: auto; position: absolute; left: 10%; top: 20%"></div>
+<div id="harbour" style="display: none; border: solid; width: 80%; height: auto; position: absolute; left: 10%; top: 30%"></div>
 <button onclick="start()" style="position: absolute; top: 70%; left: 45%; font-size: 80px; padding: 13px 40px;">Start</button>
 <div id="allButtons" style="display: inline-block; position: absolute; right: 7%; top: 70%;">
 	<button id="drawer" onclick="draw()" style="display: none;">Draw</button>
