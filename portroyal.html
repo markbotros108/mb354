@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
-<!-- TODO: If its not your turn, pay 1 coin to current player when trading a ship 
+<!-- TODO: If its not your turn, pay 1 coin to current player when trading a ship
+	ALMOST: be able to PASS, shuffle discard when deck empty
+	DONE: <3 coloured ships take 1 card, 4 takes 2 and all 5 takes 3
 	DONE: If two ships with same colour are drawn, discard all harbour -->
 <head>
 	<title>Port Royal</title>
 	<script type="text/javascript">
-		let deck = [], playerTurn = 1, playerToggler = true;
+		let deck = [], playerTurn = 1, playerToggler = true, count = 0;
 		let colours = [ 'blue', 'green', 'yellow', 'red', 'black'];
 		var swordFinder = [], coins1 = 3, coins2 = 3, swords1 = 0, swords2 = 0, madams = 0, madams2 = 0, traders = [0, 0, 0, 0, 0], traders2 = [0, 0, 0, 0, 0];
 
@@ -62,7 +64,7 @@
 			}
 			for (var i = 0; i < colours.length; i++) {
 				newShip = new ship(3, colours[i]+'trader', 1); deck.push(newShip);
-				if(!(i%2)&&i<4) newShip = new ship(3, colours[i]+'trader', 2);
+				if(!(i%2)&&i<4) newShip = new ship(5, colours[i]+'trader', 2);
 				deck.push(newShip);
 			}
 			deck = shuffle(deck);
@@ -120,7 +122,7 @@
 				}
 			}
 			if(colourChecker.includes(2) && (!swordsToBeat || swordsToBeat > swords1)) setTimeout(function(){ alert('2 ships with same colour found! Player does not have more than '+swordsToBeat+' swords. Harbour is discarded.'); end(); }, 350);
-			
+			else colourCount(colourChecker);
 		}
 
 		function beginTrading() { document.getElementById('drawer').style.display = 'none';
@@ -133,6 +135,12 @@
 				currentHarbour[i].style.cursor = 'pointer';
 			}
 
+		}
+
+		function colourCount(arr){ count = 0;
+			for (var i = 0; i < arr.length; i++) {
+				if(arr[i]) count++;
+			}//			console.log(count);
 		}
 
 		function end(){ swordSwap();
@@ -157,16 +165,29 @@
 			
 			let coinsGained = parseInt(chosenShip[0]);
 			if (playerToggler) { coins1 += coinsGained + traders[colours.indexOf(chosenShip.slice(1, -1))];
-				document.getElementById('coins').innerHTML = 'Coins: '+ coins1;
-			}
+				document.getElementById('coins').innerHTML = 'Coins: '+ coins1;}
 			else {coins2 += coinsGained + traders2[colours.indexOf(chosenShip.slice(1, -1))]; 
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;}
 			
 			for (var i = 0; i < coinsGained; i++) deck.pop();
-			setTimeout(coinSwap, 1000);
-
 			if (!cardsDrawn.children.length) {cardsDrawn.style.display = 'none'; setTimeout(end, 200); }
-			playerToggler = !playerToggler;
+
+			if (count>3) count--;
+			else {
+				if (playerToggler) {
+					if( playerTurn%2 ){ document.getElementById('ender').innerHTML = 'Pass';
+								document.getElementById('ender').onclick = pass;}
+					else { document.getElementById('ender').innerHTML = 'End turn';
+								document.getElementById('ender').onclick = end;}
+				}
+				else {
+					if( playerTurn%2 ){ document.getElementById('ender').innerHTML = 'End turn';
+								document.getElementById('ender').onclick = end;}
+					else { document.getElementById('ender').innerHTML = 'Pass';
+								document.getElementById('ender').onclick = pass;}
+				}
+				setTimeout(coinSwap, 500);
+				playerToggler = !playerToggler;}
 		}
 
 		function hire() { let selectedCard = this.src; 
@@ -187,7 +208,14 @@
 				}
 
 				if (!cardsDrawn.children.length) {cardsDrawn.style.display = 'none'; setTimeout(end, 200); }
-				setTimeout(coinSwap, 1000);	playerToggler = !playerToggler;
+
+				if (count>3) count--;
+				else {	if( playerTurn%2 ){ document.getElementById('ender').innerHTML = 'Pass';
+								document.getElementById('ender').onclick = pass;}
+				else { document.getElementById('ender').innerHTML = 'End turn';
+								document.getElementById('ender').onclick = end;}
+					setTimeout(coinSwap, 500);
+					playerToggler = !playerToggler;}
 			}
 			else if (!playerToggler && coins2 >= (price - madams2)) { coins2 -= (price - madams2);
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;
@@ -204,9 +232,23 @@
 				}
 
 				if (!cardsDrawn.children.length) {cardsDrawn.style.display = 'none'; setTimeout(end, 200); }
-				setTimeout(coinSwap, 1000);	playerToggler = !playerToggler;
+
+				if (count>3) count--;
+				else {if( playerTurn%2 ){ document.getElementById('ender').innerHTML = 'End turn';
+								document.getElementById('ender').onclick = end;}
+				else { document.getElementById('ender').innerHTML = 'Pass';
+								document.getElementById('ender').onclick = pass;}
+					setTimeout(coinSwap, 500);
+					playerToggler = !playerToggler;}
 			}
-			else alert('You cannot afford to hire this ' + crewmate.slice(1,-1) + '.');
+			else alert('You cannot afford to hire this ' + crewmate.slice(1,-1) + '.\nYou needed '+price+' coins.');
+		}
+
+		function pass(){ 
+			playerToggler = !playerToggler;
+			coinSwap();
+			document.getElementById('ender').innerHTML = 'End turn';
+			document.getElementById('ender').onclick = end;
 		}
 
 		function coinSwap(){
