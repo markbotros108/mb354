@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
-<!-- TODO: If two ships with same colour are drawn, discard all harbour -->
+<!-- TODO: If its not your turn, pay 1 coin to current player when trading a ship 
+	DONE: If two ships with same colour are drawn, discard all harbour -->
 <head>
 	<title>Port Royal</title>
 	<script type="text/javascript">
 		let deck = [], playerTurn = 1, playerToggler = true;
 		let colours = [ 'blue', 'green', 'yellow', 'red', 'black'];
-		var swordFinder = [], coins1 = 0, coins2 = 0;
+		var swordFinder = [], coins1 = 0, coins2 = 0, swords1 = 0, swords2 = 0;
 
 		class ship {
 			constructor(x, y, z) {
@@ -42,14 +43,18 @@
 			for (var j = 0; j < colours.length; j++) { 
 				for (var i = 1; i <= 4; i++) { 
 						newShip = new ship(i, colours[j], swordFinder[j][deck.length%10]);
-						deck.push(newShip);//console.log(deck[deck.length-1]);
+						deck.push(newShip);
 
 					if (i <= 3)	{ newShip = new ship(i, colours[j], swordFinder[j][deck.length%10]);
-						deck.push(newShip);//console.log(deck[deck.length-1]);
+						deck.push(newShip);
 						newShip = new ship(i, colours[j], swordFinder[j][deck.length%10]); 
-						deck.push(newShip);//console.log(deck[deck.length-1]);
+						deck.push(newShip);
 					}
 				}
+			}
+			for (var i = 0; i < 10; i++) {
+				newShip = new ship(3, 'sailor', 1); deck.push(newShip);
+				if (i<3) {newShip = new ship(5, 'pirate', 2); deck.push(newShip);}
 			}
 			deck = shuffle(deck);
 		}
@@ -88,19 +93,23 @@
 
 		function draw() { let currentHarbour = document.getElementById('harbour');
 			currentHarbour.style.display = 'initial';
-			if (deck.length)
-			currentHarbour.append(deck.pop().displayShip());
+			if (deck.length) currentHarbour.append(deck.pop().displayShip());
 			else {alert('Deck is empty.');
 				document.getElementById('drawer').style.display = 'none';
 			}
-			let colourChecker = [0, 0, 0, 0, 0];
+			let colourChecker = [0, 0, 0, 0, 0], swordsToBeat = 0;
 			for (var i = 0; i < currentHarbour.children.length; i++) {
 				for (var j = 0; j < colours.length; j++) {
-					if(currentHarbour.children[i].src.includes(colours[j]))
+					if(currentHarbour.children[i].src.includes(colours[j])) {
 						colourChecker[j]++;
+						if(colourChecker[j] >= 2) {swordsToBeat = currentHarbour.children[i].src.slice(currentHarbour.children[i].src.indexOf('images')+7, currentHarbour.children[i].src.indexOf('.jpg'));
+							swordsToBeat = parseInt(swordsToBeat.slice(-1));
+							console.log(swordsToBeat);
+						}
+					}
 				}
 			}
-			setTimeout(function(){if(colourChecker.includes(2)) {alert('2 ships with same colour found! Harbour is discarded.'); end(); }}, 350);
+			if(colourChecker.includes(2) && swordsToBeat > swords1) setTimeout(function(){ alert('2 ships with same colour found! Harbour is discarded.'); end(); }, 350);
 			
 		}
 
@@ -109,13 +118,14 @@
 			document.getElementById('ender').onclick = end;
 			let currentHarbour = document.getElementsByTagName('img');
 			for (var i = 0; i < currentHarbour.length; i++) {
-				currentHarbour[i].onclick = trade;
+				if (currentHarbour[i].src.includes('sailor')||currentHarbour[i].src.includes('pirate')) currentHarbour[i].onclick = hire;
+				else currentHarbour[i].onclick = trade;
 				currentHarbour[i].style.cursor = 'pointer';
 			}
 
 		}
 
-		function end(){ 
+		function end(){ swordSwap();
 			alert('Player '+((playerTurn%2)+1)+'\'s turn.');
 			playerTurn++; let opponent = document.getElementById('coins2').innerHTML;
 			if( playerTurn%2 ) {playerToggler=true; if (opponent.includes('1')) coinSwap();}
@@ -129,8 +139,8 @@
 		}
 
 		function trade() { let discarded = this.src;
-			let chosenShip = discarded.slice(discarded.indexOf('images')+7, discarded.indexOf('.jpg'));
 			let cardsDrawn = document.getElementById('harbour');
+			let chosenShip = discarded.slice(discarded.indexOf('images')+7, discarded.indexOf('.jpg'));
 			for (var i = 0; i < cardsDrawn.children.length; i++) {
 				if(cardsDrawn.childNodes[i].src.includes(chosenShip)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
 			}
@@ -148,6 +158,19 @@
 			playerToggler = !playerToggler;
 		}
 
+		function hire() { let selectedCard = this.src, price = parseInt(crewmate[0]); 
+			let cardsDrawn = document.getElementById('harbour');
+			let crewmate = selectedCard.slice(selectedCard.indexOf('images')+7, selectedCard.indexOf('.jpg'));
+			if (coins1 >= price) { coins1 -= price;
+				swords1 += parseInt(crewmate.slice(-1));
+				for (var i = 0; i < cardsDrawn.children.length; i++) {
+					if(cardsDrawn.childNodes[i].src.includes(crewmate)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
+				}
+				playerToggler = !playerToggler;
+			}
+			else alert('You cannot afford to hire this ' + crewmate.slice(1,-1) + '.');
+		}
+
 		function coinSwap(){
 			if(playerToggler) {
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins1;
@@ -157,6 +180,12 @@
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;
 				document.getElementById('coins2').innerHTML = 'Player 1\'s Coins: '+ coins1;
 			}
+		}
+
+		function swordSwap(){
+			let temp = swords1;
+			swords1 = swords2;
+			swords2 = temp;
 		}
 
 		function shuffle(list) {
