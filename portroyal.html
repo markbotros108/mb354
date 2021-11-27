@@ -65,7 +65,7 @@
 				if(!(i%2)&&i<4) newShip = new ship(3, colours[i]+'trader', 2);
 				deck.push(newShip);
 			}
-			// deck = shuffle(deck);
+			deck = shuffle(deck);
 		}
 
 		function swordCalc() {
@@ -244,7 +244,7 @@
 	<button id="drawer" onclick="draw()" style="display: none;">Draw</button>
 	<button id="ender" onclick="beginTrading()" style="display: none;">Trade</button>
 </div>
-<div id="coins" style="display: none; font-size: 130px; position: absolute; left: 32%; top: 85%;">Coins: 0</div>
-<div id="coins2" style="display: none; font-size: 130px; position: absolute; left: 22%; top: 3%;">Player 2's Coins: 0</div>
+<div id="coins" style="display: none; font-size: 130px; position: absolute; left: 32%; top: 85%;">Coins: 3</div>
+<div id="coins2" style="display: none; font-size: 130px; position: absolute; left: 22%; top: 3%;">Player 2's Coins: 3</div>
 </body>
 </html>
