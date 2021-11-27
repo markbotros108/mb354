@@ -51,7 +51,7 @@
 					}
 				}
 			}
-			// deck = shuffle(deck);
+			deck = shuffle(deck);
 		}
 
 		function swordCalc() {
@@ -86,12 +86,22 @@
 			}
 		}
 
-		function draw() { document.getElementById('harbour').style.display = 'initial';
+		function draw() { let currentHarbour = document.getElementById('harbour');
+			currentHarbour.style.display = 'initial';
 			if (deck.length)
-			document.getElementById('harbour').append(deck.pop().displayShip());
+			currentHarbour.append(deck.pop().displayShip());
 			else {alert('Deck is empty.');
 				document.getElementById('drawer').style.display = 'none';
 			}
+			let colourChecker = [0, 0, 0, 0, 0];
+			for (var i = 0; i < currentHarbour.children.length; i++) {
+				for (var j = 0; j < colours.length; j++) {
+					if(currentHarbour.children[i].src.includes(colours[j]))
+						colourChecker[j]++;
+				}
+			}
+			setTimeout(function(){if(colourChecker.includes(2)) {alert('2 ships with same colour found! Harbour is discarded.'); end(); }}, 350);
+			
 		}
 
 		function beginTrading() { document.getElementById('drawer').style.display = 'none';
@@ -134,7 +144,7 @@
 			for (var i = 0; i < coinsGained; i++) deck.pop();
 			setTimeout(coinSwap, 1000);
 
-			if (!cardsDrawn.children.length) cardsDrawn.style.display = 'none';
+			if (!cardsDrawn.children.length) {cardsDrawn.style.display = 'none'; setTimeout(end, 200); }
 			playerToggler = !playerToggler;
 		}
 
@@ -168,6 +178,6 @@
 	<button id="ender" onclick="beginTrading()" style="display: none;">Trade</button>
 </div>
 <div id="coins" style="display: none; font-size: 130px; position: absolute; left: 32%; top: 85%;">Coins: 0</div>
-<div id="coins2" style="display: none; font-size: 130px; position: absolute; left: 22%; top: 3%;">Opponent's Coins: 0</div>
+<div id="coins2" style="display: none; font-size: 130px; position: absolute; left: 22%; top: 3%;">Player 2's Coins: 0</div>
 </body>
 </html>
