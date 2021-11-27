@@ -112,7 +112,7 @@
 					}
 				}
 			}
-			if(colourChecker.includes(2) && (!swordsToBeat || swordsToBeat > swords1)) setTimeout(function(){ alert('2 ships with same colour found! Harbour is discarded.'); end(); }, 350);
+			if(colourChecker.includes(2) && (!swordsToBeat || swordsToBeat > swords1)) setTimeout(function(){ alert('2 ships with same colour found! Player does not have more than '+swordsToBeat+' swords. Harbour is discarded.'); end(); }, 350);
 			
 		}
 
@@ -185,7 +185,7 @@
 
 				if(crewmate.includes('sailor')||crewmate.includes('pirate')){
 					swords2 += parseInt(crewmate.slice(-1));
-					alert('Player 1 now has '+swords2+' swords!');
+					alert('Player 2 now has '+swords2+' swords!');
 				}
 				else if(crewmate.includes('mademoiselle')) madams2++;
 
@@ -228,7 +228,7 @@
 	</script>
 </head>
 <body>
-<div id="harbour" style="display: none; border: solid; width: 80%; height: auto; position: absolute; left: 10%; top: 30%"></div>
+<div id="harbour" style="display: none; border: solid; width: 80%; height: auto; position: absolute; left: 10%; top: 35%"></div>
 <button onclick="start()" style="position: absolute; top: 70%; left: 45%; font-size: 80px; padding: 13px 40px;">Start</button>
 <div id="allButtons" style="display: inline-block; position: absolute; right: 7%; top: 70%;">
 	<button id="drawer" onclick="draw()" style="display: none;">Draw</button>
