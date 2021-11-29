@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <!-- TODO: If its not your turn, pay 1 coin to current player when trading a ship
-	ALMOST: be able to PASS, shuffle discard when deck empty
-	DONE: <3 coloured ships take 1 card, 4 takes 2 and all 5 takes 3
-	DONE: If two ships with same colour are drawn, discard all harbour -->
+	DONE: be able to PASS, shuffle discard when deck empty, Display personal crew
+		<3 coloured ships take 1 card, 4 takes 2 and all 5 takes 3
+		If two ships with same colour are drawn, discard all harbour -->
 <head>
 	<title>Port Royal</title>
 	<script type="text/javascript">
-		let deck = [], playerTurn = 1, playerToggler = true, count = 0;
-		let colours = [ 'blue', 'green', 'yellow', 'red', 'black'];
-		var swordFinder = [], coins1 = 3, coins2 = 3, swords1 = 0, swords2 = 0, madams = 0, madams2 = 0, traders = [0, 0, 0, 0, 0], traders2 = [0, 0, 0, 0, 0];
+		let deck = [], playerTurn = 1, playerToggler = true, count = 0; // For extra turns
+		const colours = [ 'blue', 'green', 'yellow', 'red', 'black'];
+		var swordFinder = [], coins1 = 3, coins2 = 3, swords1 = 0, swords2 = 0, madams = 0, madams2 = 0, traders = [0, 0, 0, 0, 0], traders2 = [0, 0, 0, 0, 0],
+			crew = [], crew2 = [], discard = [];
 
 		class ship {
 			constructor(x, y, z) {
@@ -68,6 +69,7 @@
 				deck.push(newShip);
 			}
 			deck = shuffle(deck);
+			// for (var i = 0; i < 6; i++) discard.push(deck.pop());
 		}
 
 		function swordCalc() {
@@ -105,8 +107,9 @@
 		function draw() { let currentHarbour = document.getElementById('harbour');
 			currentHarbour.style.display = 'initial';
 			if (deck.length) currentHarbour.append(deck.pop().displayShip());
-			else {alert('Deck is empty.');
-				document.getElementById('drawer').style.display = 'none';
+			else {alert('Deck is empty.\nShuffling discard pile..');
+				deck = deck.concat(discard); 
+				discard = []; // document.getElementById('drawer').style.display = 'none';
 			}
 			let colourChecker = [0, 0, 0, 0, 0], swordsToBeat = 0;
 			for (var i = 0; i < currentHarbour.children.length; i++) {
@@ -115,8 +118,7 @@
 					if(currentCard.includes(colours[j]) && !currentCard.includes('trader')) {
 						colourChecker[j]++;
 						if(colourChecker[j] >= 2) {swordsToBeat = currentCard.slice(currentCard.indexOf('images')+7, currentCard.indexOf('.jpg'));
-							swordsToBeat = parseInt(swordsToBeat.slice(-1));
-							console.log(swordsToBeat);
+							swordsToBeat = parseInt(swordsToBeat.slice(-1)); //console.log(swordsToBeat);
 						}
 					}
 				}
@@ -148,9 +150,17 @@
 			playerTurn++; let opponent = document.getElementById('coins2').innerHTML;
 			if( playerTurn%2 ) {playerToggler=true; if (opponent.includes('1')) coinSwap();}
 			else {playerToggler=false; if (opponent.includes('2')) coinSwap();}
+			
+			let theCurrentHarbour = document.getElementById('harbour');
 
-			document.getElementById('harbour').innerHTML = '';
-			document.getElementById('harbour').style.display = 'none';
+			for (var i = 0; i < theCurrentHarbour.children.length; i++) {
+				let currentCard = theCurrentHarbour.children[i].src.slice(theCurrentHarbour.children[i].src.indexOf('images')+7, theCurrentHarbour.children[i].src.indexOf('.jpg'));
+				let newCard = new ship(currentCard[0], currentCard.slice(1, -1), currentCard[currentCard.length-1]);
+				discard.push(newCard);
+			}
+
+			theCurrentHarbour.innerHTML = '';
+			theCurrentHarbour.style.display = 'none';
 			document.getElementById('drawer').style.display = 'initial';
 			document.getElementById('ender').innerHTML = 'Trade';
 			document.getElementById('ender').onclick = beginTrading;
@@ -169,7 +179,7 @@
 			else {coins2 += coinsGained + traders2[colours.indexOf(chosenShip.slice(1, -1))]; 
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;}
 			
-			for (var i = 0; i < coinsGained; i++) deck.pop();
+			for (var i = 0; i < coinsGained; i++) discard.push(deck.pop());
 			if (!cardsDrawn.children.length) {cardsDrawn.style.display = 'none'; setTimeout(end, 200); }
 
 			if (count>3) count--;
@@ -195,6 +205,7 @@
 			let crewmate = selectedCard.slice(selectedCard.indexOf('images')+7, selectedCard.indexOf('.jpg')), price = parseInt(crewmate[0]);
 			if (playerToggler && coins1 >= (price - madams)) { coins1 -= (price - madams);
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins1;
+				crew.push(crewmate);
 
 				if(crewmate.includes('sailor')||crewmate.includes('pirate')){
 					swords1 += parseInt(crewmate.slice(-1));
@@ -219,6 +230,7 @@
 			}
 			else if (!playerToggler && coins2 >= (price - madams2)) { coins2 -= (price - madams2);
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;
+				crew.push(crewmate);
 
 				if(crewmate.includes('sailor')||crewmate.includes('pirate')){
 					swords2 += parseInt(crewmate.slice(-1));
@@ -231,6 +243,7 @@
 					if(cardsDrawn.childNodes[i].src.includes(crewmate)) {cardsDrawn.removeChild(cardsDrawn.childNodes[i]); break;}
 				}
 
+				displayCrews();
 				if (!cardsDrawn.children.length) {cardsDrawn.style.display = 'none'; setTimeout(end, 200); }
 
 				if (count>3) count--;
@@ -260,6 +273,31 @@
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;
 				document.getElementById('coins2').innerHTML = 'Player 1\'s Coins: '+ coins1;
 			}
+
+			let tempArr = []; tempArr = tempArr.concat(crew);
+			crew = []; crew = crew.concat(crew2);
+			crew2 = []; crew2 = crew2.concat(tempArr);
+			displayCrews();
+		}
+
+		function displayCrews(){ let displayCard = '';
+			let yourCrew = document.getElementById('crew'); yourCrew.innerHTML = '';
+			let oppCrew = document.getElementById('crew2'); oppCrew.innerHTML = '';
+			if(crew.length) yourCrew.style.display = 'initial';
+			if(crew2.length) oppCrew.style.display = 'initial';
+			
+				for (var i = 0; i < crew.length; i++) {
+					displayCard = new ship(crew[i][0], crew[i].slice(1, -1), crew[i].slice(-1));
+					let heightAdjusted = displayCard.displayShip();
+					heightAdjusted.style.height = '200px';
+					yourCrew.append(heightAdjusted);
+				}
+				for (var i = 0; i < crew2.length; i++) {
+					displayCard = new ship(crew2[i][0], crew2[i].slice(1, -1), crew2[i].slice(-1));
+					let heightAdjusted = displayCard.displayShip();
+					heightAdjusted.style.height = '200px'
+					oppCrew.append(heightAdjusted);
+				}
 		}
 
 		function swordSwap(){
@@ -287,6 +325,8 @@
 	<button id="ender" onclick="beginTrading()" style="display: none;">Trade</button>
 </div>
 <div id="coins" style="display: none; font-size: 130px; position: absolute; left: 32%; top: 85%;">Coins: 3</div>
-<div id="coins2" style="display: none; font-size: 130px; position: absolute; left: 22%; top: 3%;">Player 2's Coins: 3</div>
+<div id="coins2" style="display: none; font-size: 90px; position: absolute; right: 12%; top: 3%;">Player 2's Coins: 3</div>
+<div id="crew" style="display: none; border: solid blue; position: absolute; left: 2%; top: 70%;">Crew:</div>
+<div id="crew2" style="display: none; border: solid red; position: absolute; left: 2%; top: 3%;">P2's Crew:</div>
 </body>
 </html>
