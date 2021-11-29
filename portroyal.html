@@ -145,7 +145,7 @@
 			}//			console.log(count);
 		}
 
-		function end(){ swordSwap();
+		function end(){
 			alert('Player '+((playerTurn%2)+1)+'\'s turn.');
 			playerTurn++; let opponent = document.getElementById('coins2').innerHTML;
 			if( playerTurn%2 ) {playerToggler=true; if (opponent.includes('1')) coinSwap();}
@@ -230,7 +230,7 @@
 			}
 			else if (!playerToggler && coins2 >= (price - madams2)) { coins2 -= (price - madams2);
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;
-				crew.push(crewmate);
+				crew2.push(crewmate);
 
 				if(crewmate.includes('sailor')||crewmate.includes('pirate')){
 					swords2 += parseInt(crewmate.slice(-1));
@@ -264,7 +264,7 @@
 			document.getElementById('ender').onclick = end;
 		}
 
-		function coinSwap(){
+		function coinSwap(){ displayCrews();
 			if(playerToggler) {
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins1;
 				document.getElementById('coins2').innerHTML = 'Player 2\'s Coins: '+ coins2;
@@ -274,37 +274,41 @@
 				document.getElementById('coins2').innerHTML = 'Player 1\'s Coins: '+ coins1;
 			}
 
-			let tempArr = []; tempArr = tempArr.concat(crew);
+			/*let tempArr = []; tempArr = tempArr.concat(crew);
 			crew = []; crew = crew.concat(crew2);
-			crew2 = []; crew2 = crew2.concat(tempArr);
-			displayCrews();
+			crew2 = []; crew2 = crew2.concat(tempArr);*/
 		}
 
 		function displayCrews(){ let displayCard = '';
 			let yourCrew = document.getElementById('crew'); yourCrew.innerHTML = '';
 			let oppCrew = document.getElementById('crew2'); oppCrew.innerHTML = '';
-			if(crew.length) yourCrew.style.display = 'initial';
-			if(crew2.length) oppCrew.style.display = 'initial';
 			
 				for (var i = 0; i < crew.length; i++) {
 					displayCard = new ship(crew[i][0], crew[i].slice(1, -1), crew[i].slice(-1));
 					let heightAdjusted = displayCard.displayShip();
 					heightAdjusted.style.height = '200px';
-					yourCrew.append(heightAdjusted);
+					if (playerToggler) yourCrew.append(heightAdjusted);
+					else oppCrew.append(heightAdjusted);
 				}
 				for (var i = 0; i < crew2.length; i++) {
 					displayCard = new ship(crew2[i][0], crew2[i].slice(1, -1), crew2[i].slice(-1));
 					let heightAdjusted = displayCard.displayShip();
 					heightAdjusted.style.height = '200px'
-					oppCrew.append(heightAdjusted);
+					if (playerToggler) oppCrew.append(heightAdjusted);
+					else yourCrew.append(heightAdjusted);
 				}
+			
+			if(yourCrew.innerHTML.length) yourCrew.style.display = 'initial';
+			else yourCrew.style.display = 'none';
+			if(oppCrew.innerHTML.length) oppCrew.style.display = 'initial';
+			else oppCrew.style.display = 'none';
 		}
 
-		function swordSwap(){
+		/*function swordSwap(){
 			let temp = swords1;
 			swords1 = swords2;
 			swords2 = temp;
-		}
+		}*/
 
 		function shuffle(list) {
 			var newOrder = [];
@@ -324,7 +328,7 @@
 	<button id="drawer" onclick="draw()" style="display: none;">Draw</button>
 	<button id="ender" onclick="beginTrading()" style="display: none;">Trade</button>
 </div>
-<div id="coins" style="display: none; font-size: 130px; position: absolute; left: 32%; top: 85%;">Coins: 3</div>
+<div id="coins" style="display: none; font-size: 130px; position: absolute; left: 52%; top: 85%;">Coins: 3</div>
 <div id="coins2" style="display: none; font-size: 90px; position: absolute; right: 12%; top: 3%;">Player 2's Coins: 3</div>
 <div id="crew" style="display: none; border: solid blue; position: absolute; left: 2%; top: 70%;">Crew:</div>
 <div id="crew2" style="display: none; border: solid red; position: absolute; left: 2%; top: 8%;">P2's Crew:</div>
