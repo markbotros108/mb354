@@ -123,11 +123,11 @@
 					}
 				}
 			}
-			if((playerTurn%2) && colourChecker.includes(2) && (!swordsToBeat || swordsToBeat > swords1)) setTimeout(function(){ alert('2 ships with same colour found! Player 1 does not have more than '+swordsToBeat+' swords. Harbour is discarded.'); end(); }, 300);
+			if((playerTurn%2) && colourChecker.includes(2) && (!swordsToBeat || swordsToBeat > swords1)) setTimeout(function(){ alert('2 '+ currentCardName.slice(1, -1) +' ships were discovered! Player 1 does not have more than '+swordsToBeat+' swords. Harbour is discarded.'); end(); }, 350);
 			else if ((playerTurn%2) && colourChecker.includes(2) && swordsToBeat && swordsToBeat <= swords1) {alert('Player 1 successfully repelled second '+currentCardName.slice(1) +' ship!'); 
 				discard.push(new ship(currentCardName[0], currentCardName.slice(1, -1), currentCardName.slice(-1) ) );
 				currentHarbour.removeChild(currentHarbour.childNodes[(currentHarbour.children.length)-1]); }
-			else if(!(playerTurn%2) && colourChecker.includes(2) && (!swordsToBeat || swordsToBeat > swords2)) setTimeout(function(){ alert('2 ships with same colour found! Player 2 does not have more than '+swordsToBeat+' swords. Harbour is discarded.'); end(); }, 300);
+			else if(!(playerTurn%2) && colourChecker.includes(2) && (!swordsToBeat || swordsToBeat > swords2)) setTimeout(function(){ alert('2 '+ currentCardName.slice(1, -1) +' ships were discovered! Player 2 does not have more than '+swordsToBeat+' swords. Harbour is discarded.'); end(); }, 350);
 			else if (!(playerTurn%2) && colourChecker.includes(2) && swordsToBeat && swordsToBeat <= swords2) {alert('Player 2 successfully repelled second '+currentCardName.slice(1) +' ship!'); 
 				discard.push(new ship(currentCardName[0], currentCardName.slice(1, -1), currentCardName.slice(-1) ) );
 				currentHarbour.removeChild(currentHarbour.childNodes[(currentHarbour.children.length)-1]); }
