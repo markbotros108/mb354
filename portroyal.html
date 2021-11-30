@@ -303,8 +303,8 @@
 				for (var i = 0; i < crew.length; i++) {
 					displayCard = new ship(crew[i][0], crew[i].slice(1, -1), crew[i].slice(-1));
 					
-					if (displayCard.colour.includes('trader')) vp++;
-					else vp += parseInt(crew[i].slice(-1));
+					//if (displayCard.colour.includes('trader')) vp++;else 
+					vp += parseInt(crew[i].slice(-1));
 
 					let heightAdjusted = displayCard.displayShip();
 					heightAdjusted.style.height = '200px';
@@ -314,8 +314,8 @@
 				for (var i = 0; i < crew2.length; i++) {
 					displayCard = new ship(crew2[i][0], crew2[i].slice(1, -1), crew2[i].slice(-1));
 
-					if (displayCard.colour.includes('trader')) vp2++;
-					else vp2 += parseInt(crew2[i].slice(-1));
+					//if (displayCard.colour.includes('trader')) vp2++;else 
+					vp2 += parseInt(crew2[i].slice(-1));
 
 					let heightAdjusted = displayCard.displayShip();
 					heightAdjusted.style.height = '200px'
