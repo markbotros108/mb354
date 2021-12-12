@@ -11,7 +11,7 @@
 		let deck = [], playerTurn = 1, playerToggler = true, count = 0; // For extra turns
 		const colours = [ 'blue', 'green', 'yellow', 'red', 'black'];
 		var swordFinder = [], coins1 = 3, coins2 = 3, swords1 = 0, swords2 = 0, madams = 0, madams2 = 0, traders = [0, 0, 0, 0, 0], traders2 = [0, 0, 0, 0, 0],
-			crew = [], crew2 = [], discard = [], vp = 0, vp2 = 0;
+			crew = [], crew2 = [], discard = [], vp = 0, vp2 = 0, player = [];
 
 		class ship {
 			constructor(x, y, z) {
@@ -29,7 +29,8 @@
 				}
 		}
 
-		function start() { document.getElementById('coins').style.display = 'initial';
+		function start() { //prompt('entr'
+			document.getElementById('coins').style.display = 'initial';
 			document.getElementById('coins2').style.display = 'initial';
 			let allButtons = document.getElementsByTagName('button');
 			for (var i = allButtons.length - 1; i > 0; i--) {
@@ -221,7 +222,8 @@
 				crew.push(crewmate);
 
 				if(crewmate.includes('sailor')||crewmate.includes('pirate')){
-					swords1 += parseInt(crewmate.slice(-1));
+					if(crewmate.includes('pirate')) swords1++;
+					swords1++;
 					alert('Player 1 now has '+swords1+' swords!');
 				}
 				else if(crewmate.includes('mademoiselle')) madams++;
@@ -246,8 +248,9 @@
 				document.getElementById('coins').innerHTML = 'Coins: '+ coins2;
 				crew2.push(crewmate);
 
-				if(crewmate.includes('sailor')||crewmate.includes('pirate')){
-					swords2 += parseInt(crewmate.slice(-1));
+				if(crewmate.includes('pirate')||crewmate.includes('sailor')){
+					if(crewmate.includes('pirate')) swords2++;
+					swords2++;
 					alert('Player 2 now has '+swords2+' swords!');
 				}
 				else if(crewmate.includes('mademoiselle')) madams2++;
@@ -303,7 +306,6 @@
 				for (var i = 0; i < crew.length; i++) {
 					displayCard = new ship(crew[i][0], crew[i].slice(1, -1), crew[i].slice(-1));
 					
-					//if (displayCard.colour.includes('trader')) vp++;else 
 					vp += parseInt(crew[i].slice(-1));
 
 					let heightAdjusted = displayCard.displayShip();
@@ -314,7 +316,6 @@
 				for (var i = 0; i < crew2.length; i++) {
 					displayCard = new ship(crew2[i][0], crew2[i].slice(1, -1), crew2[i].slice(-1));
 
-					//if (displayCard.colour.includes('trader')) vp2++;else 
 					vp2 += parseInt(crew2[i].slice(-1));
 
 					let heightAdjusted = displayCard.displayShip();
