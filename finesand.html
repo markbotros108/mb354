@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fine Sand</title>
+	<script type="text/javascript">
+		var deck = [], discard =[], payment=0;
+		let draw = 2, limit = 3, extra = 2, build = 1, building=false, paying=false, ending=false;
+
+		function init() {
+			document.getElementById('starter').style.display = 'none';
+			document.getElementById('drawer').style.display = 'initial';
+			document.getElementById('tableau').style.display = 'initial';
+			document.getElementById('hand').style.display = 'initial';
+			for (var i = 0; i < 4; i++) {
+				deck.push((i%3+6)+'draw+1');//+(i%3+1)
+				deck.push((i%3+4)+'build+1');
+				deck.push((i%3+4)+'limit+1');
+				deck.push((i%3+3)+'extra+1');
+				if (i) deck.push('coins2');
+				else deck.push('coins3');
+			}
+			console.log(deck); update();
+		}
+
+		function first(){
+			drawMore(draw);
+			setTimeout(next, 200);
+		}
+
+		function next() {
+			let input = confirm('Would you like to build this turn? Cancel to draw extra cards instead.');
+			if (input) {
+				buildTime();
+				update();
+			}
+			else { document.getElementById('drawer').style.display = 'none';
+				document.getElementById('ender').style.display='initial';
+				drawMore(extra);
+				clickable(0);
+			}
+		}
+
+		function drawMore(arg){
+			for (var i = 0; i < arg; i++) {
+				let newcard = document.createElement('span');
+				let cardName = deck.pop();
+				discard.push(cardName);
+				if (cardName.includes('coi')) { let cardImg = document.createElement('img');
+					cardImg.src = 'images/'+cardName+'.png';
+					newcard.append(cardImg);
+				}
+				else {newcard.innerHTML = cardName.slice(1);// newcard.onclick = toggle;
+				newcard.style.border = 'solid'+cardColour(cardName);}
+				newcard.style.cursor = 'pointer';
+				document.getElementById('hand').append(newcard);
+			}
+		}
+
+		function buildTime(){ building = true;
+			document.getElementById('drawer').style.display = 'none';
+			clickable(1);
+		}
+
+		function clickable(on){let allCards = document.getElementsByTagName('span');
+			if (on) {
+				for (var i = 0; i < allCards.length; i++) {
+					allCards[i].onclick = toggle;
+				}
+			}
+			else for (var i = 0; i < allCards.length; i++) {
+					allCards[i].onclick = '';
+				}
+		}
+
+		function toggle(){ 
+			if (building) clearSelection();
+
+			if (this.style.backgroundColor=='yellow') this.style.backgroundColor = 'initial';
+			else this.style.backgroundColor = 'yellow';
+		
+			let currentlySelected=selectionCount();
+			if (building&&currentlySelected) { document.getElementById('builder').style.display = 'initial';
+				document.getElementById('builder').onclick = buildSelected;
+			}
+			else if(paying&&currentlySelected) { 
+				document.getElementById('builder').style.display = 'initial';
+			}
+			else if (ending&&currentlySelected) {
+				document.getElementById('ender').style.display = 'initial';
+			}
+			else document.getElementById('builder').style.display = 'none';
+		}
+
+		function buildSelected(){ let built = false; //Grab selected cost. Remove selection if confirmed. 
+			let allCards = document.getElementsByTagName('span');
+			for (var i = 0; i < allCards.length; i++) {
+				if (allCards[i].style.backgroundColor=='yellow') {
+					payment=findPayment(allCards[i].innerHTML); 
+					if (!payment) {alert('You cannot build this card.'); clearSelection();}
+					else if(confirm('This will cost $'+payment+'.')) {building=false;
+						paying=true;
+						document.getElementById('builder').innerHTML = 'Pay';
+						document.getElementById('builder').onclick = pay;
+						alert('Select cards to pay with.');
+						// built = true when payment made
+						allCards[i].remove();
+						}
+					else clearSelection();
+					break;}
+			}
+			document.getElementById('builder').style.display = 'none';
+			if (built) document.getElementById('drawer').style.display = 'initial';
+		}
+
+		function findPayment(cardName){ let cost=0;
+			for (var i = 0; i < discard.length; i++) {
+				if (discard[i].includes(cardName)) {
+					cost=discard[i].charAt(0);
+					// discard.splice(i, 1);
+					break;
+				} 
+			}
+			return parseInt(cost);
+		}
+
+		function pay(){ let paymentSuccess=false;
+			document.getElementById('builder').style.display = 'none'; 
+			//clearSelection();
+
+			if (selectionCount()>=payment) paymentSuccess = true;
+			else paymentSuccess = checkPayment();
+
+			if (paymentSuccess) {alert('Payment successful! Adding building..');
+				document.getElementById('builder').innerHTML='Build';
+				document.getElementById('ender').style.display = 'initial';
+				removeSelection();
+				paying=false;
+			}
+			else {
+				alert('Not enough coins.');
+			}
+		}
+
+		function end(){ let allCards = document.getElementsByTagName('span');
+		if (allCards.length <= limit) checkLimit();
+		else {	alert('Discard down to '+limit+' cards.');
+			document.getElementById('ender').innerHTML = 'Discard';
+			document.getElementById('ender').onclick = checkLimit;
+			clickable(1);
+			ending=true;}
+		}
+
+		function checkPayment(){ let currentlyPaid=0;
+			let allCards = document.getElementsByTagName('span');
+			for (var i = 0; i < allCards.length; i++) {
+				if (allCards[i].style.backgroundColor=='yellow'){
+					if (allCards[i].innerHTML.includes('coin')) currentlyPaid += parseInt(allCards[i].slice(-1))
+					else currentlyPaid++;
+				}
+			}
+			if (currentlyPaid>=payment) return true;
+			else return false;
+		}
+
+		function checkLimit(){ let allCards = document.getElementsByTagName('span');
+			if (allCards.length-selectionCount() <= limit) {
+				document.getElementById('ender').innerHTML = 'End turn';
+				document.getElementById('ender').onclick = end;
+				document.getElementById('ender').style.display = 'none';
+				document.getElementById('drawer').style.display = 'initial';
+				removeSelection();
+				ending=false;
+				return true;
+			}
+			else alert('Select more cards to discard. Your hand limit is currently ' +limit+'.');
+			return false;
+		}
+
+		function selectionCount(){ let count=0;
+			let allCards = document.getElementsByTagName('span');
+			for (var i = 0; i < allCards.length; i++) {
+				if (allCards[i].style.backgroundColor=='yellow') count++;
+			}
+			return count;
+		}
+
+		function removeSelection(){
+			let allCards = document.getElementsByTagName('span');
+			for (var i = 0; i < allCards.length; i++) {
+				if (allCards[i].style.backgroundColor=='yellow'){ allCards[i].remove(); i--;}
+			}
+		}
+
+		function clearSelection(){
+			let allCards = document.getElementsByTagName('span');
+			for (var i = 0; i < allCards.length; i++) {
+				allCards[i].style.backgroundColor = 'initial';
+			}
+		}
+
+		function cardColour(name){
+			if (name.includes('draw')) return ' green';
+			else if (name.includes('build')) return ' red';
+			else if (name.includes('extra')) return ' blue';
+			else if (name.includes('limit')) return ' purple';
+			else return '';
+		}
+
+		function update() {
+			let currentValues = document.getElementsByTagName('tr');
+			if (currentValues[1]) currentValues[1].remove();
+			let newrow = document.createElement('tr');
+			let col1 = document.createElement('td');
+			col1.innerHTML = draw;
+			newrow.append(col1);
+			let col2 = document.createElement('td');
+			col2.innerHTML = build;
+			newrow.append(col2);
+			let col3 = document.createElement('td');
+			col3.innerHTML = extra;
+			newrow.append(col3);
+			let col4 = document.createElement('td');
+			col4.innerHTML = limit;
+			newrow.append(col4);
+			document.getElementsByTagName('table')[0].append(newrow);
+		}
+	</script>
+	<style type="text/css">
+		button {
+			position: absolute;
+			left: 50%;
+			font-size: 100px;
+			top: 50%;
+		}
+
+		span {
+			padding: 30px 20px;
+			margin: 10px;
+		}
+
+		#starter {
+			top: 80%;
+		}
+	</style>
+</head>
+<body>
+<div id="tableau" style="display: none; position: relative; left: 20%;">
+	<table style="border: solid; font-size: 70px; text-align: center;"><caption>TABLEAU</caption>
+		<tr style="border: solid;">
+			<th style="border: solid green;">DRAW</th>
+			<th style="border: solid red;">BUILD</th>
+			<th style="border: solid blue;">EXTRA</th>
+			<th style="border: solid purple;">LIMIT</th>
+		</tr>
+	</table>
+</div>
+<button id="starter" onclick="init()">Play</button>
+<button id="drawer" style="display: none;" onclick="first()">Draw</button>
+<button id="builder" style="display: none;" onclick="alert('none')">Build</button>
+<button id="ender" style="display: none;" onclick="end()">End Turn</button>
+<p id="hand" style="display: none; position: absolute; top: 60%; left: 20%;">Hand:<br></p>
+</body>
+</html>
