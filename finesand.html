@@ -154,7 +154,7 @@
 			let allCards = document.getElementsByTagName('span');
 			for (var i = 0; i < allCards.length; i++) {
 				if (allCards[i].style.backgroundColor=='yellow'){
-					if (allCards[i].innerHTML.includes('coin')) currentlyPaid += parseInt(allCards[i].slice(-1))
+					if (allCards[i].innerHTML.includes('coin')) currentlyPaid += parseInt(allCards[i].innerHTML.slice(-7))
 					else currentlyPaid++;
 				}
 			}
