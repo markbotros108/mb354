@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Damsel's tale</title>
+	<style type="text/css">
+		button {
+			font-size: 50px;
+			position: absolute;
+			left: 80%;
+			top: 80%;
+		}
+
+		img {
+			position: absolute;
+		}
+
+		#hand, #gameIcons, #cardList {
+			position: absolute;
+			cursor: pointer;
+			padding: 20px;
+			font-size: 45px;
+			display: none;
+		}
+
+		#gameIcons, #cardList {
+			left: 8%;
+			background-color: blue;
+			color: red;
+		}
+
+		#hand img {
+			cursor: pointer;
+			padding: 10px;
+			margin: 10px;
+			position: relative;
+		}
+	</style>
+	<script type="text/javascript">
+		// 
+		const cardlist = ['daringruse', 'homeadvantage', 'recklessadvance', 'flamesnort', 'cautiousadvance', 'intruderalert', 'tacticalretreat', 'cryforhelp', 'warcry', 'takeheart', 'lielow', 'cowerinfear'],
+			noisy = [2, 6, 11, 14, 17, 19, 22],	hidden = [0, 3, 8, 16];
+		let deck = [], dragonDeck = [], mummaDiscard=[], knightHand = [], dragonHand = [];
+		let dragonMoves = [1, 1, 2, 2, 3, 3], cardsPlayed = [], actionsTaken = 0, currTurn = 1;
+		let panic = 1, mumma = 0, knight = 0, iconToggler=false, listToggler=false, playerTurn = true, silenced = false;
+
+		function init() { document.getElementById('starter').id = 'player';
+			document.getElementById('player').style.display = 'none';
+			document.getElementById('player').innerHTML = 'Play';
+			document.getElementById('player').onclick = play;
+			document.getElementById('drawer').style.display = 'initial';
+			document.getElementById('gameIcons').style.display = 'initial';
+			document.getElementById('cardList').style.display = 'initial';
+			document.getElementById('drawer').onclick = draw;
+			document.getElementById('map').style.display = 'initial';
+			document.getElementById('map').src = 'images/damselstale-map.jpg';
+
+			// Create panic cube
+			let panicCube = document.createElement('img');
+			panicCube.id = 'panicCube';
+			panicCube.src = 'images/panic.jpg';
+			panicCube.style.left = '87%';
+			document.getElementById('bgHolder').append(panicCube);
+
+			// Create mumma dragon
+			let mummaDragon = document.createElement('img');
+			mummaDragon.id = 'mummaDragon';
+			mummaDragon.src = 'images/mumma dragon.jpg';
+			mummaDragon.style.width = '45px';
+			mummaDragon.style.transform = 'scaleY(-1) scaleX(-1)';
+			document.getElementById('bgHolder').append(mummaDragon);
+
+			// Create knight
+			let knightMeeple = document.createElement('img');
+			knightMeeple.id = 'knightMeeple';
+			knightMeeple.src = 'images/knightMeeple.jpg';
+			knightMeeple.style.width = '50px';
+			document.getElementById('bgHolder').append(knightMeeple);
+
+			// Display tokens
+			displayKnight(); displayPanic(); displayMumma();
+
+			// Initialise decks
+			initDecks();
+			dragonMoves = shuffle(dragonMoves);
+			/*for (var i = 0; i < 4; i++) {
+				let randomCard = list1[Math.floor(Math.random()*list1.length)];
+				deck.push(randomCard);
+				list1.splice(list1.indexOf(randomCard), 1);
+			}			console.log(deck);*/
+		}
+
+		function initDecks() {
+			deck = []; dragonDeck = [];
+			for (var i = 0; i < cardlist.length; i++) {
+				if (i%2) dragonDeck.push(cardlist[i]);
+				else deck.push(cardlist[i]);
+			}
+			deck = shuffle(deck);
+			dragonDeck = shuffle(dragonDeck);
+		}
+
+		function shuffle(list) {
+			var newOrder = [];
+			var len = list.length;
+			for (var i = 0; i < len; i++) { var r = Math.floor(Math.random()*list.length);
+				newOrder.push(list[r]);
+				list.splice(r, 1);
+			}
+			return newOrder;
+		}
+
+		function draw() { document.getElementById('drawer').style.display = 'none';
+			//mumma++;displayMumma();panic++;displayPanic();knight++;displayKnight();
+			for (var i = 0; i < 4; i++) {
+				knightHand.push(deck.pop());
+				dragonHand.push(dragonDeck.pop());
+			}
+			displayHand();
+		}
+
+		function displayHand() { let handElement = document.getElementById('hand');
+			handElement.style.display = 'initial';
+			handElement.style.left = '16%';
+			handElement.style.top = '16%';
+			handElement.style.cursor = 'initial';
+			handElement.onclick = '';
+			handElement.innerHTML = '';
+			document.getElementById('map').onclick = toggleHand;
+			
+			let currHand = [];
+			if (playerTurn) currHand = knightHand;
+			else currHand = dragonHand;
+
+			for (var i = 0; i < currHand.length; i++) {
+				let cardDrawn = document.createElement('img');
+				// cardDrawn.style.cursor = 'pointer';
+				cardDrawn.onclick = selectCard;
+				cardDrawn.src = 'images/' + currHand[i] + '.jpg';
+				document.getElementById('hand').append(cardDrawn);
+			}
+		}
+
+		function toggleHand() { let handElement = document.getElementById('hand');
+			handElement.innerHTML = 'Hand';
+			handElement.onclick = displayHand;
+			handElement.style.cursor = 'pointer';
+			handElement.style.left = '11%';
+			handElement.style.top = '83%';
+			document.getElementById('map').onclick = '';
+			document.getElementById('player').style.display = 'none';
+		}
+
+		function selectCard() {
+			if (this.style.backgroundColor == 'yellow') {this.style.backgroundColor = 'initial';
+				document.getElementById('player').style.display = 'none';
+			}
+			else { let drawnCards = document.getElementById('hand').children;
+				for (var i = 0; i < drawnCards.length; i++) {
+					drawnCards[i].style.backgroundColor = 'initial';
+				}
+				this.style.backgroundColor = 'yellow';
+				document.getElementById('player').style.display = 'initial';
+			}
+		}
+
+		function play() { document.getElementById('player').style.display = 'none';
+			let drawnCards = document.getElementById('hand').children;
+				for (var i = 0; i < drawnCards.length; i++) {
+					if(drawnCards[i].style.backgroundColor == 'yellow') {
+						let playedCard = drawnCards[i].src;
+						for (var i = 0; i < cardlist.length; i++) {
+							if (playedCard.includes(cardlist[i])) playedCard = cardlist[i];
+						}
+						// let player = ''; if (playerTurn) player = '';else player = 'Knight';alert('Dragon\'s turn..');
+						if (playerTurn) knightHand.splice(knightHand.indexOf(playedCard), 1);
+						else dragonHand.splice(dragonHand.indexOf(playedCard), 1);
+						cardsPlayed.push(playedCard);
+						toggleHand();
+						// if (playerTurn) setTimeout(function(){ alert('Dragon\'s turn..')}, 200);
+					}
+				}
+			playerTurn = !playerTurn;
+			if (playerTurn) setTimeout(playOutcome, 500);
+		}
+
+		function playOutcome() {
+			if(cardlist.indexOf(cardsPlayed[0])>cardlist.indexOf(cardsPlayed[1])){ 
+					action(cardsPlayed[1]); document.getElementById('next').style.display = 'initial';
+					document.getElementById('next').onclick = function() {document.getElementById('next').style.display = 'none'; action(cardsPlayed[0]);};
+				}
+			//alert('Dragon resolves first.');
+			else { action(cardsPlayed[0]); document.getElementById('next').style.display = 'initial';
+			document.getElementById('next').onclick = function() {document.getElementById('next').style.display = 'none'; action(cardsPlayed[1]);}; }//alert('Knight resolves first.');
+		}
+
+		function endTurn() { currTurn++;
+
+			let currNext = document.getElementById('next');
+				currNext.style.display = 'none';
+				currNext.innerHTML = 'Next';
+
+			actionsTaken = 0; cardsPlayed = []; endTurnChecks(); 
+			if (!knightHand.length) newRound();
+		}
+
+		function action(arg) { actionsTaken++; let actionLog = 'Turn '+ currTurn + ': ';
+			if (actionsTaken==1) actionLog += 'First card'; else actionLog += 'Second card';
+			actionLog += ' played ' + arg;
+			console.log(actionLog);
+			
+			switch(arg){
+				case 'daringruse': if (hidden.includes(knight)) {if (cardsPlayed[0]===arg) cardsPlayed[1] = ''; else cardsPlayed[0]= '';}
+								else if (mumma) {mumma--; displayMumma();}
+								break;
+				case 'homeadvantage': if (hidden.includes(knight)) {if (panic>1){ panic--; displayPanic(); } }
+									else {if (cardsPlayed[0]===arg) cardsPlayed[1] = ''; else cardsPlayed[0]= '';}
+									 break;
+				case 'recklessadvance': alert('==============Reckless=Advance==============\nKnight moves twice the panic level: '+panic+'\nThen Mumma Dragon moves..'); knight += panic; knight += panic; if (knight>24) knight = 24; displayKnight(); drawMummaDragonCard(); break;
+				case 'flamesnort': alert('Flame Snort moves knight one space.'); knight++; displayKnight(); break;
+				case 'cautiousadvance': if (confirm('==============Cautious=Advance==============\nWould you like to move the knight by '+panic+' spaces? (Ignoring noisy spaces if you land on one)\nCancel to return a mummaDragon card from the discard: '+mummaDiscard)) {
+										knight += panic; if (knight>24) knight = 24; displayKnight(); silenced=true;
+									}
+									 else returnMummaDragonCard();
+				 					break;
+				case 'intruderalert': mumma++; displayMumma(); if (panic<4) { panic++; displayPanic();} 
+									if (!hidden.includes(knight)) drawMummaDragonCard();
+										break;
+				case 'tacticalretreat': if (hidden.includes(knight) && mumma){ moveMummaDragon( -parseInt(dragonMoves.pop()) );}
+										else for (var i = hidden.length-1; i > 0; i--) {
+											if (knight > hidden[i]) {knight = hidden[i]; displayKnight(); break;}// i = 0;
+										}
+										break;
+				case 'cryforhelp': alert('===========Cry=For=Help===========\nDraw a Mumma Dragon card.'); drawMummaDragonCard(); break;
+				case 'warcry': if (confirm('==============War=Cry==============\nWould you like to increase panic by 1?\nCancel to move knight '+panic+' spaces.')) { if (panic<4) {panic++; displayPanic();} }
+								else {knight += panic; displayKnight(); } 
+									break;
+				case 'takeheart': if (confirm('==============Take=Heart==============\nWould you like to reduce panic by 1?\nCancel to return a mummaDragon card from the discard: '+mummaDiscard)) { if (panic>1) {panic--; displayPanic();} }
+								else returnMummaDragonCard();
+				 				break;
+				case 'lielow': if (hidden.includes(knight)){ if (panic>1) {panic--; displayPanic();} }
+								else knight++; displayKnight();
+								break;
+				case 'cowerinfear': if (hidden.includes(knight)) drawMummaDragonCard();
+									else if (panic < 4) {panic++; displayPanic();}
+								break;
+				case '': alert('Other player\'s card does not resolve this turn.'); break;
+				default: alert('Error in action function..');
+			}
+			if (actionsTaken>1) { let currNext = document.getElementById('next');
+				currNext.style.display = 'initial';
+				currNext.innerHTML = 'End turn';
+				currNext.onclick = endTurn;
+			}
+		}
+
+		function endTurnChecks() {
+			// Check for noisy or hidden or if mumma spotted knight or if knight reached treasure
+			if (noisy.includes(knight) && !silenced) { alert('Knight ended turn on a noisy space!\nMumma dragon is moving..'); drawMummaDragonCard();}
+			else if (hidden.includes(knight) && panic < 4) { alert('Knight ended turn on a hidden space!\nBaby dragon panic increasing..'); panic++; displayPanic();}
+			silenced = false;
+			if (mumma==11) { if (hidden) {mumma=0; displayMumma(); alert('Mumma Dragon did NOT find an intruder and returned to her cavern..');}
+				else endGame(1);
+			}
+			if (knight==24) endGame(0);
+		}
+
+		function endGame(caught) {
+			if (caught) alert('Knight was CAUGHT by mumma Dragon!\nKnight loses.');
+			else alert('Knight made it to the treasure!\nKnight WINS.');
+			dragonMoves = [1, 1, 2, 2, 3, 3]; mummaDiscard = []; mumma = 0; knight = 0; panic = 1;
+			iconToggler=false; listToggler=false; playerTurn = true; silenced = false;
+		}
+
+		function drawMummaDragonCard() { document.getElementById('mummaDragonDeck').style.display = 'initial';
+			let drawnDragonCard = document.createElement('img');
+			let dragonValue = dragonMoves.pop();
+			drawnDragonCard.style.cursor = 'pointer';
+			drawnDragonCard.src = 'images/mumma' + dragonValue +'.jpg';
+			drawnDragonCard.onclick = function() {moveMummaDragon(dragonValue);}
+			document.getElementById('mummaDragonDeck').append(drawnDragonCard);
+			mummaDiscard.push(dragonValue);
+		}
+
+		function moveMummaDragon(value) { mumma += value; displayMumma(); let currentDragonDeck = document.getElementById('mummaDragonDeck');
+			if (currentDragonDeck.children.length) currentDragonDeck.children[0].remove();
+			currentDragonDeck.style.display = 'none';
+		}
+
+		function returnMummaDragonCard(){ let input = -1;
+			do {
+				input = parseInt(prompt('Choose a card (type \'0\' if none) to return from the following: '+mummaDiscard));
+			} while ( input && !mummaDiscard.includes(input) )
+			if (input) {
+				dragonMoves.push(mummaDiscard.splice(mummaDiscard.indexOf(input), 1)[0]);
+			}
+		}
+
+		function newRound() { alert('End of round!\nEach player draws a new set of 4 cards.'); initDecks();
+			document.getElementById('hand').style.display = 'none';
+			document.getElementById('drawer').style.display = 'initial';
+		}
+
+		function displayPanic() {
+			switch(panic){
+				case 2: document.getElementById('panicCube').style.top = '48%'; break;
+				case 3: document.getElementById('panicCube').style.top = '39%'; break;
+				case 4: document.getElementById('panicCube').style.top = '30%'; break;
+				default: panic=1; document.getElementById('panicCube').style.top = '57%';
+			}
+		}
+
+		function displayMumma() { currentMumPosition = document.getElementById('mummaDragon').style;
+			switch(mumma){
+				case 1: currentMumPosition.left = '83%'; currentMumPosition.top = '14%'; break;
+				case 2: currentMumPosition.left = '78%'; currentMumPosition.top = '17%'; break;
+				case 3: currentMumPosition.left = '73%'; currentMumPosition.top = '18%'; break;
+				case 4: currentMumPosition.left = '68%'; currentMumPosition.top = '17%'; break;
+				case 5: currentMumPosition.left = '62.5%'; currentMumPosition.top = '17%'; break;
+				case 6: currentMumPosition.left = '57%'; currentMumPosition.top = '15%'; break;
+				case 7: currentMumPosition.left = '50%'; currentMumPosition.top = '14%'; break;
+				case 8: currentMumPosition.left = '44%'; currentMumPosition.top = '17%'; break;
+				case 9: currentMumPosition.left = '37%'; currentMumPosition.top = '14%'; break;
+				case 10: currentMumPosition.left = '38%'; currentMumPosition.top = '21%'; break;
+				case 11: currentMumPosition.left = '40%'; currentMumPosition.top = '28%'; break;
+				default: mumma=0; currentMumPosition.left = '89%'; currentMumPosition.top = '9%';
+			}
+		}
+
+		function displayKnight() { currentKnightPosition = document.getElementById('knightMeeple').style;
+			switch(knight){
+				case 1: currentKnightPosition.left = '17%'; currentKnightPosition.top = '17%'; break;
+				case 2: currentKnightPosition.left = '20.5%'; currentKnightPosition.top = '24%'; break;
+				case 3: currentKnightPosition.left = '25.5%'; currentKnightPosition.top = '25%'; break;
+				case 4: currentKnightPosition.left = '31.5%'; currentKnightPosition.top = '28%'; break;
+				case 5: currentKnightPosition.left = '36.5%'; currentKnightPosition.top = '32%'; break;
+				case 6: currentKnightPosition.left = '43%'; currentKnightPosition.top = '32%'; break;
+				case 7: currentKnightPosition.left = '48%'; currentKnightPosition.top = '34%'; break;
+				case 8: currentKnightPosition.left = '52%'; currentKnightPosition.top = '43%'; break;
+				case 9: currentKnightPosition.left = '48%'; currentKnightPosition.top = '48%'; break;
+				case 10: currentKnightPosition.left = '45%'; currentKnightPosition.top = '55%'; break;
+				case 11: currentKnightPosition.left = '40.5%'; currentKnightPosition.top = '48%'; break;
+				case 12: currentKnightPosition.left = '34%'; currentKnightPosition.top = '48%'; break;
+				case 13: currentKnightPosition.left = '28%'; currentKnightPosition.top = '50%'; break;
+				case 14: currentKnightPosition.left = '26.5%'; currentKnightPosition.top = '56%'; break;
+				case 15: currentKnightPosition.left = '30.5%'; currentKnightPosition.top = '64%'; break;
+				case 16: currentKnightPosition.left = '39.5%'; currentKnightPosition.top = '64%'; break;
+				case 17: currentKnightPosition.left = '45.5%'; currentKnightPosition.top = '65%'; break;
+				case 18: currentKnightPosition.left = '51%'; currentKnightPosition.top = '72%'; break;
+				case 19: currentKnightPosition.left = '56.5%'; currentKnightPosition.top = '78%'; break;
+				case 20: currentKnightPosition.left = '62%'; currentKnightPosition.top = '72%'; break;
+				case 21: currentKnightPosition.left = '67%'; currentKnightPosition.top = '67%'; break;
+				case 22: currentKnightPosition.left = '74.5%'; currentKnightPosition.top = '64%'; break;
+				case 23: currentKnightPosition.left = '81%'; currentKnightPosition.top = '68%'; break;
+				case 24: currentKnightPosition.left = '86%'; currentKnightPosition.top = '74%'; break;
+				default: knight=0; currentKnightPosition.left = '20.5%'; currentKnightPosition.top = '9%';
+			}
+		}
+		var prevDrawStatus;
+		function toggleIcons(arg) { if (arg === 'gameIcons') iconToggler = !iconToggler; else listToggler = !listToggler;
+			if (iconToggler || listToggler) { document.getElementById(arg).style.top = '0%';
+				document.getElementById(arg).style.color = 'transparent'
+				document.getElementById(arg).style.backgroundColor = 'transparent';
+				let iconImg = document.createElement('img');
+				iconImg.src = 'images/damselstale-'+arg+'.png';
+				if (arg === 'gameIcons') {document.getElementById('cardList').style.display = 'none'; iconImg.style.width = '360%';}
+				else {document.getElementById('gameIcons').style.display = 'none'; iconImg.style.width = '500%';}
+				document.getElementById(arg).append(iconImg);
+				prevDrawStatus = document.getElementById('drawer').style.display;
+				document.getElementById('drawer').style.display = 'none';
+			}
+			else { document.getElementById(arg).children[0].remove();
+				if (arg === 'gameIcons') {document.getElementById('cardList').style.display = 'initial'; document.getElementById(arg).style.top = '72%';}
+				else  {document.getElementById('gameIcons').style.display = 'initial'; document.getElementById(arg).style.top = '62%';}
+				document.getElementById(arg).style.backgroundColor = 'blue';
+				document.getElementById(arg).style.color = 'red';
+				document.getElementById('drawer').style.display = prevDrawStatus;
+			}
+		}
+	</script>
+</head>
+<body>
+<div id="bgHolder"><img id="map" style="position: absolute; width: 90%; height: 95%; left: 5%; display: none;">
+<span id="mummaDragonDeck" style="position: absolute; left: 64%; top: 27%;"></span>
+</div>
+<span id="hand" style="background-color: aquamarine">Hand</span>
+<span id="gameIcons" onclick="toggleIcons(this.id)" style="top: 72%;">Game Icons</span>
+<span id="cardList" onclick="toggleIcons(this.id)" style="top: 62%;">Card List</span>
+<button id="starter" onclick="init()">Start</button>
+<button id="drawer" style="display: none;">Draw</button>
+<button id="next" style="display: none;">Next</button>
+</body>
+</html>
