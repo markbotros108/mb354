@@ -209,11 +209,11 @@
 			console.log(actionLog);
 			
 			switch(arg){
-				case 'daringruse': if (hidden.includes(knight)) {if (cardsPlayed[0]===arg) cardsPlayed[1] = ''; else cardsPlayed[0]= '';}
+				case 'daringruse': if (hidden.includes(knight)) {if (cardsPlayed[0]===arg) cardsPlayed[1] = 'did not resolve'; else cardsPlayed[0]= 'did not resolve';}
 								else if (mumma) {mumma--; displayMumma();}
 								break;
 				case 'homeadvantage': if (hidden.includes(knight)) {if (panic>1){ panic--; displayPanic(); } }
-									else {if (cardsPlayed[0]===arg) cardsPlayed[1] = ''; else cardsPlayed[0]= '';}
+									else {if (cardsPlayed[0]===arg) cardsPlayed[1] = 'did not resolve'; else cardsPlayed[0]= 'did not resolve';}
 									 break;
 				case 'recklessadvance': alert('==============Reckless=Advance==============\nKnight moves twice the panic level: '+panic+'\nThen Mumma Dragon moves..'); knight += panic; knight += panic; if (knight>24) knight = 24; displayKnight(); drawMummaDragonCard(); break;
 				case 'flamesnort': alert('Flame Snort moves knight one space.'); knight++; displayKnight(); break;
