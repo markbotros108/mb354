@@ -205,7 +205,7 @@
 
 		function action(arg) { actionsTaken++; let actionLog = 'Turn '+ currTurn + ': ';
 			if (actionsTaken==1) actionLog += 'First card'; else actionLog += 'Second card';
-			actionLog += ' played ' + arg;
+			actionLog += ' played was ' + arg;
 			console.log(actionLog);
 			
 			switch(arg){
@@ -243,7 +243,7 @@
 				case 'cowerinfear': if (hidden.includes(knight)) drawMummaDragonCard();
 									else if (panic < 4) {panic++; displayPanic();}
 								break;
-				case '': alert('Other player\'s card does not resolve this turn.'); break;
+				case 'did not resolve': alert('Other player\'s card does not resolve this turn.'); break;
 				default: alert('Error in action function..');
 			}
 			if (actionsTaken>1) { let currNext = document.getElementById('next');
