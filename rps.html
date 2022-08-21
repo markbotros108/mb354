@@ -35,20 +35,34 @@
 	  const db = getDatabase();
 
 	  function insertData() { turn++;
-	  	set(ref(db, "test"), {
-	  		turn: document.getElementById('action').value+turn
+	  	set(ref(db, "Turn "+turn), {
+	  		player: 'name', 
+	  		selected: document.getElementById('action').value
 	  	})
 	  	.then(()=>{
-	  		alert('data stored successfully');
+	  		console.log('data stored successfully');
 	  	})
 	  	.catch((error)=>{
-	  		alert('unsuccessful, error: '+error);
+	  		console.log('unsuccessful, error: '+error);
 	  	});
+	  }
+
+	  function removeData() {
+	  	for (var i = 1; i <= turn; i++) {
+		  	remove(ref(db, "Turn "+i))
+		  	.then(()=>{
+		  		console.log('data removed successfully');
+		  	})
+		  	.catch((error)=>{
+		  		console.log('unsuccessful, error: '+error);
+		  	});
+	  	}
 	  }
 
 	  var turn = 0;
 
 	  document.getElementById('tester').addEventListener('click', insertData);
+	  document.getElementById('ender').addEventListener('click', removeData);
 
 	</script>
 	<p> I choose: 
@@ -58,7 +72,7 @@
 		<option value="scissors">Scissors</option>
 	</select>
 	</p>
-	<button id="tester">Test send</button>
-
+	<button id="tester">Select</button>
+	<button id="ender">End game</button>
 </body>
 </html>
