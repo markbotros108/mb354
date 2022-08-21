@@ -18,6 +18,7 @@
 	  const firebaseConfig = {
 	    apiKey: "AIzaSyAtJPYCJsLL_s10YIZCXYLEm22QerWqV1s",
 	    authDomain: "crud-test-b2202.firebaseapp.com",
+	    databaseURL: "https://crud-test-b2202-default-rtdb.asia-southeast1.firebasedatabase.app",
 	    projectId: "crud-test-b2202",
 	    storageBucket: "crud-test-b2202.appspot.com",
 	    messagingSenderId: "947453537031",
@@ -30,13 +31,12 @@
 	  import {getDatabase, ref, get, set, child, update, remove}
 	  from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
 
+	  // ref = Database.database("https://crud-test-b2202-default-rtdb.asia-southeast1.firebasedatabase.app")
 	  const db = getDatabase();
 
-
-	  function insertData() {
+	  function insertData() { turn++;
 	  	set(ref(db, "test"), {
-	  		attr1: 1,
-	  		attr2: 2
+	  		turn: document.getElementById('action').value+turn
 	  	})
 	  	.then(()=>{
 	  		alert('data stored successfully');
@@ -46,10 +46,18 @@
 	  	});
 	  }
 
+	  var turn = 0;
+
 	  document.getElementById('tester').addEventListener('click', insertData);
 
 	</script>
-
+	<p> I choose: 
+	<select id="action">
+		<option value="rock">Rock</option>
+		<option value="paper">Paper</option>
+		<option value="scissors">Scissors</option>
+	</select>
+	</p>
 	<button id="tester">Test send</button>
 
 </body>
