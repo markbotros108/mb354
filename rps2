@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		RPS
+	</title>
+</head>
+<body>
+
+
+	<script type="module">
+	  // Import the functions you need from the SDKs you need
+	  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
+	  // TODO: Add SDKs for Firebase products that you want to use
+	  // https://firebase.google.com/docs/web/setup#available-libraries
+
+	  // Your web app's Firebase configuration
+	  const firebaseConfig = {
+	    apiKey: "AIzaSyAtJPYCJsLL_s10YIZCXYLEm22QerWqV1s",
+	    authDomain: "crud-test-b2202.firebaseapp.com",
+	    databaseURL: "https://crud-test-b2202-default-rtdb.asia-southeast1.firebasedatabase.app",
+	    projectId: "crud-test-b2202",
+	    storageBucket: "crud-test-b2202.appspot.com",
+	    messagingSenderId: "947453537031",
+	    appId: "1:947453537031:web:7eba8ca69828a0f045f3a2"
+	  };
+
+	  // Initialize Firebase
+	  const app = initializeApp(firebaseConfig);
+
+	  import {getDatabase, ref, get, set, child, update, remove}
+	  from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
+
+	  // ref = Database.database("https://crud-test-b2202-default-rtdb.asia-southeast1.firebasedatabase.app")
+	  const db = getDatabase();
+
+	  function insertData() { turn++;
+	  	set(ref(db, "Turn "+turn), {
+	  		player: opponent, 
+	  		selected: document.getElementById('action').value
+	  	})
+	  	.then(()=>{
+	  		console.log('data stored successfully');
+	  	})
+	  	.catch((error)=>{
+	  		console.log('unsuccessful, error: '+error);
+	  	});
+	  	document.getElementById('turner').innerHTML = "Turn " + (turn+1) +':';
+	  }
+
+	  function removeData() { 
+	  	for (; turn > 0; turn--) {
+	  		// get(child(dbref, "Turn "+turn)).then((snapshot)=>{
+	  			// if (snapshot.exists()) {
+	  				remove(ref(db, "Turn "+turn))
+				  	.then(()=>{
+				  		console.log('data removed successfully');
+				  	})
+				  	.catch((error)=>{
+				  		console.log('unsuccessful, error: '+error);
+				  	});
+	  			// }
+	  		// });
+	  	}
+	  	document.getElementById('turner').innerHTML = "Turn " + (turn+1) +':';
+	  }
+
+  	const dbref = ref(db);
+	  var turn = 0;
+
+	  document.getElementById('tester').addEventListener('click', insertData);
+	  document.getElementById('ender').addEventListener('click', removeData);
+
+	</script>
+	<h1 id="turner">Turn 1:</h1>
+	<p> I choose: 
+	<select id="action">
+		<option value="rock">Rock</option>
+		<option value="paper">Paper</option>
+		<option value="scissors">Scissors</option>
+	</select>
+	</p>
+	<button id="tester">Select</button>
+	<button id="ender">End game</button>
+</body>
+</html>
