@@ -45,26 +45,34 @@
 	  	.catch((error)=>{
 	  		console.log('unsuccessful, error: '+error);
 	  	});
+	  	document.getElementById('turner').innerHTML = "Turn " + (turn+1) +':';
 	  }
 
-	  function removeData() {
-	  	for (var i = 1; i <= turn; i++) {
-		  	remove(ref(db, "Turn "+i))
-		  	.then(()=>{
-		  		console.log('data removed successfully');
-		  	})
-		  	.catch((error)=>{
-		  		console.log('unsuccessful, error: '+error);
-		  	});
+	  function removeData() { 
+	  	for (; turn > 0; turn--) {
+	  		// get(child(dbref, "Turn "+turn)).then((snapshot)=>{
+	  			// if (snapshot.exists()) {
+	  				remove(ref(db, "Turn "+turn))
+				  	.then(()=>{
+				  		console.log('data removed successfully');
+				  	})
+				  	.catch((error)=>{
+				  		console.log('unsuccessful, error: '+error);
+				  	});
+	  			// }
+	  		// });
 	  	}
+	  	document.getElementById('turner').innerHTML = "Turn " + (turn+1) +':';
 	  }
 
+  	const dbref = ref(db);
 	  var turn = 0;
 
 	  document.getElementById('tester').addEventListener('click', insertData);
 	  document.getElementById('ender').addEventListener('click', removeData);
 
 	</script>
+	<h1 id="turner">Turn 1:</h1>
 	<p> I choose: 
 	<select id="action">
 		<option value="rock">Rock</option>
