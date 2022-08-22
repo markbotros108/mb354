@@ -36,8 +36,8 @@
 
 	  function insertData() { turn++;
 	  	set(ref(db, "Turn "+turn), {
-	  		player: opponent, 
-	  		selected: document.getElementById('action').value
+	  		opponent: 'name2', 
+	  		selectedopp: document.getElementById('action').value
 	  	})
 	  	.then(()=>{
 	  		console.log('data stored successfully');
