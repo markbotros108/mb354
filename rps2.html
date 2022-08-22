@@ -35,7 +35,7 @@
 	  const db = getDatabase();
 
 	  function insertData() { turn++;
-	  	set(ref(db, "Turn "+turn), {
+	  	update(ref(db, "Turn "+turn), {
 	  		opponent: 'name2', 
 	  		selectedopp: document.getElementById('action').value
 	  	})
