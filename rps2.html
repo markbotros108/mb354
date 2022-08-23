@@ -106,7 +106,7 @@
 	  					alert('winner decided between ' +snapshot.val().selected + ' '+ snapshot.val().selectedopp);
 	  					findWinner(snapshot.val().selected, snapshot.val().selectedopp, i);
 	  				}
-	  				else if (snapshot.val().selectedopp && row<=turn ) {addTableRow(); ready('player2');}
+	  				else if (snapshot.val().selected && row<=turn ) {addTableRow(); ready('player1');}
 	  			}
 
 	  			else{
