@@ -85,14 +85,14 @@
 	  	document.getElementById('results').append(nextTurn);
 	  }
 
-	  function ready(player){
+	   function ready(player){
 	  	if (player === 'player1') {
-	  		document.getElementById('p'+turn).innerHTML = 'ready';
-	  		document.getElementById('p'+turn).style.color = 'green';
+	  		document.getElementById(turn).children[1].innerHTML = 'ready';
+	  		document.getElementById(turn).children[1].style.color = 'green';
 	  	}
 	  	else if(player === 'player2'){
-	  		document.getElementById('o'+turn).innerHTML = 'ready';
-	  		document.getElementById('o'+turn).style.color = 'green';
+	  		document.getElementById(turn).children[2].innerHTML = 'ready';
+	  		document.getElementById(turn).children[2].style.color = 'green';
 	  	}
 	  }
 
