@@ -123,10 +123,10 @@
 	  function findWinner(sel, opp, currturn) {
 	  		currturn--; // WHY??
 	  	if (!winnerFound) {
-	  		document.getElementById(currturn).children[2].innerHTML = sel;
-	  		document.getElementById(currturn).children[2].style.color = 'black';
-	  		document.getElementById(currturn).children[1].innerHTML = opp;
+	  		document.getElementById(currturn).children[1].innerHTML = sel;
 	  		document.getElementById(currturn).children[1].style.color = 'black';
+	  		document.getElementById(currturn).children[2].innerHTML = opp;
+	  		document.getElementById(currturn).children[2].style.color = 'black';
 
 	  		let outcome = document.createElement('td');
 	  		if (sel === opp) outcome.innerHTML = 'draw';
