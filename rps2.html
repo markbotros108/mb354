@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		RPS
+	</title>
+	<style type="text/css">
+		body {
+			font-size: 56px;
+			text-align: center;
+		}
+		button {
+			font-size: 40px;
+		}
+
+		select {
+			font-size: 130px;
+		}
+	</style>
+</head>
+<body>
+
+
+	<script type="module">
+	  // Import the functions you need from the SDKs you need
+	  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
+	  // TODO: Add SDKs for Firebase products that you want to use
+	  // https://firebase.google.com/docs/web/setup#available-libraries
+
+	  // Your web app's Firebase configuration
+	  const firebaseConfig = {
+	    apiKey: "AIzaSyAtJPYCJsLL_s10YIZCXYLEm22QerWqV1s",
+	    authDomain: "crud-test-b2202.firebaseapp.com",
+	    databaseURL: "https://crud-test-b2202-default-rtdb.asia-southeast1.firebasedatabase.app",
+	    projectId: "crud-test-b2202",
+	    storageBucket: "crud-test-b2202.appspot.com",
+	    messagingSenderId: "947453537031",
+	    appId: "1:947453537031:web:7eba8ca69828a0f045f3a2"
+	  };
+
+	  // Initialize Firebase
+	  const app = initializeApp(firebaseConfig);
+
+	  import {getDatabase, ref, get, set, child, update, remove}
+	  from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
+
+	  // ref = Database.database("https://crud-test-b2202-default-rtdb.asia-southeast1.firebasedatabase.app")
+	  const db = getDatabase();
+
+	  function insertData() {
+	  	let selection = document.getElementById('action').value;
+
+	  	update(ref(db, "Turn "+turn), {
+	  		player: 'name', 
+	  		selected: selection
+	  	})
+	  	.then(()=>{
+	  		console.log('data stored successfully');
+	  	})
+	  	.catch((error)=>{
+	  		console.log('unsuccessful, error: '+error);
+	  	});
+
+	  	if (!document.getElementById(turn+1)) {addTableRow(); winnerFound = false; }
+	  	// updateData();
+	  	if(!winnerFound) ready('player1');
+	  	turn++; 
+	  	document.getElementById('turner').innerHTML = "Turn " + turn +':';
+	  }
+
+	  function addTableRow(){ row++;
+	  	let nextTurn = document.createElement('tr');
+	  	let newrow = document.createElement('td');
+	  	newrow.innerHTML = row;
+	  	newrow.style.textAlign = 'center';
+	  	let choice = document.createElement('td');
+	  	// choice.id = 'p'+row;
+	  	let oppchoice = document.createElement('td');
+	  	// oppchoice.innerHTML = 'ready';
+	  	// oppchoice.id = 'o'+row;
+	  	nextTurn.append(newrow);
+	  	nextTurn.append(choice);
+	  	nextTurn.append(oppchoice);
+	  	nextTurn.id = row;
+	  	document.getElementById('results').append(nextTurn);
+	  }
+
+	   function ready(player){
+	  	if (player === 'player1') {
+	  		document.getElementById(turn).children[1].innerHTML = 'ready';
+	  		document.getElementById(turn).children[1].style.color = 'green';
+	  	}
+	  	else if(player === 'player2'){
+	  		document.getElementById(turn).children[2].innerHTML = 'ready';
+	  		document.getElementById(turn).children[2].style.color = 'green';
+	  	}
+	  }
+
+	  function updateData() { 
+		  	const dbref = ref(db);
+// TODO: Populate whole table
+		for (var i = 1; i <= row; i++) { console.log(i+ '/' +turn);
+	  		get(child(dbref, 'Turn '+i)).then((snapshot)=>{
+	  			if (snapshot.exists()) { console.log(i+snapshot.val().selectedopp);
+	  				if(snapshot.val().selected && snapshot.val().selectedopp){
+	  					alert('winner decided between ' +snapshot.val().selected + ' '+ snapshot.val().selectedopp);
+	  					findWinner(snapshot.val().selected, snapshot.val().selectedopp, i);
+	  				}
+	  				else if (snapshot.val().selectedopp && row<=turn ) {addTableRow(); ready('player2');}
+	  			}
+
+	  			else{
+	  				alert("No data found");
+	  			}
+	  		})
+	  		.catch((error)=>{
+	  			console.log('unsuccessful, error: '+error);
+	  		});
+
+	  	}
+	  }
+
+	  function findWinner(sel, opp, currturn) {
+	  		currturn--; // WHY??
+	  	if (!winnerFound) {
+	  		document.getElementById(currturn).children[2].innerHTML = sel;
+	  		document.getElementById(currturn).children[2].style.color = 'black';
+	  		document.getElementById(currturn).children[1].innerHTML = opp;
+	  		document.getElementById(currturn).children[1].style.color = 'black';
+
+	  		let outcome = document.createElement('td');
+	  		if (sel === opp) outcome.innerHTML = 'draw';
+	  		else if ( (sel === 'rock' && opp === 'scissors') || (sel === 'scissors' && opp === 'paper') || (sel === 'paper' && opp === 'rock') ) outcome.innerHTML = 'player 1';
+	  		else outcome.innerHTML = 'player 2';
+	  		document.getElementById(currturn).append(outcome);
+	  		winnerFound = true;
+	  	}
+	  }
+
+	  function removeData() { 
+	  	for (; row > 0; row--) {
+	  		// get(child(dbref, "Turn "+turn)).then((snapshot)=>{
+	  			// if (snapshot.exists()) {
+	  				remove(ref(db, "Turn "+row))
+				  	.then(()=>{
+				  		console.log('data removed successfully');
+				  	})
+				  	.catch((error)=>{
+				  		console.log('unsuccessful, error: '+error);
+				  	});
+	  			// }
+	  		// });
+	  	}
+	  	turn=1;
+	  	document.getElementById('results').innerHTML = '<tr><td><b>Turn</b></td><td>Player 1</td><td>Player 2</td><td>Winner</td></tr><tr id="1"><td style="text-align: center;">1</td><td id="p1"></td><td id="o1"></td></tr>'
+	  	document.getElementById('turner').innerHTML = "Turn " + turn +':';
+	  }
+
+	  var turn = 1, row = 1, winnerFound = false;
+
+	  document.getElementById('tester').addEventListener('click', insertData);
+	  document.getElementById('ender').addEventListener('click', removeData);
+	  document.getElementById('updater').addEventListener('click', updateData);
+
+	</script>
+	<h1 id="turner">Turn 1:</h1>
+	<!-- <p>  -->
+		I choose: 
+	<select id="action">
+		<option value="rock">Rock</option>
+		<option value="paper">Paper</option>
+		<option value="scissors">Scissors</option>
+	</select>
+	<!-- </p> -->
+	<button id="tester">Select</button> <br><br>
+	<button id="ender">End game</button>
+	<button id="updater">Update table</button>
+	<br><br><br>
+	<table id="results" style="border: solid;">
+		<tr>
+			<td><b>Turn</b></td>
+			<td>Player 1</td>
+			<td>Player 2</td>
+			<td>Winner</td>
+		</tr>
+		<tr id="1">
+			<td style="text-align: center;">1</td>
+			<td id="p1"></td>
+			<td id="o1"></td>
+		</tr>
+	</table>
+</body>
+</html>
