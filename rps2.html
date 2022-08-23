@@ -51,8 +51,8 @@
 	  	let selection = document.getElementById('action').value;
 
 	  	update(ref(db, "Turn "+turn), {
-	  		player: 'name', 
-	  		selected: selection
+	  		opponent: 'name2', 
+	  		selectedopp: selection
 	  	})
 	  	.then(()=>{
 	  		console.log('data stored successfully');
