@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Scales Puzzle</title>
+	<style type="text/css">
+		button {
+			font-size: 50px;
+		}
+
+		.rotateLeft {
+			transform: rotate(15deg);
+		}
+
+		.rotateRight {
+			transform: rotate(-15deg);
+		}
+
+		#scale {
+			position: absolute;
+			left: 1%;
+			top: 70%;
+		}
+
+		#clearer, #weigher {
+			position: absolute;
+			left: 40%;
+			top: 90%;
+		}
+
+		#weigher {
+			left: 50%;
+			display: none;
+		}
+
+		div {
+			border: solid;
+/*			width: fit-content;*/
+			padding: 20px;
+		}
+
+		.box {
+			display: inline-block;
+			font-size: 70px;
+			margin: 10px;
+		}
+
+		#scaleContainer .scaleSide {
+			border: solid dimgrey;
+			width: 30%;
+			height: 25%;
+		}
+	</style>
+	<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript">
+		let uses = 0;
+		let beingDragged;
+		let secretNo = (Math.floor((Math.random()*12)+1)).toString();
+		let secretHeavier, secretWeight = Math.random();
+		if (secretWeight > 0.5) secretHeavier = true;
+
+		$( document ).ready(function() {
+		    const scaleSides = document.querySelectorAll('.scaleSide');
+				scaleSides.forEach(side => {
+					side.addEventListener('dragover', dragOver);
+					side.addEventListener('drop', dragDrop);
+				});
+		});
+
+		function dragStart(e) {// console.log(e.target);
+			beingDragged = e.target;
+		}
+
+		function dragOver(e) {
+			e.preventDefault();
+		}
+
+		function dragDrop(e) {
+			e.target.append(beingDragged);
+		}
+
+		function clearScale() { let allcontainers = document.getElementsByClassName('scaleSide');
+			allcontainers[0].innerHTML = '';allcontainers[1].innerHTML = '';allcontainers[2].innerHTML = '';
+
+			for (var i = 1; i <= 12; i++) {
+				let newBox = document.createElement('div');
+				newBox.className = 'box';
+				newBox.innerHTML = i;
+				newBox.addEventListener('dragstart', dragStart);
+				newBox.draggable = true;
+				document.getElementById('boxes').append(newBox);
+			}
+
+			document.getElementById('clearer').innerHTML = 'Clear';
+			document.getElementById('scale').classList.remove('rotateLeft');
+			document.getElementById('scale').classList.remove('rotateRight');
+			document.getElementById('clearer').style.display = 'none';
+			document.getElementById('weigher').style.display = 'initial';
+		}
+
+		function weigh() { uses++; document.getElementById('remainingUses').innerHTML = 'Uses: ' + uses +'/3'; let leftWeight = 0, rightWeight = 0;
+			let leftList = document.getElementById('leftScale').children, rightList = document.getElementById('rightScale').children;
+
+			for (var i = 0; i < leftList.length; i++) {
+				if(leftList[i].innerHTML===secretNo) {console.log('found'+secretHeavier);
+					if (secretHeavier) leftWeight+=2;
+				}
+				else leftWeight++;
+			}
+			for (var i = 0; i < rightList.length; i++) {
+				if(rightList[i].innerHTML===secretNo) {console.log('found'+secretHeavier);
+					if (secretHeavier) rightWeight+=2;
+				}
+				else rightWeight++;
+			}
+
+			if(leftWeight > rightWeight) document.getElementById('scale').classList.add('rotateRight');
+			else if(leftWeight < rightWeight) document.getElementById('scale').classList.add('rotateLeft');
+
+			document.getElementById('weigher').style.display = 'none';
+			if (uses >= 3) setTimeout(endPuzzle, 500);
+			else document.getElementById('clearer').style.display = 'initial';
+		}
+
+		function endPuzzle() {
+			let guess = prompt('Which box was the odd one out?');
+			if(guess === secretNo) alert("Correct! You solved the puzzle :D");
+			else { if (secretHeavier) alert('Incorrect, the correct answer was '+secretNo+' and it was heavier than all the rest.');
+				else alert('Incorrect, the correct answer was '+secretNo+' and it was lighter than all the rest.');}
+		}
+	</script>
+</head>
+<body><span id="boxContainer" style="justify-content: center;">
+	<div id="boxes" class="scaleSide" style="width: fit-content;"></div></span>
+	<span id="scaleContainer" style="display: flex;">
+		<div id="leftScale" class="scaleSide"></div> <div id="rightScale" class="scaleSide" style="position: absolute; right: 1%;"></div>
+	</span>
+	<img src="images/line.png" id="scale">
+	<p id="remainingUses" style="position: absolute; top: 80%; font-size: 70px;">Uses: 0/3</p>
+	<button id="clearer" onclick="clearScale()">Begin</button>
+	<button id="weigher" onclick="weigh()">Weigh</button>
+</body>
+</html>
