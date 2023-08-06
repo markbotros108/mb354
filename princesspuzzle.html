@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Princess Puzzle</title>
+	<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript">
+		// Began 8:15pm Completed 8:40pm 6/8/23
+		let rooms = 0, gameOn = true, checked = [], prinRooms = [];
+
+		/*if(confirm('Would you like to change the number of rooms?')){
+			rooms = prompt('How many rooms?');
+		} else*/ rooms = 6;
+
+		let night = 1, princess = Math.floor(Math.random()*rooms+1);
+
+		$( document ).ready(function() {
+			for (var i = 0; i < rooms; i++) {
+				let newroom = document.createElement('img');
+				newroom.src = 'images/white.png';
+				newroom.id = i+1;
+				newroom.onclick = checkroom;
+				document.getElementById('castle').append(newroom);
+			}
+		});
+
+		function checkroom() { let roomGuess = this.id;
+			alert('You searched room '+roomGuess);
+			checked.push(roomGuess);
+			prinRooms.push(princess);
+
+			if (roomGuess == princess) { alert('You found the princess!');
+					document.getElementById('revealer').style.display = 'initial'; 
+					document.getElementById(this.id).src = 'images/red.png';
+				gameOn = false; return;}
+			else { alert("Princess was not in this room.");//alert("Princess was in room " + princess);
+				if (princess == 1) princess++;
+				else if (princess == rooms) princess--;
+				else { let randomiser = Math.random();
+					if (randomiser > 0.5) princess++;
+					else princess--;}
+				}
+
+			if (gameOn) { night++;
+				document.getElementById('nightCounter').innerHTML = 'Night: '+night + ' Rooms checked: ' +checked;
+			}
+		}
+
+		function revealPrincess() { document.getElementById('nightCounter').innerHTML += '<br> Princess was in rooms: '+ prinRooms;
+			document.getElementById('revealer').style.display = 'none'; 
+			document.getElementById('refresher').style.display = 'initial'; 
+		}
+
+		function refreshPage() { document.getElementById('refresher').style.display = 'none';
+			location.reload();
+		}
+	</script>
+</head>
+<body>
+<span id="nightCounter" style="font-size: 32px;">Night: 1</span>
+<div id="castle" style="border: solid; width: fit-content;"></div>
+<button id="revealer" onclick="revealPrincess()" style="display: none;">Reveal</button>
+<button id="refresher" onclick="refreshPage()" style="display: none;">Restart</button>
+</body>
+</html>
