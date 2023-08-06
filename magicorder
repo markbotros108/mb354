@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Magic Trick - Card Order</title>
+	<style type="text/css">
+		button, p{
+			font-size: 52px;
+			position: absolute;
+			left: 30%;
+			top: -10%;
+		}
+
+		button{
+			top: 70%;
+			padding: 10px 40px;
+		}
+	</style>
+	<script type="text/javascript">
+		var orderList = [];
+		const oldArr = [1, 2, 3];
+
+		function init() {
+
+		for (var i = 0; i < 3; i++){
+			let currArr = [...oldArr];
+			let firstNum = currArr.splice(currArr.indexOf(i+1), 1);
+
+				for (var j = 0; j < 2; j++) {
+					let newArr = [firstNum];
+
+					if (j) {newArr.push(Math.max(...currArr));newArr.push(Math.min(...currArr));}
+					else {newArr.push(Math.min(...currArr));newArr.push(Math.max(...currArr));}
+
+					orderList.push(newArr);
+				}
+		}
+			let thelist = "<ol><li>";
+			thelist += orderList.join('</li> <li>');
+			thelist += "</li></ol>"
+			document.getElementById('para').innerHTML = thelist;
+			document.getElementsByTagName("button")[0].style.display = 'none';
+		}
+	</script>
+</head>
+<body>
+<p id="para" style=""></p>
+<button onclick="init();">RUN</button>
+</body>
+</html>
