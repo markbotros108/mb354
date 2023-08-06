@@ -11,7 +11,7 @@
 
 		/*if(confirm('Would you like to change the number of rooms?')){
 			rooms = prompt('How many rooms?');
-		} else*/ rooms = 6;
+		} else*/ rooms = 5;
 
 		let night = 1, princess = Math.floor(Math.random()*rooms+1);
 
@@ -43,11 +43,13 @@
 				}
 
 			if (gameOn) { night++;
-				document.getElementById('nightCounter').innerHTML = 'Night: '+night + ' Rooms checked: ' +checked;
+				document.getElementById('nightCounter').innerHTML = 'Night: '+ night + ' Rooms checked: ' +checked;
 			}
 		}
 
-		function revealPrincess() { document.getElementById('nightCounter').innerHTML += '<br> Princess was in rooms: '+ prinRooms;
+		function revealPrincess() { 
+			document.getElementById('nightCounter').innerHTML = 'Night: '+ night + ' Rooms checked: ' +checked + '<br> Princess was in rooms: '+ prinRooms;
+			
 			document.getElementById('revealer').style.display = 'none'; 
 			document.getElementById('refresher').style.display = 'initial'; 
 		}
