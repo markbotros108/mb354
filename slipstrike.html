@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<!-- Began 8:05pm 20/09/23 
+	Added weapons and wield function 10:55pm 26/09/23
+	Added cooldown for weapons 5:05pm 27/09/23
+	Added weapons images, slipstrike function 11:45pm 27/09/23
+		
+	TODO: displayHealth function
+		AI for opponent
+		display opponent cooldown
+		endgame function
+-->
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=0.5">
+	<title>Slip strike</title>
+	<style type="text/css">
+		button {
+			font-size: 32px;
+			width: 300px;
+			/*position: absolute;
+			bottom: 10%;
+			right: 10%;*/
+		}
+
+		#locationMap {
+/*			width: 100%;*/
+		}
+
+		#player1 {
+/*			width: 10%;*/
+		}
+
+		#hand {
+			border: solid blue;
+			font: 32px Trebuchet MS;
+			width: 660px;
+		}
+
+		#hand img {
+			cursor: pointer;
+			padding: 15px;
+			width: 100px;
+		}
+
+		#hand img:hover {
+  			background-color: yellow;
+		}
+	</style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript"> $(document).ready( function(){ init(); });
+		const locations = ['station', 'warehouse', 'park', 'tower', 'mansion'], weapons = ['blade', 'pistol', 'rifle'];
+		const locationPositions = [[275, 100], [460, 200], [420, 420], [200, 430], [120, 220]];
+		var hand = [], onlySelectedImgs = [], coolDown = [0,0,0,0,0, 0, 0, 0, 0, 0], currCount = 0, currLocation = 0, oppLocation = Math.floor(Math.random()*5) , turnOver = true, turn = 1, oppHealth =5;
+
+		function init() {
+			let allLocations = document.createElement('img');
+			let player = document.createElement('img');
+			let opponent = document.createElement('img');
+			player.src = 'images/blue player.png';
+			opponent.src = 'images/black player.png';
+			allLocations.src = 'images/slipstrike locations.png';
+			allLocations.id = 'locationMap';
+			player.id = 'player1';
+			opponent.id = 'player2';
+			player.style.position = 'absolute';
+			opponent.style.position = 'absolute';
+			setTimeout(displayPlayers, 10);
+			document.getElementById('locations').append(player);
+			document.getElementById('locations').append(opponent);
+			document.getElementById('locations').append(allLocations);
+
+			for (var i = 0; i < locations.length; i++) {
+				hand.push(locations[i]);
+			}
+			hand.push('right');
+			hand.push('left');
+			for (var i = 0; i < weapons.length; i++) {
+				hand.push(weapons[i]);
+			}
+			displayHand();
+
+			document.getElementById('hand').addEventListener('click', redCount);
+		}
+
+		function displayPlayers() { oppLocation = Math.floor(Math.random()*5);
+			document.getElementById('player1').style.left = locationPositions[currLocation][0] +'px';
+			document.getElementById('player1').style.top = locationPositions[currLocation][1] +'px';
+			document.getElementById('player2').style.left = locationPositions[oppLocation][0] +'px';
+			document.getElementById('player2').style.top = locationPositions[oppLocation][1] +'px';
+
+			if (currLocation == oppLocation) {
+				document.getElementById('player1').style.left = (locationPositions[currLocation][0]-35) +'px';
+				document.getElementById('player2').style.left = (locationPositions[oppLocation][0]+35) +'px';
+			}
+		}
+
+		function displayHand() { document.getElementById('hand').innerHTML = '';
+
+			let handTit = document.createElement('div');
+			 handTit.id = 'handTitle';
+			 handTit.innerHTML = 'Hand:';
+			 document.getElementById('hand').append(handTit);
+
+			 // let playbutt = document.createElement('button');
+			 // playbutt.id = 'playButton';
+			 // playbutt.onclick = playCards;
+			 // playbutt.innerHTML = 'Play';
+			 // playbutt.style.display = 'none';
+			 // document.getElementById('handTitle').append(playbutt);
+
+			for (var i = 0; i < hand.length; i++) {
+				let newCard = document.createElement('img');
+				let cardName = hand[i];
+				newCard.id = cardName + i;
+				newCard.src = "images/" + cardName +'.png';
+				newCard.onclick = function () { selectCard(newCard.id) };
+				document.getElementById('hand').append(newCard);
+			}
+		}
+
+		function redCount() {
+			let allImgs = document.getElementById('hand').querySelectorAll('img');
+			
+			for (var i = 0; i < allImgs.length; i++) {
+				if (allImgs[i].style.backgroundColor == 'red' && !onlySelectedImgs.includes(allImgs[i].id)) onlySelectedImgs.push(allImgs[i].id); 
+			}
+
+			if (onlySelectedImgs.length == 2) document.getElementById('playButton').style.display = 'initial';
+			else document.getElementById('playButton').style.display = 'none';
+
+			// document.getElementById('selection').innerHTML = "Selected images: " + onlySelectedImgs;		alert(currCount + ' '+ onlySelectedImgs.length);
+			// if (currCount != onlySelectedImgs.length) console.log(onlySelectedImgs);
+		}
+
+		function clearSelection() {
+			let allImgs = document.getElementById('hand').querySelectorAll('img');
+
+			for (var i = 0; i < allImgs.length; i++) {
+				if (allImgs[i].style.backgroundColor == 'red') allImgs[i].style.backgroundColor = ''; 
+			}
+			if (onlySelectedImgs.length) onlySelectedImgs = [];
+			redCount();
+		}
+
+		function selectCard(argument) { currCount = onlySelectedImgs.length;
+			let coolDownPos = argument.slice(-1);
+
+			if (document.getElementById(argument).style.backgroundColor == 'red'){
+				 	document.getElementById(argument).style.backgroundColor = '';
+				 	onlySelectedImgs.splice(onlySelectedImgs.indexOf(argument), 1);
+				}
+			else if (coolDown[coolDownPos]) {
+				if (coolDown[coolDownPos] == 2) alert('This card is in cooldown for 2 turns.');
+				else alert('This card is in cooldown until next turn.');
+			}
+			else if (onlySelectedImgs.length < 2 && turnOver) document.getElementById(argument).style.backgroundColor = 'red';
+		}
+
+		function playCards() {
+			if(confirm('Would you like to play '+ onlySelectedImgs[0].slice(0, onlySelectedImgs[0].length-1).toUpperCase() + ' and ' + onlySelectedImgs[1].slice(0, onlySelectedImgs[1].length-1).toUpperCase() +'?')){
+				
+				let secondChoice = onlySelectedImgs.pop();
+				let firstChoice = onlySelectedImgs.pop();
+				if (locations.includes(firstChoice.slice(0, firstChoice.length-1))) {
+					teleport(firstChoice.slice(-1), 1);
+				}
+				else if (weapons.includes(firstChoice.slice(0, firstChoice.length-1))) {
+					wield(firstChoice.slice(-1), 1);
+				}
+				else if (firstChoice.includes('right') || firstChoice.includes('left')) leftOrRight(firstChoice, 1);
+				else alert('ERROR: Played card is not yet implemented.');
+				
+				// console.log('Played '+firstChoice); 
+				turnOver = false;
+				document.getElementById('nextButton').style.display = 'initial';
+				document.getElementById('nextButton').onclick = function () {nextCards(secondChoice)};
+			}
+
+			clearSelection();
+		}
+
+		function nextCards(secondChoice) {
+			if (locations.includes(secondChoice.slice(0, secondChoice.length-1))) {
+					teleport(secondChoice.slice(-1), 1);
+				}
+			else if (weapons.includes(secondChoice.slice(0, secondChoice.length-1))) {
+					wield(secondChoice.slice(-1), 1);
+				}
+			else if (secondChoice.includes('right') || secondChoice.includes('left')) leftOrRight(secondChoice, 1);
+			else alert('ERROR: Played card is not yet implemented.');
+			// console.log('Played '+secondChoice);
+			document.getElementById('nextButton').style.display = 'none';
+			endTurn();
+		}
+
+		function endTurn() {
+			turnOver = true; 
+			turn++; 
+			
+			for (var i = coolDown.length - 1; i >= 0; i--) {
+				if (coolDown[i]) coolDown[i]--;
+			}
+
+			setTimeout(function () {alert('Turn '+turn)}, 500);
+		}
+
+		function leftOrRight(arg, playerNo){
+			if (playerNo == 1) {
+				if (arg.includes('r')) currLocation--;
+				else currLocation++;
+
+				if (currLocation<0) currLocation+= 5;
+				else if (currLocation>4) currLocation -= 5;
+
+				alert("Player moved " + arg.slice(0, arg.length-1).toUpperCase() + " to "+ locations[currLocation].toUpperCase());
+				console.log("Turn "+turn+ ": Player moved " + arg.slice(0, arg.length-1).toUpperCase() + " to "+ locations[currLocation].toUpperCase());
+			}
+			else {
+				if (arg.includes('r')) oppLocation--;
+				else oppLocation++;
+				
+				if (oppLocation<0) oppLocation+= 5;
+				else if (oppLocation>4) oppLocation -= 5;
+
+				alert("Opponent moved " + arg.slice(0, arg.length-1).toUpperCase() + " to "+ locations[oppLocation].toUpperCase());
+				console.log("Turn "+turn+ ": Opponent moved " + arg.slice(0, arg.length-1).toUpperCase() + " to "+ locations[oppLocation].toUpperCase());
+			}
+
+			displayPlayers();
+		}
+
+		function wield(arg, playerNo) {
+			let weaponNo = parseInt(arg);
+			weaponNo -= 7;
+
+			let gameMsg = "";
+
+			if (playerNo == 1) {
+				gameMsg = "Player wielded a "+ weapons[weaponNo].toUpperCase();
+
+				switch(weaponNo){
+					case 0: if (currLocation == oppLocation) {oppHealth--;
+								gameMsg += '. Successfully stabbed opponent!';
+							}
+							else gameMsg += '.. but missed.';
+						break;
+					case 1: if ((currLocation+4)%5 == oppLocation || (currLocation+1)%5 == oppLocation ){ oppHealth--;
+								gameMsg += '. Successfully shot opponent!';
+							}
+							else gameMsg += '.. but missed.';
+						break;
+					case 2: if ( (currLocation+3)%5 == oppLocation || (currLocation+2)%5 == oppLocation ){ oppHealth--;
+								gameMsg += '. Successfully sniped opponent!';
+							}
+							else gameMsg += '.. but missed.';
+						break;
+					default: alert('Issue firing weapon..');
+				}
+
+				alert(gameMsg);
+				console.log("Turn "+turn+ ": "+ gameMsg);
+				coolDown[weaponNo+7]+=2;
+			}
+			else { gameMsg = "Opponent wielded a "+ weapons[weaponNo].toUpperCase();
+
+				switch(weaponNo){
+					case 0: if (currLocation == oppLocation) {chooseToLose();
+								gameMsg += '. Successfully stabbed player1!';
+							}
+							else gameMsg += '.. but missed.';
+						break;
+					case 1: if ((oppLocation-1)%5 == currLocation || (oppLocation+1)%5 == currLocation ){ chooseToLose();
+								gameMsg += '. Successfully shot player1!';
+							}
+							else gameMsg += '.. but missed.';
+						break;
+					case 2: if ( (oppLocation-2)%5 == currLocation || (oppLocation+2)%5 == currLocation ){ chooseToLose();
+								gameMsg += '. Successfully sniped player1!';
+							}
+							else gameMsg += '.. but missed.';
+						break;
+					default: alert('Issue firing weapon..');
+				}
+				alert("Opponent used a "+ weapons[weaponNo].toUpperCase());
+				console.log("Turn "+turn+ ": "+ gameMsg);
+			}
+		}
+
+		function chooseToLose() {
+			let chosen = '';
+			let onlyPromptLocs = 'Pick which card you would like to lose to slip out of the strike:\n';
+
+			for (var i = 0; hand[i] != 'right'; i++) {
+					onlyPromptLocs += '\n' + hand[i].toUpperCase();
+				}
+			if(onlyPromptLocs.length <= 67) {
+				alert('No more cards to slip out of strike... You LOSE!');
+				return;
+			}
+
+			while (!hand.includes(chosen)) { //alert(chosen);
+				chosen = prompt(onlyPromptLocs).toLowerCase();
+				// if (chosen === null) chosen = '';
+				if (!hand.includes(chosen)) alert('This card is not in your hand. Type in a card from the list.');
+			}
+
+			hand.splice(hand.indexOf(chosen), 1);
+			displayHand();
+		}
+
+		function teleport(arg, playerNo){
+			let locNo = parseInt(arg);
+			if (playerNo == 1) {
+				currLocation = locNo;
+				alert("Player teleported to "+ locations[locNo].toUpperCase());
+				console.log("Turn "+turn+ ": Player teleported to "+ locations[currLocation].toUpperCase());
+				coolDown[locNo]+=3;
+			}
+			else {
+				oppLocation = locNo;
+				alert("Opponent teleported to "+ locations[locNo].toUpperCase());
+				console.log("Turn "+turn+ ": Opponent teleported to "+ locations[oppLocation].toUpperCase());
+			}
+			
+			displayPlayers();
+		}
+	</script>
+</head>
+<body> 
+	<!-- <span id="selection">Selected images: </span> -->
+<p id="locations"></p>
+<span id="handContainer" style="display: inline-flex;">
+<div id="hand"></div>
+<button id="playButton" onclick="playCards();" style="display: none;">Play</button>
+<button id="nextButton" style="display: none;">Next</button>
+</span>
+</body>
+</html>
