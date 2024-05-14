@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Village Pillage</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		const starter = ['farmer', 'wall', 'raider', 'merchant'];
+		var deck = ['florist', 'mason', 'ratcatcher', 'innkeeper', 'pickler', 'miner', 'labyrinth', 'cathedral', 'tollbridge', 'moat', 'treasury', 'dungeon', 'beserker', 'outlaw', 'veteran', 'burglar', 'cutpurse', 'trapper', 'bard', 'doctor'];
+		const isGreen = ['farmer', 'florist', 'mason', 'ratcatcher', 'innkeeper', 'pickler', 'miner'];
+		const isBlue = ['wall', 'labyrinth', 'cathedral', 'tollbridge', 'moat', 'treasury', 'dungeon'];
+		const isRed = ['beserker', 'outlaw', 'veteran', 'burglar', 'cutpurse', 'trapper'];
+		const isYellow = ['merchant', 'bard', 'doctor'];
+		var myHand = [], oppHand = [], shopCards = [], exhaustPile = [], shopOpen = false, turnips = 1, oppNips = 1, banked = 1, oppBank = 1, relics = 0, oppRelics=0, bothPlayedMerchant = false, turn = 0;
+
+		$(document).ready( function(){ //starter.push(deck.pop());
+			myHand = myHand.concat(starter);
+			oppHand = oppHand.concat(starter);
+			displayHand();
+
+			for (var i = 0; i <4; i++) {
+				shopCards.push(drawCard());
+			}
+
+			closeShop();
+		});
+
+		function displayHand() { 
+			document.getElementById('hand').innerHTML = '';
+
+			for (var i = 0; i < myHand.length; i++)
+			{
+				var newCard = document.createElement('img');
+				newCard.src = 'images/'+myHand[i]+'.png';
+				newCard.style = 'padding: 10px';
+				newCard.onclick = function(){
+				if (this.style.backgroundColor == 'yellow'){ 
+						clearSelection();
+						document.getElementById('playButton').style.display = 'none';
+						this.style.backgroundColor = 'initial';
+					}
+				else { clearSelection(); 
+						this.style.backgroundColor = 'yellow';
+						document.getElementById('playButton').style.display = 'initial';
+					}		 
+				};
+				document.getElementById('hand').append(newCard);
+			}
+		}
+
+		function drawCard() {
+			let drawnCard = 'Empty deck';
+			if (deck.length) drawnCard = deck.splice(Math.floor(Math.random()*deck.length), 1);
+			return drawnCard[0];
+		}
+
+		function closeShop() {
+			document.getElementById('shop').innerHTML='';
+			if (shopOpen) {
+				let shopIcon = document.createElement('img');
+				shopIcon.src = 'images/'+'hanging-sign'+'.png';
+				shopIcon.style = 'width: 150px;';
+				document.getElementById('shop').append(shopIcon);
+			}
+			else displayShop();
+			shopOpen = !shopOpen;
+		}
+
+		function displayShop() {
+			for (var i = 0; i < shopCards.length; i++)
+			{
+				newCard = document.createElement('img');
+				newCard.src = 'images/'+shopCards[i]+'.png';
+				newCard.style = 'padding: 10px';
+				document.getElementById('shop').append(newCard);
+			}
+		}
+
+		function clearSelection() {
+			for (var i = document.getElementById('hand').children.length - 1; i >= 0; i--) {
+				document.getElementById('hand').children[i].style.backgroundColor = 'initial';
+			}
+		}
+
+		function clearShopSelection() {
+			for (var i = document.getElementById('shop').children.length - 1; i >= 0; i--) {
+				document.getElementById('shop').children[i].style.backgroundColor = 'initial';
+			}
+		}
+
+		function playCard() { var selected = 0; turn++;
+			document.getElementById('playButton').style.display = 'none';
+
+			for (var i = document.getElementById('hand').children.length - 1; i >= 0; i--) {
+				if (document.getElementById('hand').children[i].style.backgroundColor === 'yellow') {selected = myHand[i];
+						clearSelection();
+					}
+				
+			}
+
+			let oppChoice = oppPlay();
+			alert('You played: '+selected + '\nOpponent played: '+oppChoice);
+			console.log('Turn '+turn+': Player played '+selected+'\nOpponent played '+oppChoice);
+			playOutcome(selected, oppChoice);
+			refreshExhaust();
+		}
+
+		function oppPlay() {
+			return oppHand[Math.floor(Math.random()*oppHand.length)];
+		}
+
+		function bankTurnips(amount) {
+			for (var i = 0; i < amount; i++) {
+				if (turnips && banked < 4) {
+					banked++; 
+					turnips--; 
+				}
+				else if (banked < 4) alert("You don't have any more turnips to bank..");
+				else alert('Your bank is full!');
+			}
+		}
+
+		function bankOppnips(amount) {
+			for (var i = 0; i < amount; i++) {
+				if (oppNips && oppBank < 4) {
+					oppBank++; 
+					oppNips--; 
+				}
+				else if (oppBank < 4) alert("Opponent didn't have any turnips to bank..");
+				else alert('Opponent bank is full!');
+			}
+		}
+
+		function stealTurnips(amount, evenBanked) {
+			for (var i = 0; i < amount; i++) {
+				if (oppNips) { turnips++; oppNips--; 
+					alert('Stole 1 turnip from Opponent!');
+				}
+				else if (evenBanked && oppBank) {turnips++; oppBank--; 
+					alert("Stole 1 turnip from Opponent's bank!");
+				}
+				else alert('Opponent has no turnips to steal!');
+			}
+		}
+
+		function oppStealTurnips(amount, evenBanked) {
+			for (var i = 0; i < amount; i++) {
+				if (turnips) { oppNips++; turnips--; 
+					alert('Opponent stole 1 turnip from you!');
+				}
+				else if (evenBanked && banked) {oppNips++; banked--; 
+					alert("Opponent stole 1 turnip from your bank!");
+				}
+				else alert('Opponent tried to steal but you have no more turnips !');
+			}
+		}
+
+		function playOutcome(player, opp) {
+			if (isGreen.includes(player) || isGreen.includes(opp)) {
+				if (player == 'farmer') turnips += 3;
+				else if (player == 'ratcatcher') {
+					if (isGreen.includes(opp)) turnips += 6;
+					else turnips += 4;
+				}
+				else if (player == 'pickler') { turnips += 4;
+					if (!isRed.includes(opp)) bankTurnips(2);
+				}
+				else if (player == 'florist') { turnips += 5;
+					if (isRed.includes(opp)) oppStealTurnips(2);
+				}
+				else if (player == 'mason') { turnips += 4;
+					if (isBlue.includes(opp)) { stealTurnips(1); bankTurnips(2);}
+				}
+				else if (player == 'innkeeper') { turnips += 4;
+					if (isYellow.includes(opp)) { turnips++; buyCards();}
+				}
+				else if (player == 'miner') { turnips += 4;
+					if (isBlue.includes(opp)) { turnips++; exhaustCard(opp, false);}
+				}
+
+				if (opp == 'farmer') oppNips += 3;
+				else if (opp == 'ratcatcher') {
+					if (isGreen.includes(player)) oppNips += 6;
+					else oppNips += 4;
+				}
+				else if (opp == 'pickler') { oppNips += 4;
+					if (!isRed.includes(player)) bankOppnips(2);
+				}
+				else if (opp == 'florist') { oppNips += 5;
+					if (isRed.includes(player)) stealTurnips(2);
+				}
+				else if (opp == 'mason') { oppNips += 4;
+					if (isBlue.includes(player)) { oppStealTurnips(1); bankOppnips(2);}
+				}
+				else if (opp == 'innkeeper') { oppNips += 4;
+					if (isYellow.includes(player)) { oppNips++; oppBuysCard();}
+				}
+				else if (opp == 'miner') { oppNips += 4;
+					if (isBlue.includes(player)) { oppNips++; exhaustCard(player, true);}
+				}
+			}
+
+			if (isBlue.includes(player) || isBlue.includes(opp)) {
+				if (player == 'wall') {
+					if (isRed.includes(opp)) {
+						stealTurnips(1, false);
+						bankTurnips(1);
+					}
+					else { turnips++; bankTurnips(1); }
+				}
+				else if (player == 'treasury') {
+					if (isRed.includes(opp)) {
+						stealTurnips(2, false);
+						bankTurnips(4);
+					}
+					else { turnips++; bankTurnips(4); }
+				}
+				else if (player == 'dungeon') {
+					if (isRed.includes(opp) || isBlue.includes(opp)) {
+						turnips++;
+						stealTurnips(1, false);
+						bankTurnips(1);
+					}
+					else { turnips++; bankTurnips(2); }
+				}
+				else if (player == 'cathedral') {
+					if (isRed.includes(opp)) {
+						stealTurnips(3, false);
+						bankTurnips(1);
+					}
+					else if (turnips+banked) {
+							buyCards();
+							if (turnips) turnips--;
+							else banked--;
+					}
+					else alert('You do not have enough turnips to buy a card. :(');
+				}
+				else if (player == 'moat') {
+					if (isRed.includes(opp)) { turnips+=2;
+						stealTurnips(3, false);
+					}
+					else if (isGreen.includes(opp)) oppNips++;
+					else bankTurnips(2);
+				}
+				else if (player == 'tollbridge') {
+					if (isRed.includes(opp) || isYellow.includes(opp)) {
+						stealTurnips(2, true);
+					}
+					else bankTurnips(2);
+				}
+				else if (player == 'labyrinth') {
+					if (isRed.includes(opp)) {
+						stealTurnips(3, false);
+						exhaustCard(opp, false);
+					}
+					else { turnips++; bankTurnips(2); }
+				}
+
+				if (opp == 'wall') {
+					if (isRed.includes(player)) {
+						oppStealTurnips(1, false);
+						bankOppnips(1);
+					}
+					else { oppNips++; bankOppnips(1); }
+				}
+				else if (opp == 'treasury') {
+					if (isRed.includes(player)) {
+						oppStealTurnips(2, false);
+						bankOppnips(4);
+					}
+					else { oppNips++; bankOppnips(4); }
+				}
+				else if (opp == 'dungeon') {
+					if (isRed.includes(player) || isBlue.includes(player)) {
+						oppNips++;
+						oppStealTurnips(1, false);
+						bankOppnips(1);
+					}
+					else { oppNips++; bankOppnips(2); }
+				}
+				else if (opp == 'cathedral') {
+					if (isRed.includes(player)) {
+						oppStealTurnips(3, false);
+						bankOppnips(1);
+					}
+					else if (oppNips+oppBank) {
+							oppBuysCard();
+							if (oppNips) oppNips--;
+							else oppBank--;
+					}
+					else alert('Opponent did not have enough turnips to buy a card..');
+				}
+				else if (opp == 'moat') {
+					if (isRed.includes(player)) { oppNips+=2;
+						oppStealTurnips(3, false);
+					}
+					else if (isGreen.includes(player)) turnips++;
+					else bankOppnips(2);
+				}
+				else if (opp == 'tollbridge') {
+					if (isRed.includes(player) || isYellow.includes(player)) {
+						oppStealTurnips(2, true);
+					}
+					else bankOppnips(2);
+				}
+				else if (opp == 'labyrinth') {
+					if (isRed.includes(player)) {
+						oppStealTurnips(3, false);
+						exhaustCard(player, true);
+					}
+					else { turnips++; bankOppnips(2); }
+				}
+			}
+
+			if (isRed.includes(player) || isRed.includes(opp)) {
+				if (player == 'raider') {
+					if (isGreen.includes(opp) || isYellow.includes(opp)) stealTurnips(4, false);
+				}
+				else if (player == 'burglar') {
+					if (isGreen.includes(opp) || isYellow.includes(opp)) stealTurnips(4, true);
+				}
+				else if (player == 'trapper') {
+					if (isGreen.includes(opp) || isYellow.includes(opp)) {
+						stealTurnips(4, false);
+						turnips++;
+					}
+					else if (isRed.includes(opp)) stealTurnips(1, false);
+				}
+				else if (player == 'cutpurse') {
+					if (isGreen.includes(opp) || isYellow.includes(opp)) stealTurnips(6, false);
+					else if (isRed.includes(opp)) oppNips++;
+				}
+				else if (player == 'beserker') {
+					if (isGreen.includes(opp) || isYellow.includes(opp)) stealTurnips(6, false);
+					else if (isBlue.includes(opp)) oppNips++;
+				}
+				else if (player == 'outlaw') {
+					if (isGreen.includes(opp)) stealTurnips(5, false);
+					else if (isYellow.includes(opp)) {stealTurnips(4, false); buyCards();}
+				}
+				else if (player == 'veteran') {
+					if (isGreen.includes(opp) || isYellow.includes(opp)) {
+						stealTurnips(6, false);
+						exhaustCard('veteran', true);
+					}
+				}
+
+				if (opp == 'raider') {
+					if (isGreen.includes(player) || isYellow.includes(player)) 
+					oppStealTurnips(4, false);
+				}
+				else if (opp == 'burglar') {
+					if (isGreen.includes(player) || isYellow.includes(player)) 
+					oppStealTurnips(4, true);
+				}
+				else if (opp == 'trapper') {
+					if (isGreen.includes(player) || isYellow.includes(player)) {oppStealTurnips(4, false);
+						oppNips++;
+					}
+					else if (isRed.includes(player)) oppStealTurnips(1, false);
+				}
+				else if (opp == 'cutpurse') {
+					if (isGreen.includes(player) || isYellow.includes(player)) oppStealTurnips(6, false);
+					else if (isRed.includes(player)) turnips++;
+				}
+				else if (opp == 'beserker') {
+					if (isGreen.includes(player) || isYellow.includes(player)) oppStealTurnips(6, false);
+					else if (isBlue.includes(player)) turnips++;
+				}
+				else if (opp == 'outlaw') {
+					if (isGreen.includes(player)) oppStealTurnips(5, false);
+					else if (isYellow.includes(player)) {oppStealTurnips(4, false); oppBuysCard();}
+				}
+				else if (opp == 'veteran') {
+					if (isGreen.includes(player) || isYellow.includes(player)) {
+						oppStealTurnips(6, false);
+						exhaustCard('veteran', false);
+					}
+				}
+			}
+
+			if (isYellow.includes(player) || isYellow.includes(opp)) {
+				if (player == 'merchant') { let relicCost = 6+relics;
+					if (turnips+banked >= relicCost) buyRelic(relicCost, true);
+					else if (turnips+banked) {
+						buyCards();
+						if (turnips) turnips--;
+						else banked--;
+					}
+					else alert('You do not have enough turnips to buy a card. :(');
+
+					if (opp == 'merchant') bothPlayedMerchant = true; // should be b4 buycards?
+				}
+				else if (player == 'bard') { let relicCost = 6+relics;
+					if (turnips+banked >= relicCost) buyRelic(relicCost, true);
+					else {
+						myHand.push(drawCard());
+						turnips++;
+					}
+				}
+				else if (player == 'doctor') { let relicCost = 6+relics;
+					if (turnips+banked >= relicCost) buyRelic(relicCost, true);
+					else {
+						turnips+=2;
+						exhaustCard(opp, false);
+					}
+				}
+
+				if (opp == 'merchant' && player != 'merchant') oppPlayedMerchant();
+				else if (opp == 'bard') { let relicCost = 6+relics;
+					if (oppNips+oppBank >= relicCost) buyRelic(relicCost, false);
+					else {    
+						oppHand.push(drawCard());
+						oppNips++;
+					}
+				}
+				else if (opp == 'doctor') { let relicCost = 6+relics;
+					if (oppNips+oppBank >= relicCost) buyRelic(relicCost, false);
+					else {
+						oppNips+=2;
+						exhaustCard(player, true);
+					}
+				}
+			}
+			
+			// refreshExhaust();
+			displayHand();
+			document.getElementById('stockpile').innerHTML = 'Turnips: '+ turnips;
+			document.getElementById('oppStockpile').innerHTML = 'Opponent: '+ oppNips;
+			document.getElementById('bank').children[0].src = 'images/bankduel'+relics+banked+'.png' ;
+			document.getElementById('oppBank').children[0].src = 'images/bankduel'+oppRelics+oppBank+'.png' ;
+		}
+
+		function oppPlayedMerchant() { let relicCost = 6+oppRelics;
+			if (oppNips+oppBank >= relicCost) buyRelic(relicCost, false);
+			else if (oppNips+oppBank) { 
+				oppBuysCard();
+				if (oppNips) oppNips--;
+				else oppBank--;
+			}
+			else alert('Opponent did not have enough turnips to buy a card..');
+		}
+
+		function buyRelic(relicCost, isPlayer) {
+			if (isPlayer) {
+				alert("Congratulations! You bought a relic!");
+				while(relicCost > 0) {
+					if (turnips) {
+						turnips--;
+						relicCost--;
+					}
+					else {
+						banked--;
+						relicCost--;
+					}
+				}
+				relics++;
+			}
+
+			else { alert("Uh-oh! Opponent bought a relic!");
+				while(relicCost > 0) {
+					if (oppNips) {
+						oppNips--;
+						relicCost--;
+					}
+					else {
+						oppBank--;
+						relicCost--;
+					}
+				}
+				oppRelics++;
+			}
+		}
+
+		function buyCards() { // Remove ability to select hand cards
+			closeShop(); // To open shop
+			document.getElementById('shop').onclick = '';
+
+			let shopItems = document.getElementById('shop').children;
+			for (var i = shopItems.length - 1; i >= 0; i--) {
+				shopItems[i].onclick = function(){
+				if (this.style.backgroundColor == 'yellow'){ 
+						clearShopSelection();
+						document.getElementById('buyButton').style.display = 'none';
+						this.style.backgroundColor = 'initial';
+					}
+				else { clearShopSelection(); 
+						this.style.backgroundColor = 'yellow';
+						document.getElementById('buyButton').style.display = 'initial';
+					}		 
+				};
+			}
+		}
+
+		function buySelectedCard() {
+			document.getElementById('shop').onclick = closeShop;
+
+			let shopItems = document.getElementById('shop').children;
+			for (var i = shopItems.length - 1; i >= 0; i--) {
+				if (shopItems[i].style.backgroundColor === 'yellow') {
+						let boughtCard = shopItems[i].src.slice(52);
+						boughtCard = boughtCard.split('.')[0];
+						alert('You bought '+ boughtCard);
+						myHand.push(boughtCard);
+						console.log('Turn '+turn+ ': Player bought '+ boughtCard);
+						shopCards.splice(i, 1);
+						shopCards.push(drawCard());
+						clearShopSelection();
+					}
+				shopItems[i].onclick = '';
+			}
+
+ 			closeShop();
+			displayHand();
+			document.getElementById('buyButton').style.display = 'none';
+			if (bothPlayedMerchant) { bothPlayedMerchant = false;
+				oppPlayedMerchant();
+			}
+		}
+
+		function oppBuysCard() {
+			let oppRand = Math.floor(Math.random()*4);
+			let boughtCard = shopCards[oppRand];
+			console.log('Turn '+turn+ ': Opponent bought '+ boughtCard);
+			alert('Opponent bought '+ boughtCard);
+			oppHand.push(boughtCard);
+			
+			shopCards.splice(oppRand, 1); 
+			shopCards.push(drawCard());
+		}
+
+		function exhaustCard(card, isPlayer) { 
+			if (isPlayer) { // take it out of hand
+				myHand.splice(myHand.indexOf(card), 1);
+			}
+			else oppHand.splice(oppHand.indexOf(card), 1);
+
+			let newExhaust = [];
+			newExhaust.push(card);
+			newExhaust.push(turn); // ensure to keep track of turn each card entered exhaust
+			newExhaust.push(isPlayer); // and who it belongs to
+			exhaustPile.push(newExhaust);
+			
+			// display in exhaust
+			displayExhaust();
+
+			// displayHand();
+			document.getElementById('exhaust').style.display = 'initial';
+		}
+
+		function displayExhaust() {
+			document.getElementById('exhaust').innerHTML = 'Exhaust<hr>';
+
+			for (var i = 0; i < exhaustPile.length; i++) {
+				let exhaustedCard = document.createElement('img');
+				exhaustedCard.src = 'images/'+exhaustPile[i][0]+'.png';
+				document.getElementById('exhaust').append(exhaustedCard);
+			}
+		}
+
+		function refreshExhaust() {
+			// clear exhaust of cards that have been there for 1 turn & return it their hand
+			for (var i = 0; i < exhaustPile.length; i++) { let currCard = exhaustPile[i];
+				// console.log(turn+' ' +parseInt(currCard[1]))
+				if (turn > parseInt(currCard[1])) {
+					if (currCard[2]) myHand.push(currCard[0]);
+					else oppHand.push(currCard[0]);
+					exhaustPile.splice(i, 1);
+				}
+			}
+
+			// displayHand();
+			if (exhaustPile.length) displayExhaust();
+			else document.getElementById('exhaust').style.display = 'none';
+		}
+	</script>
+	<style type="text/css">
+		img:hover {
+			cursor: pointer;
+		}
+
+		#hand {
+			position: absolute;
+			left: 25%;
+			top: 30%;
+		}
+
+		#bank {
+			position: absolute;
+			left: 5%;
+			top: 35%;
+		}
+
+		#oppBank {
+			position: absolute;
+			left: 75%;
+		}
+
+		#shop {
+			position: absolute;
+			left: 10%;
+			top: 8%;
+			z-index: 1;
+			text-align: center;
+			font-size: 25px;
+		}
+
+		#stockpile, #oppStockpile {
+			position: absolute;
+			left: 8%;
+			top: 85%;
+			font-size: 55px;
+		}
+
+		#oppStockpile {
+			top: -5%;
+		}
+
+		#hand img{
+			width: 20%;
+		}
+
+		#bank img:hover {
+			cursor: initial;
+		}
+
+		#oppBank img:hover {
+			cursor: initial;
+		}
+
+		#oppBank img {
+			transform: rotate(180deg);
+			width: 160px;
+		}
+
+		#shop img{
+			width: 20%;
+		}
+
+		#shop:hover {
+			cursor: pointer;
+		}
+
+		#exhaust {
+			position: absolute;
+			left: 75%;
+			top: 55%;
+			text-align: center;
+			font-size: 30px;
+		}
+
+		#exhaust img {
+			width: 200px;
+		}
+
+		#exhaust img:hover {
+			cursor: initial;
+		}
+
+		button {
+			font-size: 50px;
+		}
+
+		p {
+			border: solid;
+			width: fit-content;
+		}
+	</style>
+</head>
+<body>
+<p id="shop" onclick="closeShop()"></p>
+<p id="bank"><img src="images/bankduel01.png"></p>
+<p id="oppBank"><img src="images/bankduel01.png"></p>
+<p id="hand"></p>
+<p id="exhaust" style="display: none;"></p>
+<p id="stockpile">Turnips: 1</p><p id="oppStockpile">Opponent: 1</p>
+<button id="playButton" onclick="playCard()" style="display: none; position: absolute; left: 45%; top: 76%;">PLAY</button>
+<button id="buyButton" onclick="buySelectedCard()" style="display: none; position: absolute; left: 45%; top: 76%;">BUY</button>
+</body>
+</html>
