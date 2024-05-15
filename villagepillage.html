@@ -499,7 +499,7 @@
 			let shopItems = document.getElementById('shop').children;
 			for (var i = shopItems.length - 1; i >= 0; i--) {
 				if (shopItems[i].style.backgroundColor === 'yellow') {
-						let boughtCard = shopItems[i].src.slice(shopItems[i].src.indexOf('/images/'));
+						let boughtCard = shopItems[i].src.slice(shopItems[i].src.indexOf('/images/')+8);
 						boughtCard = boughtCard.split('.')[0];
 						alert('You bought '+ boughtCard);
 						myHand.push(boughtCard);
