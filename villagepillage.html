@@ -104,6 +104,16 @@
 			console.log('Turn '+turn+': Player played '+selected+'\nOpponent played '+oppChoice);
 			playOutcome(selected, oppChoice);
 			refreshExhaust();
+			checkWin();
+		}
+
+		function checkWin() {
+			if(relics == 3) { alert('~You bought your 3rd relic~\nYOU WIN!');
+				relics=0;
+			}
+			else if (oppRelics == 3) { alert('~Opponent bought 3rd relic~\nYou lose..');
+				oppRelics = 0;
+			}
 		}
 
 		function oppPlay() {
