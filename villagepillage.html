@@ -142,28 +142,40 @@
 			}
 		}
 
-		function stealTurnips(amount, evenBanked) {
+		function stealTurnips(amount, evenBanked) { let stolen = 0;
 			for (var i = 0; i < amount; i++) {
 				if (oppNips) { turnips++; oppNips--; 
-					alert('Stole 1 turnip from Opponent!');
+					console.log('Stole 1 turnip from Opponent!');
+					stolen++;
 				}
 				else if (evenBanked && oppBank) {turnips++; oppBank--; 
-					alert("Stole 1 turnip from Opponent's bank!");
+					console.log("Stole 1 turnip from Opponent's bank!");
+					stolen++;
 				}
-				else alert('Opponent has no turnips to steal!');
+				else console.log('Opponent has no turnips to steal!');
 			}
+			if (stolen) {
+				if (stolen == 1) alert('Stole 1 turnip from Opponent!');
+				else alert('Stole '+stolen+' turnips from Opponent!');
+			}
+			else alert('Opponent had no turnips to steal!');
 		}
 
-		function oppStealTurnips(amount, evenBanked) { console.log("opp trying to steal turnips");
-			for (var i = 0; i < amount; i++) { console.log("stealing attempt "+i+" out of "+amount);
+		function oppStealTurnips(amount, evenBanked) { let oppStolen = 0;
+			for (var i = 0; i < amount; i++) {
 				if (turnips) { oppNips++; turnips--; 
-					alert('Opponent stole 1 turnip from you!');
+					console.log('Opponent stole 1 turnip from you!');
 				}
 				else if (evenBanked && banked) {oppNips++; banked--; 
-					alert("Opponent stole 1 turnip from your bank!");
+					console.log("Opponent stole 1 turnip from your bank!");
 				}
-				else alert('Opponent tried to steal but you have no more turnips !');
+				else console.log('Opponent tried to steal but you have no more turnips !');
 			}
+			if (oppStolen) {
+				if (oppStolen == 1) alert('Opponent stole 1 turnip from you!');
+				else alert("Opponent stole '+oppStolen+' turnips from you!");
+			}
+			else alert('Opponent tried to steal but you have no more turnips !');
 		}
 
 		function playOutcome(player, opp) {
@@ -594,6 +606,7 @@
 			position: absolute;
 			left: 25%;
 			top: 30%;
+			width: 66%;
 		}
 
 		#bank {
