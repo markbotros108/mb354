@@ -144,8 +144,8 @@
 			}
 		}
 
-		function oppStealTurnips(amount, evenBanked) {
-			for (var i = 0; i < amount; i++) {
+		function oppStealTurnips(amount, evenBanked) { console.log("opp trying to steal turnips");
+			for (var i = 0; i < amount; i++) { console.log("stealing attempt "+i+" out of "+amount);
 				if (turnips) { oppNips++; turnips--; 
 					alert('Opponent stole 1 turnip from you!');
 				}
