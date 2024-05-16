@@ -312,7 +312,7 @@
 					else { turnips++; bankOppnips(2); }
 				}
 			}
-
+			console.log(isRed.includes(opp) + ' ' + opp);
 			if (isRed.includes(player) || isRed.includes(opp)) {
 				if (player == 'raider') {
 					if (isGreen.includes(opp) || isYellow.includes(opp)) stealTurnips(4, false);
@@ -345,7 +345,7 @@
 						exhaustCard('veteran', true);
 					}
 				}
-
+				console.log('testing for raider: '+(opp == 'raider') + ' opp: ' + opp)
 				if (opp == 'raider') { console.log('raider reached');
 					if (isGreen.includes(player) || isYellow.includes(player)) {
 					oppStealTurnips(4, false); console.log('steal reached');}
