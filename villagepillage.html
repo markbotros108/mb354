@@ -10,7 +10,7 @@
 		var deck = ['florist', 'mason', 'ratcatcher', 'innkeeper', 'pickler', 'miner', 'labyrinth', 'cathedral', 'tollbridge', 'moat', 'treasury', 'dungeon', 'beserker', 'outlaw', 'veteran', 'burglar', 'cutpurse', 'trapper', 'bard', 'doctor'];
 		const isGreen = ['farmer', 'florist', 'mason', 'ratcatcher', 'innkeeper', 'pickler', 'miner'];
 		const isBlue = ['wall', 'labyrinth', 'cathedral', 'tollbridge', 'moat', 'treasury', 'dungeon'];
-		const isRed = ['beserker', 'outlaw', 'veteran', 'burglar', 'cutpurse', 'trapper'];
+		const isRed = ['raider', 'beserker', 'outlaw', 'veteran', 'burglar', 'cutpurse', 'trapper'];
 		const isYellow = ['merchant', 'bard', 'doctor'];
 		var myHand = [], oppHand = [], shopCards = [], exhaustPile = [], shopOpen = true, turnips = 1, oppNips = 1, banked = 1, oppBank = 1, relics = 0, oppRelics=0, bothPlayedMerchant = false, turn = 0;
 
@@ -312,7 +312,7 @@
 					else { turnips++; bankOppnips(2); }
 				}
 			}
-			console.log(isRed.includes(opp) + ' ' + opp);
+			
 			if (isRed.includes(player) || isRed.includes(opp)) {
 				if (player == 'raider') {
 					if (isGreen.includes(opp) || isYellow.includes(opp)) stealTurnips(4, false);
@@ -345,10 +345,10 @@
 						exhaustCard('veteran', true);
 					}
 				}
-				console.log('testing for raider: '+(opp == 'raider') + ' opp: ' + opp)
-				if (opp == 'raider') { console.log('raider reached');
-					if (isGreen.includes(player) || isYellow.includes(player)) {
-					oppStealTurnips(4, false); console.log('steal reached');}
+				
+				if (opp == 'raider') {
+					if (isGreen.includes(player) || isYellow.includes(player))
+					oppStealTurnips(4, false); 
 				}
 				else if (opp == 'burglar') {
 					if (isGreen.includes(player) || isYellow.includes(player)) 
