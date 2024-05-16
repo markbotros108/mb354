@@ -346,9 +346,9 @@
 					}
 				}
 
-				if (opp == 'raider') {
-					if (isGreen.includes(player) || isYellow.includes(player)) 
-					oppStealTurnips(4, false);
+				if (opp == 'raider') { console.log('raider reached');
+					if (isGreen.includes(player) || isYellow.includes(player)) {
+					oppStealTurnips(4, false); console.log('steal reached');}
 				}
 				else if (opp == 'burglar') {
 					if (isGreen.includes(player) || isYellow.includes(player)) 
