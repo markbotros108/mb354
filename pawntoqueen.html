@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Pawn to Queen challenge</title>
+	<script type="text/javascript">
+		const chessPieces = ['rook', 'bishop', 'knight'];
+		let emptySquare = 0;
+
+		function startGame() {		emptySquare = 12;
+			for (var i = chessPieces.length - 1; i >= 0; i--) {
+				let row = document.createElement('tr');
+				for (var j = 0; j < 4; j++) {
+					let piece = document.createElement('td');
+					let pieceIcon = document.createElement('img');
+					pieceIcon.src = 'images/chess-'+ chessPieces[i] + '.png';
+					pieceIcon.onclick = movePiece;
+					piece.append(pieceIcon);
+					row.append(piece);
+				}
+				document.getElementById('gameboard').append(row);
+			}
+
+			let finalRow = document.createElement('tr');
+			for (var k = 0; k < 4; k++) {
+				let finalPiece = document.createElement('td');
+				let finalPieceIcon = document.createElement('img');
+
+					if (k==0) finalPieceIcon.src = 'images/white.png';
+					else if (k==3) finalPieceIcon.src = 'images/pawn.png';
+					else finalPieceIcon.src = 'images/red.png';
+
+				finalPieceIcon.onclick = movePiece;
+				finalPiece.append(finalPieceIcon);
+				finalRow.append(finalPiece);
+			}
+			document.getElementById('gameboard').append(finalRow);
+		}
+
+		function movePiece() {
+			let allImgs = document.getElementsByTagName('img');
+			let selectedPiece = 'ERROR', selectedImg;
+
+			for (var i = allImgs.length - 1; i >= 0; i--) {
+				if (this == allImgs[i]) {selectedPiece = i;
+					selectedImg = this.src;
+				}
+			}
+
+			allImgs[selectedPiece].src = 'images/white.png'
+			if (selectedImg.includes('pawn') && emptySquare < 4) { alert('Promoted Pawn to Queen!');
+				allImgs[emptySquare].src = 'images/chess-queen.png';
+			}
+			else allImgs[emptySquare].src = selectedImg;
+			emptySquare = selectedPiece;
+			console.log('Player moved ' + selectedPiece);
+		}
+	</script>
+	<style type="text/css">
+		#gameboard, #start {
+			position: absolute;
+			left: 30%;
+		}
+
+		#start {
+			top: 70%;
+			left: 35%;
+			font-size: 80px;
+		}
+
+		table, td {
+			border: solid burlywood;
+		}
+
+		img {
+			width: 100px;
+		}
+
+		td:hover {
+/*			cursor: pointer;*/
+		}
+	</style>
+</head>
+<body>
+<table id="gameboard">
+</table>
+<button id="start" onclick="startGame()">Reset</button>
+</body>
+</html>
