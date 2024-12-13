@@ -51,6 +51,7 @@
 			}
 
 			allImgs[selectedPiece].src = 'images/white.png'
+			if (selectedImg.includes('queen') && emptySquare == 12) alert('You completed the puzzle!\nWELL DONE!!');
 			if (selectedImg.includes('pawn') && emptySquare < 4) { alert('Promoted Pawn to Queen!');
 				allImgs[emptySquare].src = 'images/chess-queen.png';
 			}
