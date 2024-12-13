@@ -9,6 +9,8 @@
 		let emptySquare = 0;
 
 		function startGame() {		emptySquare = 12;
+		document.getElementById('gameboard').innerHTML = '';
+
 			for (var i = chessPieces.length - 1; i >= 0; i--) {
 				let row = document.createElement('tr');
 				for (var j = 0; j < 4; j++) {
