@@ -61,7 +61,7 @@
 				emptySquare = selectedPiece;
 				console.log('Player moved ' + selectedPiece);
 			}
-			else if(!selectedImg.includes('white') && selectedImg.includes('red')) alert("Invalid move");
+			else if(!selectedImg.includes('white') && !selectedImg.includes('red')) alert("Invalid move");
 		}
 
 		function checkValidMove(pieceName, pieceLocation) {
