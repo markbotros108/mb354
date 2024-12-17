@@ -50,7 +50,7 @@
 
 			if (checkValidMove(selectedImg, selectedPiece)) {
 				allImgs[selectedPiece].src = 'images/white.png'
-				if (selectedImg.includes('queen') && emptySquare == 12) alert('You completed the puzzle!\nWELL DONE!!');
+				if (selectedImg.includes('black') && emptySquare == 17) alert('You completed the puzzle!\nWELL DONE!!');
 				allImgs[emptySquare].src = selectedImg;
 				emptySquare = selectedPiece;
 				console.log('Player moved ' + selectedPiece);
