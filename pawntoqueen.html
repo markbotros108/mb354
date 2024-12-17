@@ -6,6 +6,7 @@
 	<title>Pawn to Queen challenge</title>
 	<script type="text/javascript">
 		const chessPieces = ['rook', 'bishop', 'knight'];
+		const knightMoves = [[6, 9], [7, 8, 10], [4, 9, 11], [5, 10], [2, 10], [3, 11, 12], [0, 8, 15], [1, 9], [1, 6], [0, 2, 7, 15], [1, 3, 4, 12], [2, 5], [5, 10], [], [], [6, 9]];
 		let emptySquare = 0;
 
 		function startGame() {		emptySquare = 12;
@@ -50,14 +51,41 @@
 				}
 			}
 
-			allImgs[selectedPiece].src = 'images/white.png'
-			if (selectedImg.includes('queen') && emptySquare == 12) alert('You completed the puzzle!\nWELL DONE!!');
-			if (selectedImg.includes('pawn') && emptySquare < 4) { alert('Promoted Pawn to Queen!');
-				allImgs[emptySquare].src = 'images/chess-queen.png';
+			if (checkValidMove(selectedImg, selectedPiece)) {
+				allImgs[selectedPiece].src = 'images/white.png'
+				if (selectedImg.includes('queen') && emptySquare == 12) alert('You completed the puzzle!\nWELL DONE!!');
+				if (selectedImg.includes('pawn') && emptySquare < 4) { alert('Promoted Pawn to Queen!');
+					allImgs[emptySquare].src = 'images/chess-queen.png';
+				}
+				else allImgs[emptySquare].src = selectedImg;
+				emptySquare = selectedPiece;
+				console.log('Player moved ' + selectedPiece);
 			}
-			else allImgs[emptySquare].src = selectedImg;
-			emptySquare = selectedPiece;
-			console.log('Player moved ' + selectedPiece);
+			else alert("Invalid move");
+		}
+
+		function checkValidMove(pieceName, pieceLocation) {
+			if (pieceName.includes('pawn')) {
+				if (pieceLocation > emptySquare && pieceLocation-emptySquare == 4) return true;
+			}
+			else if (pieceName.includes('queen')) {
+				if (emptySquare-pieceLocation == 1 || pieceLocation-emptySquare == 1) return true;
+				if (emptySquare-pieceLocation == 4 || pieceLocation-emptySquare == 4) return true;
+				if (emptySquare-pieceLocation == 5 || pieceLocation-emptySquare == 5) return true;
+				if (emptySquare-pieceLocation == 3 || pieceLocation-emptySquare == 3) return true;
+			}
+			else if (pieceName.includes('rook')) {
+				if (emptySquare-pieceLocation == 4 || pieceLocation-emptySquare == 4) return true;
+				if (emptySquare-pieceLocation == 1 || pieceLocation-emptySquare == 1) return true;
+			}
+			else if (pieceName.includes('bishop')) {
+				if (emptySquare-pieceLocation == 5 || pieceLocation-emptySquare == 5) return true;
+				if (emptySquare-pieceLocation == 3 || pieceLocation-emptySquare == 3) return true;
+			}
+			else if (pieceName.includes('knight')) {
+				if (knightMoves[pieceLocation].includes(emptySquare)) return true;
+			}
+			else return false;
 		}
 	</script>
 	<style type="text/css">
