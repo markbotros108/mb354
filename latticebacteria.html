@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Lattice Bacteria</title>
+</head>
+<body>
+	<h1>Click button to play:</h1>
+	<p id="gameBoard"></p>
+	<button id="resetButton" onclick="showBoard();">Start Game</button>
+<script>
+	
+function showBoard() { 
+	document.getElementById('resetButton').style.display = "none";
+ 	document.getElementById('gameBoard').innerHTML = "";
+
+let newTable = document.createElement('table');
+
+	for (var i = 0; i < 5; i++) {
+		let newRow = document.createElement("tr"); 
+
+		for (var j = 0; j < 5; j++) {
+			let newSquare = document. createElement('td');
+	 	 	newSquare.id = idCount--; 
+		 	 if (idCount == 4) newSquare.style.backgroundColor = "red"; 
+		 	 else newSquare.style.backgroundColor = "white"; 
+		 	 newSquare.style.border = 'solid';
+		 	 newSquare.style.width = '100px';
+		 	 newSquare.style.height = '30px';
+		 	 newSquare.onclick = replicate; 
+		 	 newRow.append(newSquare);}
+
+		 newTable.append(newRow);
+		}
+
+document.getElementById('gameBoard').append(newTable); 
+}
+
+	var idCount = 25;
+
+function replicate() { let s = parseInt(this.id);
+ 		let next = parseInt(s-1); let up = parseInt(s+5); console.log(next +' '+ up);
+ 		if(next && up<26)
+			if (document.getElementById(s).style.backgroundColor == "red" && document.getElementById(next).style.backgroundColor == 'white' && document. getElementById(up).style.backgroundColor == 'white'){
+				if (next%5) document.getElementById(next).style.backgroundColor = 'red';
+				document.getElementById(up).style.backgroundColor = 'red';
+			 	document.getElementById(s).style.backgroundColor = "white";
+			}
+		// else if (next%5 && up>25 && document.getElementById(next).style.backgroundColor == 'white') document.getElementById(next).style.backgroundColor = 'red';
+		// else if (up<26) document.getElementById(up).style.backgroundColor = 'red';
+}
+</script>
+</body>
+</html>
