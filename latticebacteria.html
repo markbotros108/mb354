@@ -11,7 +11,7 @@
 	<button id="resetButton" onclick="showBoard();">Start Game</button>
 <script>
 	
-function showBoard() { 
+function showBoard() { var idCount = 25;
 	//document.getElementById('resetButton').style.display = "none";
  	document.getElementById('gameBoard').innerHTML = "";
 
@@ -36,8 +36,6 @@ let newTable = document.createElement('table');
 
 document.getElementById('gameBoard').append(newTable); 
 }
-
-	var idCount = 25;
 
 function replicate() { let s = parseInt(this.id);
  		let next = parseInt(s-1); let up = parseInt(s+5); console.log(next +' '+ up);
